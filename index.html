@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sentinela Segurança</title>
+<meta name="description" content="Instalação de CFTV e monitoramento remoto de câmeras para residências. Veja sua casa pelo celular, em tempo real.">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Sora:wght@300;400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0A0A0B; --ink:#F2F2F0; --ink-2:rgba(242,242,240,.66); --ink-3:rgba(242,242,240,.42);
+  --line:rgba(255,255,255,.12); --glass:rgba(22,22,24,.46); --lime:#B9F53C; --rec:#FF4D4D;
+  --f-display:"Michroma","Eurostile","Arial Black",system-ui,sans-serif;
+  --f-body:"Sora","Helvetica Neue",Arial,system-ui,sans-serif;
+  --gut:max(20px, env(safe-area-inset-left,0px)); --gut-r:max(20px, env(safe-area-inset-right,0px));
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{margin:0;color:var(--ink);font-family:var(--f-body);font-weight:300;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+:focus-visible{outline:1.5px solid var(--ink);outline-offset:3px;border-radius:999px}
+.display{font-family:var(--f-display);font-weight:400;text-transform:uppercase;letter-spacing:.01em;line-height:1.08;margin:0}
+.thin{color:var(--ink-3)}
+svg{display:block}
+
+/* ---------- stage ---------- */
+#stage{position:fixed;inset:0;z-index:0}
+#stage canvas{width:100%;height:100%;display:block;transition:opacity .6s}
+#stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0,0,0,.55) 100%)}
+body.dim #stage canvas{opacity:.28}
+#clips{position:fixed;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
+#film{position:relative;z-index:10;height:620vh}
+
+/* ---------- chrome ---------- */
+.nav{position:fixed;top:env(safe-area-inset-top);left:0;right:0;z-index:40;padding:0 var(--gut-r) 0 var(--gut)}
+.nav::before{content:"";position:absolute;inset:calc(-1 * env(safe-area-inset-top)) 0 -18px;background:linear-gradient(rgba(10,10,11,.92) 60%,rgba(10,10,11,0));opacity:0;transition:opacity .5s;pointer-events:none;z-index:-1}
+body.dim .nav::before{opacity:1}
+.nav .row{position:relative;height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-size:11px;letter-spacing:.18em;text-transform:uppercase}
+.links{display:flex;gap:44px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.links a{transition:color .2s}
+.links a:hover{color:var(--ink)}
+.dots{display:grid;grid-template-columns:repeat(3,3px);gap:3px;padding:8px}
+.dots i{width:3px;height:3px;border-radius:50%;background:var(--ink-2)}
+.social{position:fixed;right:var(--gut-r);top:50%;transform:translateY(-50%);z-index:30;display:flex;flex-direction:column;gap:26px}
+.social a{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:9px;letter-spacing:.08em;color:var(--ink-2);border:1px solid var(--line);background:rgba(10,10,11,.4);transition:color .2s,border-color .2s}
+.social a:hover{color:var(--ink);border-color:var(--ink-3)}
+.chev{position:fixed;right:var(--gut-r);bottom:calc(22px + env(safe-area-inset-bottom));z-index:30;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);color:var(--ink-2);display:grid;place-items:center;background:rgba(10,10,11,.4);transition:transform .4s,color .2s}
+.chev:hover{color:var(--ink)}
+.chev.up{transform:rotate(180deg)}
+.loader{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:35;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);transition:opacity .6s;pointer-events:none}
+.loader.done{opacity:0}
+
+/* ---------- overlay layers ---------- */
+.layer{position:fixed;inset:0;z-index:10;pointer-events:none;padding:96px calc(var(--gut-r) + 56px) 48px var(--gut);transition:opacity .5s}
+.layer .in{position:relative;height:100%}
+body.dim .layer{opacity:0}
+.layer a,.layer button{pointer-events:auto}
+body.dim .layer a,body.dim .layer button{pointer-events:none}
+.fx{opacity:var(--o,0);transform:translateY(calc((1 - var(--o,0)) * 28px));visibility:hidden}
+.fx.on{visibility:visible}
+body.revealing .fx{transition:opacity .8s cubic-bezier(.22,.61,.36,1),transform .8s cubic-bezier(.22,.61,.36,1)}
+
+/* hero */
+.h-title{position:absolute;left:0;top:8%;font-size:clamp(30px,4.6vw,74px)}
+.h-title span{display:block}
+.h-title span:nth-child(2){padding-left:.62em}
+.h-sub{position:absolute;left:.4em;top:calc(8% + clamp(30px,4.6vw,74px) * 3.5);max-width:30ch;font-size:14px;color:var(--ink-2);margin:0}
+.h-cta{position:absolute;left:.4em;bottom:6%;display:flex;gap:10px}
+.buy{height:46px;padding:0 26px;border-radius:999px;background:var(--lime);color:#0A0A0B;font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;display:inline-flex;align-items:center;gap:10px;transition:filter .2s}
+.buy:hover{filter:brightness(1.08)}
+.arrow{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:rgba(10,10,11,.4);display:grid;place-items:center;transition:border-color .2s}
+.arrow:hover{border-color:var(--ink-3)}
+.play{position:absolute;left:49%;top:47%;width:62px;height:62px;border-radius:50%;background:rgba(20,20,22,.5);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);display:grid;place-items:center}
+.play svg{transform:translateX(3px)}
+
+.card{position:absolute;width:200px;padding:14px 16px 12px;border-radius:18px;background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);border:1px solid var(--line)}
+.card .top{display:flex;justify-content:space-between;align-items:center}
+.card .lbl{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);display:flex;align-items:center;gap:7px}
+.chip{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;color:var(--ink-2)}
+.rec{width:6px;height:6px;border-radius:50%;background:var(--rec);box-shadow:0 0 8px var(--rec);animation:blink 1.4s steps(2,start) infinite}
+@keyframes blink{to{opacity:.2}}
+.val{font-family:var(--f-display);font-size:30px;line-height:1;margin:12px 0 6px;font-variant-numeric:tabular-nums}
+.val small{font-family:var(--f-body);font-size:9px;letter-spacing:.12em;color:var(--ink-3);vertical-align:top;margin-left:6px}
+.c-live{right:2%;top:6%}
+.c-live svg.chart{width:100%;height:56px}
+.c-cov{right:16%;bottom:4%;width:178px}
+.gauge{position:relative;height:84px;margin-top:8px}
+.gauge svg{width:100%;height:84px}
+.gauge b{position:absolute;left:0;right:0;bottom:0;text-align:center;font-family:var(--f-display);font-weight:400;font-size:24px;line-height:1}
+.gauge b small{font-size:11px;margin-left:2px;color:var(--ink-2)}
+
+/* design */
+.m-title{position:absolute;left:0;top:10%;font-size:clamp(26px,3.3vw,50px)}
+.m-title .thin{display:block}
+.m-copy{position:absolute;left:.3em;top:calc(10% + clamp(26px,3.3vw,50px) * 2.5 + 18px);max-width:28ch;color:var(--ink-2);margin:0}
+.stats{position:absolute;right:0;bottom:8%;display:grid;gap:22px;text-align:right}
+.stat .n{font-family:var(--f-display);font-size:clamp(26px,2.6vw,38px);line-height:1}
+.stat .n small{font-family:var(--f-body);font-size:10px;letter-spacing:.14em;color:var(--ink-3);margin-left:6px}
+.stat .l{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-top:6px}
+
+/* breakdown */
+.x-title{position:absolute;left:0;top:2%;font-size:clamp(24px,3vw,46px)}
+.x-info{position:absolute;right:11%;bottom:2%;display:flex;align-items:center;gap:24px;max-width:480px}
+.dial{position:relative;width:132px;height:132px;flex:none}
+.dial canvas.ticks{width:100%;height:100%}
+.thumb{position:absolute;inset:26px;border-radius:50%;background:#141416;border:1px solid var(--line);overflow:hidden}
+.thumb canvas{width:100%;height:100%;display:block}
+.x-info h3{font-size:15px;font-weight:500;margin:0 0 10px}
+.x-info p{font-size:12.5px;color:var(--ink-2);max-width:40ch;margin:0}
+
+/* ---------- after the film ---------- */
+.after{position:relative;z-index:12}
+.panel{padding:120px calc(var(--gut-r) + 56px) 40px var(--gut)}
+.wrap{max-width:1180px;margin:0 auto}
+.eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+.panel h2{font-size:clamp(26px,3.4vw,48px);margin:16px 0 48px;max-width:20ch}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.cell{padding:26px 22px;border-radius:20px;background:var(--glass);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid var(--line)}
+.cell .n{font-family:var(--f-display);font-size:clamp(28px,3vw,44px);line-height:1}
+.cell .n small{font-family:var(--f-body);font-size:11px;letter-spacing:.12em;color:var(--ink-3);margin-left:6px}
+.cell p{font-size:13px;color:var(--ink-2);margin:12px 0 0}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.lay{padding:18px 20px;border-radius:16px;border:1px solid var(--line);background:rgba(10,10,11,.35)}
+.lay .k{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+.lay .v{font-weight:500;margin-top:4px}
+
+.svc{padding:26px 22px 24px;border-radius:20px;background:var(--glass);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid var(--line)}
+.svc .ic{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;color:var(--lime);margin-bottom:20px}
+.svc h3{font-size:15px;font-weight:500;margin:0 0 8px}
+.svc p{font-size:13px;color:var(--ink-2);margin:0}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.step{padding:20px 22px;border-radius:16px;border:1px solid var(--line);background:rgba(10,10,11,.35);display:flex;gap:16px;align-items:baseline}
+.step b{font-family:var(--f-display);font-weight:400;font-size:12px;color:var(--lime)}
+.step span{font-size:13px;color:var(--ink-2)}
+.step span strong{display:block;color:var(--ink);font-weight:500;font-size:14px;margin-bottom:2px}
+
+.final{text-align:center;padding:140px var(--gut-r) 120px var(--gut)}
+.final h2{font-size:clamp(30px,5vw,72px);margin:16px auto 18px;max-width:14ch}
+.final p{color:var(--ink-2);max-width:40ch;margin:0 auto 34px}
+.final .ctas{display:flex;justify-content:center;gap:10px}
+footer{padding:26px calc(var(--gut-r) + 56px) 34px var(--gut);border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--ink-3);background:rgba(10,10,11,.6)}
+
+/* ---------- responsive ---------- */
+@media (max-width:980px){
+  .links{display:none}
+  .c-cov{display:none}
+  .stats{gap:14px}
+  .grid4{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:640px){
+  .social{display:none}
+  .layer{padding:84px var(--gut-r) 28px var(--gut)}
+  .panel{padding:96px var(--gut-r) 32px var(--gut)}
+  footer{padding:24px var(--gut-r) 30px var(--gut)}
+  .h-title{top:2%}
+  .h-sub{top:calc(2% + clamp(30px,4.6vw,74px) * 3.5);font-size:13px}
+  .play{left:calc(50% - 31px);top:50%}
+  .c-live{right:0;top:auto;bottom:14%;width:170px}
+  .h-cta{bottom:2%}
+  .m-title{top:2%}
+  .m-copy{top:calc(2% + clamp(26px,3.3vw,50px) * 2.5 + 14px);font-size:13px}
+  .stats{left:0;right:44px;bottom:2%;grid-template-columns:repeat(3,1fr);text-align:left}
+  .x-title{top:2%}
+  .x-info{left:0;right:auto;bottom:2%;gap:16px}
+  .dial{width:96px;height:96px}
+  .thumb{inset:18px}
+  .x-info p{font-size:12px}
+  .grid4{grid-template-columns:repeat(2,1fr)}
+  .grid3{grid-template-columns:repeat(2,1fr)}
+  .grid3.svcs{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .final .ctas .buy{padding:0 20px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  #stage canvas{transition:none}
+  .rec{animation:none}
+}
+</style>
+</head>
+<body>
+
+<div id="stage" aria-hidden="true"><canvas id="cv"></canvas></div>
+<div id="clips" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="row">
+    <a class="brand" href="#top" aria-label="Sentinela, início">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <circle cx="10" cy="10" r="7.5"/><circle cx="10" cy="10" r="2.6" fill="currentColor" stroke="none"/>
+      </svg>
+      Sentinela
+    </a>
+    <nav class="links" aria-label="Seções">
+      <a href="#top" data-p="0">Início</a>
+      <a href="#top" data-p="0.43">Câmera</a>
+      <a href="#top" data-p="0.93">Por dentro</a>
+      <a href="#servicos">Serviços</a>
+      <a href="#contato">Contato</a>
+    </nav>
+    <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+</header>
+
+<nav class="social" aria-label="Redes sociais">
+  <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram">IG</a>
+  <a href="https://wa.me/5500000000000" target="_blank" rel="noopener" aria-label="WhatsApp">WA</a>
+  <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook">FB</a>
+</nav>
+
+<button class="chev" id="chev" aria-label="Próxima seção">
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4.5 6 8.5l4-4"/></svg>
+</button>
+
+<main id="top">
+  <section id="film" aria-label="Filme da câmera"></section>
+
+  <!-- HERO -->
+  <div class="layer" id="l-hero">
+    <div class="in">
+      <h1 class="display h-title fx" data-in="-1" data-out="0.07" aria-label="Seus olhos em casa 24 horas">
+        <span aria-hidden="true">Seus olhos</span><span aria-hidden="true">em casa</span><span aria-hidden="true">24 horas</span>
+      </h1>
+      <p class="h-sub fx" data-in="-1" data-out="0.07">Instalação de CFTV e monitoramento remoto para residências. Veja cada canto da sua casa pelo celular, ao vivo, de onde estiver.</p>
+      <div class="h-cta fx" data-in="-1" data-out="0.07">
+        <a class="buy" href="#contato">Pedir orçamento</a>
+        <a class="arrow" href="#servicos" aria-label="Ver serviços">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><path d="M4 10 10 4M5 4h5v5"/></svg>
+        </a>
+      </div>
+      <button class="play fx" id="replay" data-in="-1" data-out="0.05" aria-label="Rever o filme da câmera">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 1.8v12.4L13.6 8z"/></svg>
+      </button>
+
+      <div class="card c-live fx" data-in="-1" data-out="0.06">
+        <div class="top"><span class="lbl"><i class="rec" aria-hidden="true"></i>CAM 01 · Ao vivo</span>
+          <span class="chip" aria-hidden="true"><svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M2.5 7.5l5-5M3.5 2.5h4v4"/></svg></span></div>
+        <div class="val"><span id="clock">21:47</span><small id="secs">:09</small></div>
+        <svg class="chart" viewBox="0 0 168 56" preserveAspectRatio="none" aria-hidden="true">
+          <defs><linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B9F53C" stop-opacity=".35"/><stop offset="1" stop-color="#B9F53C" stop-opacity="0"/></linearGradient></defs>
+          <path id="cArea" fill="url(#gfill)"/>
+          <path id="cLine" fill="none" stroke="#B9F53C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+          <circle id="cDot" r="3" fill="#F2F2F0"/>
+        </svg>
+      </div>
+
+      <div class="card c-cov fx" data-in="-1" data-out="0.06">
+        <div class="top"><span class="lbl">Cobertura</span>
+          <span class="chip" aria-hidden="true"><svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M2.5 7.5l5-5M3.5 2.5h4v4"/></svg></span></div>
+        <div class="gauge">
+          <svg viewBox="0 0 150 84" aria-hidden="true">
+            <path d="M15 78a60 60 0 0 1 120 0" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="8" stroke-linecap="round"/>
+            <path d="M15 78a60 60 0 0 1 120 0" fill="none" stroke="#B9F53C" stroke-width="8" stroke-linecap="round" pathLength="100" stroke-dasharray="96 100"/>
+          </svg>
+          <b>96<small>%</small></b>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN -->
+  <div class="layer" id="l-design">
+    <div class="in">
+      <h2 class="display m-title fx" data-in="0.30" data-out="0.53">Visão 4K <span class="thin">dia e noite</span></h2>
+      <p class="m-copy fx" data-in="0.34" data-out="0.53">Sensor Starlight que mantém as cores na penumbra e infravermelho até 40 metros. Carcaça IP67 que aguenta sol, chuva e poeira.</p>
+      <div class="stats">
+        <div class="stat fx" data-in="0.36" data-out="0.53"><div class="n">8<small>MP</small></div><div class="l">Resolução</div></div>
+        <div class="stat fx" data-in="0.39" data-out="0.53"><div class="n">40<small>M</small></div><div class="l">Visão noturna</div></div>
+        <div class="stat fx" data-in="0.42" data-out="0.53"><div class="n">30<small>DIAS</small></div><div class="l">Em nuvem</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BREAKDOWN -->
+  <div class="layer" id="l-break">
+    <div class="in">
+      <h2 class="display x-title fx" data-in="0.86" data-out="2">Feita <span class="thin">para</span><br>durar <span class="thin">anos</span></h2>
+      <div class="x-info fx" data-in="0.89" data-out="2">
+        <div class="dial" aria-hidden="true">
+          <canvas class="ticks" id="dial" width="264" height="264"></canvas>
+          <div class="thumb"><canvas id="thumb"></canvas></div>
+        </div>
+        <div>
+          <h3>Seis camadas, uma câmera</h3>
+          <p>Vidro temperado, anel de LEDs infravermelhos, lente varifocal, sensor Starlight, carcaça IP67 e tampa traseira com PoE e suporte articulado.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="after">
+  <section id="specs" class="panel">
+    <div class="wrap">
+      <div class="eyebrow">Especificações</div>
+      <h2 class="display">Instalação limpa, <span class="thin">sem fios à mostra</span></h2>
+      <div class="grid4">
+        <div class="cell"><div class="n">8<small>MP</small></div><p>Imagem 4K com HDR para identificar rostos e placas.</p></div>
+        <div class="cell"><div class="n">40<small>M</small></div><p>Visão noturna por infravermelho, mesmo no escuro total.</p></div>
+        <div class="cell"><div class="n">IP67</div><p>Resistente a chuva forte, sol e poeira o ano todo.</p></div>
+        <div class="cell"><div class="n">30<small>DIAS</small></div><p>Gravação em nuvem criptografada, acessível pelo app.</p></div>
+      </div>
+      <div class="grid3">
+        <div class="lay"><div class="k">Camada 1 · frontal</div><div class="v">Vidro temperado antirreflexo</div></div>
+        <div class="lay"><div class="k">Camada 2</div><div class="v">Anel IR com 8 LEDs</div></div>
+        <div class="lay"><div class="k">Camada 3</div><div class="v">Lente varifocal 2,8–12 mm</div></div>
+        <div class="lay"><div class="k">Camada 4</div><div class="v">Sensor Starlight 1/1,8"</div></div>
+        <div class="lay"><div class="k">Camada 5</div><div class="v">Carcaça IP67 com capa solar</div></div>
+        <div class="lay"><div class="k">Camada 6 · traseira</div><div class="v">Placa PoE e suporte articulado</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="servicos" class="panel">
+    <div class="wrap">
+      <div class="eyebrow">Serviços</div>
+      <h2 class="display">Tudo que sua casa <span class="thin">precisa</span></h2>
+      <div class="grid3 svcs">
+        <div class="svc"><div class="ic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.5h11l4-2v7l-4-2h-11z"/><path d="M6 9.5v5M3.5 14.5h5"/></svg></div><h3>Instalação de CFTV</h3><p>Projeto de cobertura, cabeamento embutido e configuração completa das câmeras.</p></div>
+        <div class="svc"><div class="ic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="8" height="16" rx="2"/><path d="M9 15h2"/></svg></div><h3>Acesso pelo celular</h3><p>Veja todas as câmeras ao vivo e receba alertas de movimento no app.</p></div>
+        <div class="svc"><div class="ic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5 16 5v4.5c0 4-2.6 6.6-6 8-3.4-1.4-6-4-6-8V5z"/><path d="m7.3 10 1.9 1.9 3.6-3.8"/></svg></div><h3>Monitoramento remoto 24h</h3><p>Central acompanhando sua casa dia e noite, com acionamento rápido.</p></div>
+        <div class="svc"><div class="ic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 15.5h9a3.5 3.5 0 0 0 .4-7A5 5 0 0 0 5.2 8 3.8 3.8 0 0 0 5.5 15.5z"/></svg></div><h3>Gravação em nuvem</h3><p>Imagens guardadas fora de casa, seguras mesmo se o gravador for levado.</p></div>
+        <div class="svc"><div class="ic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 14V9a5 5 0 0 1 10 0v5l1.5 2h-13z"/><path d="M8.5 18h3"/></svg></div><h3>Alarmes e sensores</h3><p>Sensores de abertura e presença integrados às câmeras e ao app.</p></div>
+        <div class="svc"><div class="ic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.5 3.5a4 4 0 0 0-4.9 5.2L3 13.3 6.7 17l4.6-4.6a4 4 0 0 0 5.2-4.9l-2.4 2.4-2.6-.6-.6-2.6z"/></svg></div><h3>Manutenção preventiva</h3><p>Revisões periódicas, limpeza de lentes e atualização de firmware.</p></div>
+      </div>
+      <div class="steps">
+        <div class="step"><b>01</b><span><strong>Visita técnica gratuita</strong>Avaliamos os pontos cegos da sua casa.</span></div>
+        <div class="step"><b>02</b><span><strong>Instalação em até 48h</strong>Equipe própria, acabamento limpo.</span></div>
+        <div class="step"><b>03</b><span><strong>Tudo no seu celular</strong>Configuramos o app com você.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contato" class="final">
+    <div class="eyebrow">Visita técnica gratuita · resposta em minutos</div>
+    <h2 class="display">Proteja quem você ama</h2>
+    <p>Projeto sob medida, instalação limpa e suporte local. Fale agora com um especialista.</p>
+    <div class="ctas">
+      <a class="buy" href="https://wa.me/5500000000000" target="_blank" rel="noopener">Falar no WhatsApp</a>
+      <a class="arrow" href="tel:+5500000000000" aria-label="Ligar para a Sentinela">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><path d="M4 10 10 4M5 4h5v5"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <span>Sentinela · Segurança eletrônica residencial</span>
+    <span>© 2026 · CFTV, alarmes e monitoramento remoto</span>
+  </footer>
+</div>
+
+<div class="loader" id="loader">Carregando</div>
+
+<script>
+(() => {
+'use strict';
+
+/* =====================================================================
+   Optional: real product film.
+   Leave empty to use the live 3D camera drawn in the canvas.
+   To use your own clips (e.g. generated in Google Flow), set the three
+   all-intra MP4 URLs; intro ends on the first frame of turn, turn ends
+   on the first frame of explode.
+   ===================================================================== */
+const CLIPS = { intro: '', turn: '', explode: '' };
+const USE_VIDEO = !!(CLIPS.intro && CLIPS.turn && CLIPS.explode);
+
+const HERO_SETTLE = 1.85, INTRO_LEN = 2.7;
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const clamp = (v, a = 0, b = 1) => v < a ? a : v > b ? b : v;
+const lerp = (a, b, t) => a + (b - a) * t;
+const smooth = t => t * t * (3 - 2 * t);
+const TAU = Math.PI * 2, RAD = Math.PI / 180;
+
+const body = document.body, film = $('#film'), after = $('.after');
+const cv = $('#cv'), ctx = cv.getContext('2d'), loader = $('#loader');
+let W = 0, H = 0, DPR = 1;
+
+const filmSpan = () => Math.max(1, film.offsetHeight - innerHeight);
+const prog = () => clamp(scrollY / filmSpan());
+
+/* =====================================================================
+   3D CAMERA MODEL  (local axis +X = lens direction)
+   ===================================================================== */
+const MAT = {
+  white: { c: [240, 240, 236], s: .5, h: 24, amb: .36 },
+  hood:  { c: [246, 246, 242], s: .55, h: 28, amb: .38 },
+  inner: { c: [40, 41, 44],    s: .1,  h: 8,  amb: .5 },
+  alu:   { c: [158, 161, 166], s: .7,  h: 20, amb: .25 },
+  dark:  { c: [32, 34, 38],    s: .5,  h: 24, amb: .4 },
+  black: { c: [13, 14, 17],    s: .9,  h: 50, amb: .5 },
+  glass: { c: [16, 20, 28],    s: 1.2, h: 90, amb: .6, a: .42 },
+  lens:  { c: [30, 40, 86],    s: 1.4, h: 70, amb: .5 },
+  pcb:   { c: [14, 58, 40],    s: .3,  h: 12, amb: .35 },
+  chip:  { c: [20, 20, 23],    s: .7,  h: 40, amb: .45 },
+  gold:  { c: [200, 160, 82],  s: .8,  h: 30, amb: .4 },
+  led:   { c: [96, 16, 26],    s: 1.0, h: 60, amb: .5 },
+  lime:  { c: [185, 245, 60],  e: 1 }
+};
+
+const V = [], VP = [], F = [];
+let cur = 0;
+function vx(x, y, z) { V.push(x, y, z); VP.push(cur); return VP.length - 1; }
+function face(ids, m, hx, hy, hz) {
+  const a = ids[0] * 3, b = ids[1] * 3, c = ids[2] * 3;
+  const ux = V[b] - V[a], uy = V[b + 1] - V[a + 1], uz = V[b + 2] - V[a + 2];
+  const wx = V[c] - V[a], wy = V[c + 1] - V[a + 1], wz = V[c + 2] - V[a + 2];
+  const nx = uy * wz - uz * wy, ny = uz * wx - ux * wz, nz = ux * wy - uy * wx;
+  if (nx * hx + ny * hy + nz * hz < 0) ids = ids.slice().reverse();
+  F.push({ i: ids, m: MAT[m], p: cur });
+}
+// lathe surface around X; y = r cos a, z = r sin a (a = 0 is the top)
+function tube(r, x0, x1, n, ls, m, inward, a0 = 0, a1 = TAU) {
+  const full = Math.abs(a1 - a0 - TAU) < 1e-6, na = full ? n : n + 1, g = [];
+  for (let j = 0; j <= ls; j++) {
+    const x = x0 + (x1 - x0) * j / ls, row = [];
+    for (let k = 0; k < na; k++) { const a = a0 + (a1 - a0) * k / n; row.push(vx(x, r * Math.cos(a), r * Math.sin(a))); }
+    g.push(row);
+  }
+  const s = inward ? -1 : 1;
+  for (let j = 0; j < ls; j++) for (let k = 0; k < n; k++) {
+    const k2 = full ? (k + 1) % n : k + 1, a = a0 + (a1 - a0) * (k + .5) / n;
+    face([g[j][k], g[j][k2], g[j + 1][k2], g[j + 1][k]], m, 0, s * Math.cos(a), s * Math.sin(a));
+  }
+}
+function disc(x, r0, r1, n, m, dir, a0 = 0, a1 = TAU, cy = 0, cz = 0) {
+  for (let k = 0; k < n; k++) {
+    const a = a0 + (a1 - a0) * k / n, b = a0 + (a1 - a0) * (k + 1) / n;
+    const P = (r, t) => vx(x, cy + r * Math.cos(t), cz + r * Math.sin(t));
+    if (r0 <= 0) face([vx(x, cy, cz), P(r1, a), P(r1, b)], m, dir, 0, 0);
+    else face([P(r0, a), P(r1, a), P(r1, b), P(r0, b)], m, dir, 0, 0);
+  }
+}
+function cyl(r, x0, x1, n, m, cy = 0, cz = 0, mf) { // small solid cylinder, off-axis allowed
+  const g0 = [], g1 = [];
+  for (let k = 0; k < n; k++) { const a = TAU * k / n; g0.push(vx(x0, cy + r * Math.cos(a), cz + r * Math.sin(a))); g1.push(vx(x1, cy + r * Math.cos(a), cz + r * Math.sin(a))); }
+  for (let k = 0; k < n; k++) { const k2 = (k + 1) % n, a = TAU * (k + .5) / n; face([g0[k], g0[k2], g1[k2], g1[k]], m, 0, Math.cos(a), Math.sin(a)); }
+  disc(x1, 0, r, n, mf || m, 1, 0, TAU, cy, cz);
+  disc(x0, 0, r, n, m, -1, 0, TAU, cy, cz);
+}
+function box(x0, x1, y0, y1, z0, z1, m) {
+  const p = [vx(x0, y0, z0), vx(x1, y0, z0), vx(x1, y1, z0), vx(x0, y1, z0), vx(x0, y0, z1), vx(x1, y0, z1), vx(x1, y1, z1), vx(x0, y1, z1)];
+  face([p[0], p[1], p[2], p[3]], m, 0, 0, -1); face([p[4], p[5], p[6], p[7]], m, 0, 0, 1);
+  face([p[0], p[1], p[5], p[4]], m, 0, -1, 0); face([p[3], p[2], p[6], p[7]], m, 0, 1, 0);
+  face([p[0], p[3], p[7], p[4]], m, -1, 0, 0); face([p[1], p[2], p[6], p[5]], m, 1, 0, 0);
+}
+
+// Part 0 · front glass + bezel
+cur = 0;
+disc(1.56, 0, .79, 40, 'glass', 1);
+tube(.86, 1.44, 1.56, 48, 1, 'white');
+disc(1.56, .79, .86, 48, 'white', 1);
+disc(1.565, 0, .028, 10, 'lime', 1, 0, TAU, .825, 0);
+// Part 1 · IR LED ring
+cur = 1;
+disc(1.34, .40, .74, 40, 'dark', 1);
+disc(1.30, .40, .74, 40, 'dark', -1);
+tube(.74, 1.30, 1.34, 40, 1, 'dark');
+for (let k = 0; k < 8; k++) { const a = TAU * k / 8 + TAU / 16; cyl(.07, 1.34, 1.39, 10, 'led', .57 * Math.cos(a), .57 * Math.sin(a)); }
+// Part 2 · varifocal lens
+cur = 2;
+tube(.34, .55, 1.30, 32, 3, 'black');
+disc(1.30, .22, .34, 32, 'black', 1);
+disc(1.26, 0, .22, 28, 'lens', 1);
+disc(.55, 0, .34, 32, 'black', -1);
+tube(.37, .78, .96, 32, 1, 'alu');
+disc(.96, .34, .37, 32, 'alu', 1); disc(.78, .34, .37, 32, 'alu', -1);
+// Part 3 · Starlight sensor board
+cur = 3;
+box(.40, .46, -.6, .6, -.6, .6, 'pcb');
+box(.46, .50, -.22, .22, -.22, .22, 'chip');
+box(.50, .505, -.14, .14, -.14, .14, 'lens');
+for (const [y, z] of [[.45, .45], [-.45, .45], [.45, -.45], [-.45, -.45]]) box(.46, .48, y - .05, y + .05, z - .05, z + .05, 'gold');
+box(.46, .49, -.5, -.36, -.12, .12, 'chip');
+// Part 4 · IP67 housing + sun hood
+cur = 4;
+tube(.85, -1.6, 1.44, 64, 8, 'white');
+tube(.80, -1.6, 1.44, 40, 6, 'inner', true);
+disc(1.44, .80, .85, 48, 'white', 1);
+{
+  const A0 = -1.9, A1 = 1.9, ri = .9, ro = .95, x0 = -1.25, x1 = 1.98;
+  tube(ro, x0, x1, 44, 8, 'hood', false, A0, A1);
+  tube(ri, x0, x1, 44, 8, 'inner', true, A0, A1);
+  disc(x1, ri, ro, 44, 'hood', 1, A0, A1);
+  disc(x0, ri, ro, 44, 'hood', -1, A0, A1);
+  for (const [a, sg] of [[A0, -1], [A1, 1]]) {
+    for (let j = 0; j < 8; j++) {
+      const xa = x0 + (x1 - x0) * j / 8, xb = x0 + (x1 - x0) * (j + 1) / 8;
+      face([vx(xa, ri * Math.cos(a), ri * Math.sin(a)), vx(xb, ri * Math.cos(a), ri * Math.sin(a)), vx(xb, ro * Math.cos(a), ro * Math.sin(a)), vx(xa, ro * Math.cos(a), ro * Math.sin(a))],
+        'hood', 0, -sg * Math.sin(a), sg * Math.cos(a));
+    }
+  }
+}
+// Part 5 · rear cap, PoE board, articulated wall mount
+cur = 5;
+tube(.85, -1.92, -1.6, 48, 2, 'white');
+disc(-1.92, .3, .85, 48, 'white', -1);
+disc(-1.95, 0, .3, 24, 'dark', -1);
+tube(.3, -1.95, -1.92, 24, 1, 'dark');
+box(-1.56, -1.5, -.58, .58, -.58, .58, 'pcb');
+box(-1.5, -1.47, -.2, .2, -.3, .1, 'chip');
+cyl(.14, -2.42, -1.95, 16, 'alu');
+cyl(.21, -2.6, -2.42, 18, 'alu');
+cyl(.13, -2.98, -2.6, 16, 'alu');
+cyl(.62, -3.1, -2.98, 40, 'white');
+
+const NV = VP.length, NF = F.length;
+const OFF = [5.5, 4.4, 3.4, 2.3, 0, -1.8];
+const LABEL = [[1.5, .86], [1.36, .74], [.95, .37], [.43, .6], [.3, .95], [-2.6, .62]];
+const TX = new Float32Array(NV), TY = new Float32Array(NV), TZ = new Float32Array(NV);
+const SX = new Float32Array(NV), SY = new Float32Array(NV);
+const LDIR = (() => { const l = [-.45, .72, -.55], m = Math.hypot(...l); return l.map(v => v / m); })();
+
+/* render one frame of the model. pose in device px / degrees */
+function render(c, w, h, P, bg = '#0A0A0B', floor = true) {
+  c.fillStyle = bg; c.fillRect(0, 0, w, h);
+  const D = 14, Fz = P.k * D, cx0 = w / 2 + P.x, cy0 = h / 2 + P.y;
+  const yw = P.yaw * RAD, pt = P.pitch * RAD, rl = P.roll * RAD;
+  const cyw = Math.cos(yw), syw = Math.sin(yw), cp = Math.cos(pt), sp = Math.sin(pt), cr = Math.cos(rl), sr = Math.sin(rl);
+  const E = P.e, center = lerp(-.57, 1.0, E);
+  const xform = (x, y, z, part) => {
+    x = x + OFF[part] * E - center;
+    const x1 = x * cyw + z * syw, z1 = -x * syw + z * cyw;
+    const y2 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
+    return [x1 * cr - y2 * sr, x1 * sr + y2 * cr, z2 + D];
+  };
+  let minX = 1e9, maxX = -1e9, maxY = -1e9;
+  for (let i = 0; i < NV; i++) {
+    const t = xform(V[i * 3], V[i * 3 + 1], V[i * 3 + 2], VP[i]);
+    TX[i] = t[0]; TY[i] = t[1]; TZ[i] = t[2];
+    const sx = cx0 + t[0] * Fz / t[2], sy = cy0 - t[1] * Fz / t[2];
+    SX[i] = sx; SY[i] = sy;
+    if (sx < minX) minX = sx; if (sx > maxX) maxX = sx; if (sy > maxY) maxY = sy;
+  }
+  // studio light + floor pool
+  const mx = (minX + maxX) / 2, span = Math.max(40, maxX - minX);
+  let g = c.createRadialGradient(mx, cy0, 0, mx, cy0, Math.max(w, h) * .6);
+  g.addColorStop(0, 'rgba(255,255,255,.05)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  c.fillStyle = g; c.fillRect(0, 0, w, h);
+  const fa = floor ? (1 - E) : 0;
+  if (fa > .01) {
+    const fy = maxY + span * .06;
+    c.save(); c.translate(mx, fy); c.scale(1, .14);
+    g = c.createRadialGradient(0, 0, 0, 0, 0, span * .75);
+    g.addColorStop(0, `rgba(255,255,255,${.07 * fa})`); g.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = g; c.beginPath(); c.arc(0, 0, span * .75, 0, TAU); c.fill();
+    g = c.createRadialGradient(0, 0, 0, 0, 0, span * .4);
+    g.addColorStop(0, `rgba(0,0,0,${.75 * fa})`); g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g; c.beginPath(); c.arc(0, 0, span * .4, 0, TAU); c.fill();
+    c.restore();
+  }
+  // faces: cull, shade, sort
+  const vis = [];
+  for (let f = 0; f < NF; f++) {
+    const fc = F[f], ids = fc.i, a = ids[0], b = ids[1], d = ids[2];
+    const ux = TX[b] - TX[a], uy = TY[b] - TY[a], uz = TZ[b] - TZ[a];
+    const wx = TX[d] - TX[a], wy = TY[d] - TY[a], wz = TZ[d] - TZ[a];
+    let nx = uy * wz - uz * wy, ny = uz * wx - ux * wz, nz = ux * wy - uy * wx;
+    const nl = Math.hypot(nx, ny, nz) || 1; nx /= nl; ny /= nl; nz /= nl;
+    let gx = 0, gy = 0, gz = 0;
+    for (const k of ids) { gx += TX[k]; gy += TY[k]; gz += TZ[k]; }
+    const q = ids.length; gx /= q; gy /= q; gz /= q;
+    const vl = Math.hypot(gx, gy, gz), vX = -gx / vl, vY = -gy / vl, vZ = -gz / vl;
+    const nv = nx * vX + ny * vY + nz * vZ;
+    if (nv <= 0) continue;
+    vis.push({ z: gz, f: fc, nx, ny, nz, nv, vX, vY, vZ });
+  }
+  vis.sort((A, B) => B.z - A.z);
+  c.lineJoin = 'round'; c.lineWidth = Math.max(.6, P.k / 300);
+  for (const o of vis) {
+    const m = o.f.m, ids = o.f.i;
+    let r, gg, bb, al = m.a || 1;
+    if (m.e) { [r, gg, bb] = m.c; }
+    else {
+      const dif = Math.max(0, o.nx * LDIR[0] + o.ny * LDIR[1] + o.nz * LDIR[2]);
+      let hx = LDIR[0] + o.vX, hy = LDIR[1] + o.vY, hz = LDIR[2] + o.vZ; const hl = Math.hypot(hx, hy, hz);
+      const spec = Math.pow(Math.max(0, (o.nx * hx + o.ny * hy + o.nz * hz) / hl), m.h) * m.s;
+      const rim = Math.pow(1 - o.nv, 3) * .3;
+      const fill = Math.max(0, o.nx * .8 - o.ny * .1 + o.nz * .2) * .12;
+      const k = m.amb + dif * .72 + fill;
+      r = m.c[0] * k + 255 * spec + 120 * rim; gg = m.c[1] * k + 255 * spec + 135 * rim; bb = m.c[2] * k + 255 * spec + 160 * rim;
+      if (al < 1) al = Math.min(1, al + spec * .8);
+    }
+    const col = `rgba(${r > 255 ? 255 : r | 0},${gg > 255 ? 255 : gg | 0},${bb > 255 ? 255 : bb | 0},${al})`;
+    c.beginPath(); c.moveTo(SX[ids[0]], SY[ids[0]]);
+    for (let j = 1; j < ids.length; j++) c.lineTo(SX[ids[j]], SY[ids[j]]);
+    c.closePath(); c.fillStyle = col; c.fill();
+    if (al >= 1) { c.strokeStyle = col; c.stroke(); }
+  }
+  // part numbers in the exploded view
+  if (P.lab > .01) {
+    c.save(); c.globalAlpha = P.lab;
+    const fs = Math.max(9, P.k * .16);
+    c.font = `400 ${fs}px Sora, Helvetica, Arial, sans-serif`; c.textAlign = 'center';
+    LABEL.forEach(([lx, ly], i) => {
+      const a = xform(lx, ly, 0, i), b = xform(lx, ly + .95, 0, i);
+      const ax = cx0 + a[0] * Fz / a[2], ay = cy0 - a[1] * Fz / a[2], bx = cx0 + b[0] * Fz / b[2], by = cy0 - b[1] * Fz / b[2];
+      c.strokeStyle = 'rgba(242,242,240,.32)'; c.lineWidth = Math.max(1, P.k / 160);
+      c.beginPath(); c.moveTo(ax, ay); c.lineTo(bx, by); c.stroke();
+      c.fillStyle = '#B9F53C'; c.beginPath(); c.arc(ax, ay, Math.max(2, P.k * .025), 0, TAU); c.fill();
+      c.fillStyle = 'rgba(242,242,240,.7)'; c.fillText('0' + (i + 1), bx, by - fs * .5);
+    });
+    c.restore();
+  }
+}
+
+/* pose for scroll progress p */
+function poseAt(p, w, h) {
+  const port = h > w * 1.05;
+  const s1 = smooth(clamp((p - .08) / .22)), s2 = smooth(clamp((p - .56) / .30));
+  let A, B, C;
+  if (!port) {
+    const u = Math.min(w, h * 1.75);
+    A = { x: .17 * w, y: .03 * h, k: .082 * u, yaw: 140, pitch: -13, roll: 0 };
+    B = { x: 0, y: 0, k: .165 * u, yaw: 106, pitch: -10, roll: 0 };
+    C = { x: .02 * w, y: .01 * h, k: .05 * u, yaw: 126, pitch: -14, roll: 17 };
+  } else {
+    A = { x: .06 * w, y: .02 * h, k: .15 * w, yaw: 140, pitch: -13, roll: 0 };
+    B = { x: .04 * w, y: -.01 * h, k: .22 * w, yaw: 106, pitch: -10, roll: 0 };
+    C = { x: .03 * w, y: -.02 * h, k: .112 * w, yaw: 122, pitch: -14, roll: 54 };
+  }
+  const o = {};
+  for (const key in A) o[key] = lerp(lerp(A[key], B[key], s1), C[key], s2);
+  o.e = s2; o.lab = clamp((p - .84) / .05);
+  return o;
+}
+/* pose during the intro, t in seconds */
+function introPose(t, w, h) {
+  const base = poseAt(0, w, h);
+  const q = clamp(t / HERO_SETTLE), e = 1 - Math.pow(1 - q, 3);
+  const o = Object.assign({}, base);
+  o.x = lerp(w * .75, base.x, e);
+  o.yaw = base.yaw + 330 * (1 - e);
+  o.roll = 24 * (1 - e) * Math.sin(q * Math.PI * 2.2);
+  o.y = base.y - Math.abs(Math.sin(q * Math.PI * 2)) * (1 - e) * h * .06;
+  return o;
+}
+
+/* =====================================================================
+   CANVAS SIZE
+   ===================================================================== */
+function resize() {
+  DPR = Math.min(2, devicePixelRatio || 1);
+  W = Math.round(cv.clientWidth * DPR); H = Math.round(cv.clientHeight * DPR);
+  if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+  lastKey = '';
+}
+let lastKey = '';
+
+/* =====================================================================
+   VIDEO ENGINE (only when CLIPS are set)
+   ===================================================================== */
+const vids = {};
+let curClip = null, loaded = 0, framing = { FX: .66, Z: 1.7, LZ: 1, LY: 0, LX: 0 };
+function drawVideo(v) {
+  if (!v || !v.videoWidth) return;
+  const key = v.src + '|' + v.currentTime.toFixed(3) + '|' + JSON.stringify(framing) + W + 'x' + H;
+  if (key === lastKey) return; lastKey = key;
+  const vw = v.videoWidth, vh = v.videoHeight;
+  ctx.fillStyle = '#0A0A0B'; ctx.fillRect(0, 0, W, H);
+  let dw, dh, x, y;
+  if (H <= W * 1.05) {
+    const s = Math.max(W / vw, H / vh) * framing.LZ; dw = vw * s; dh = vh * s;
+    x = (W - dw) / 2 - framing.LX * W; y = (H - dh) / 2 + framing.LY * H;
+  } else {
+    const s = (W / vw) * framing.Z; dw = vw * s; dh = vh * s;
+    x = clamp(W / 2 - framing.FX * dw, W - dw, 0); y = (H - dh) / 2;
+  }
+  ctx.drawImage(v, x, y, dw, dh);
+  const bg = '#0A0A0B', bgT = 'rgba(10,10,11,0)';
+  if (y > 0) {
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, y + 1); ctx.fillRect(0, y + dh - 1, W, H - y - dh + 1);
+    const f = dh * .18;
+    let g = ctx.createLinearGradient(0, y, 0, y + f); g.addColorStop(0, bg); g.addColorStop(1, bgT); ctx.fillStyle = g; ctx.fillRect(0, y, W, f);
+    g = ctx.createLinearGradient(0, y + dh, 0, y + dh - f); g.addColorStop(0, bg); g.addColorStop(1, bgT); ctx.fillStyle = g; ctx.fillRect(0, y + dh - f, W, f);
+  }
+  if (x > 0) {
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, x + 1, H); ctx.fillRect(x + dw - 1, 0, W - x - dw + 1, H);
+    const f = dw * .08;
+    let g = ctx.createLinearGradient(x, 0, x + f, 0); g.addColorStop(0, bg); g.addColorStop(1, bgT); ctx.fillStyle = g; ctx.fillRect(x, 0, f, H);
+    g = ctx.createLinearGradient(x + dw, 0, x + dw - f, 0); g.addColorStop(0, bg); g.addColorStop(1, bgT); ctx.fillStyle = g; ctx.fillRect(x + dw - f, 0, f, H);
+  }
+}
+function seek(key, frac) {
+  curClip = key; const v = vids[key];
+  if (!v || !v.duration) return;
+  const t = clamp(frac * v.duration, 0, v.duration - .04); v._target = t;
+  if (Math.abs(v.currentTime - t) < .02) drawVideo(v);
+  else if (!v.seeking) v.currentTime = t;
+}
+function initVideo() {
+  loader.textContent = 'Carregando filme 0%';
+  for (const k of ['intro', 'turn', 'explode']) {
+    const v = document.createElement('video');
+    v.muted = true; v.playsInline = true; v.preload = 'auto';
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+    v._target = 0; v.src = CLIPS[k];
+    v.addEventListener('seeked', () => {
+      if (curClip === k) drawVideo(v);
+      if (Math.abs(v.currentTime - v._target) > .02) v.currentTime = v._target;
+    });
+    v.addEventListener('loadeddata', () => {
+      loaded++; loader.textContent = `Carregando filme ${Math.round(loaded / 3 * 100)}%`;
+      if (loaded === 3) loader.classList.add('done');
+      if (introDone) schedule();
+    }, { once: true });
+    $('#clips').appendChild(v); vids[k] = v;
+  }
+}
+function videoTimeline(p) {
+  const port = H > W * 1.05;
+  if (p < .30) { const t = clamp((p - .08) / .22); framing = { FX: lerp(.66, .5, t), Z: lerp(1.7, 1.55, t), LZ: 1, LY: 0, LX: 0 }; }
+  else if (p < .56) framing = { FX: .5, Z: 1.55, LZ: 1, LY: 0, LX: 0 };
+  else { const t = clamp((p - .56) / .30); framing = { FX: .5, Z: lerp(1.55, 1.02, t), LZ: lerp(1, .84, t), LY: lerp(0, .05, t), LX: lerp(0, .02, t) }; }
+  void port;
+  if (p < .08) seek('turn', 0);
+  else if (p < .30) seek('turn', (p - .08) / .22);
+  else if (p < .56) seek('turn', 1);
+  else if (p < .86) seek('explode', (p - .56) / .30);
+  else seek('explode', 1);
+}
+
+/* =====================================================================
+   INTRO
+   ===================================================================== */
+let introDone = false, introPlaying = false, introRaf = 0, revealTimers = [];
+const heroEls = $$('#l-hero .fx');
+
+function reveal(instant) {
+  revealTimers.forEach(clearTimeout); revealTimers = [];
+  if (instant || RM) {
+    body.classList.remove('revealing');
+    heroEls.forEach(el => el._rev = true);
+    introDone = true; updateFx(prog()); return;
+  }
+  body.classList.add('revealing');
+  heroEls.forEach((el, i) => revealTimers.push(setTimeout(() => {
+    el._rev = true; updateFx(prog());
+    if (i === heroEls.length - 1) {
+      introDone = true;
+      revealTimers.push(setTimeout(() => body.classList.remove('revealing'), 900));
+    }
+  }, i * 70)));
+}
+function hideHero() {
+  revealTimers.forEach(clearTimeout); revealTimers = [];
+  body.classList.remove('revealing');
+  heroEls.forEach(el => el._rev = false);
+  updateFx(prog());
+}
+function playIntro() {
+  cancelAnimationFrame(introRaf);
+  hideHero(); introDone = false;
+  if (USE_VIDEO) return playIntroVideo();
+  introPlaying = true;
+  const t0 = performance.now(); let shown = false;
+  const tick = now => {
+    const t = (now - t0) / 1000;
+    render(ctx, W, H, introPose(t, W, H)); lastKey = '';
+    if (!shown && t >= HERO_SETTLE) { shown = true; reveal(); }
+    if (t < INTRO_LEN) introRaf = requestAnimationFrame(tick);
+    else { introPlaying = false; schedule(); }
+  };
+  introRaf = requestAnimationFrame(tick);
+}
+function playIntroVideo() {
+  const v = vids.intro; let shown = false;
+  const go = () => {
+    introPlaying = true; v.currentTime = 0;
+    const tick = () => {
+      lastKey = ''; drawVideo(v);
+      if (!shown && v.currentTime >= HERO_SETTLE) { shown = true; reveal(); }
+      if (!v.ended) introRaf = requestAnimationFrame(tick);
+      else { introPlaying = false; if (!shown) reveal(); schedule(); }
+    };
+    v.play().then(() => { introRaf = requestAnimationFrame(tick); }).catch(() => {
+      introPlaying = false; v.currentTime = Math.max(0, (v.duration || INTRO_LEN) - .04);
+      curClip = 'intro'; reveal(); schedule();
+    });
+  };
+  if (v.readyState >= 3) go(); else v.addEventListener('canplay', go, { once: true });
+}
+function startIntro() {
+  if (scrollY > 4 || RM) {
+    if (USE_VIDEO) {
+      const v = vids.intro;
+      const jump = () => { v.currentTime = Math.max(0, v.duration - .04); curClip = 'intro'; };
+      if (v.readyState >= 1) jump(); else v.addEventListener('loadedmetadata', jump, { once: true });
+    }
+    reveal(true); schedule(); return;
+  }
+  playIntro();
+}
+
+/* =====================================================================
+   SCROLL-DRIVEN UPDATE
+   ===================================================================== */
+const fxEls = $$('.fx').map(el => ({ el, i: +el.dataset.in, o: +el.dataset.out, hero: +el.dataset.in < 0, last: -1 }));
+function updateFx(p) {
+  for (const f of fxEls) {
+    let o = clamp((p - f.i) / .05);
+    if (p > f.o) o = Math.max(0, 1 - (p - f.o) / .04);
+    if (f.hero && !f.el._rev) o = 0;
+    o = Math.round(o * 1000) / 1000;
+    if (o !== f.last) {
+      f.last = o; f.el.style.setProperty('--o', o);
+      f.el.classList.toggle('on', o > .01);
+    }
+  }
+}
+const chev = $('#chev');
+let raf = 0;
+function schedule() { if (!raf) raf = requestAnimationFrame(update); }
+function update() {
+  raf = 0;
+  const p = prog();
+  updateFx(p);
+  const top = after.getBoundingClientRect().top;
+  body.classList.toggle('dim', top < innerHeight * .55);
+  chev.classList.toggle('up', top < innerHeight * .2);
+  chev.setAttribute('aria-label', top < innerHeight * .2 ? 'Voltar ao topo' : 'Próxima seção');
+  if (introPlaying) return;
+  if (USE_VIDEO) {
+    if (!introDone && curClip === null) { drawVideo(vids.intro); return; }
+    videoTimeline(p);
+  } else {
+    const P = poseAt(p, W, H);
+    const key = W + 'x' + H + Object.values(P).map(v => v.toFixed(3)).join(',');
+    if (key === lastKey) return;
+    lastKey = key; render(ctx, W, H, P);
+  }
+}
+addEventListener('scroll', schedule, { passive: true });
+addEventListener('resize', () => { resize(); drawDial(); schedule(); });
+
+/* =====================================================================
+   NAVIGATION
+   ===================================================================== */
+const STOPS = [0, .43, .93];
+const behavior = RM ? 'auto' : 'smooth';
+const toP = p => scrollTo({ top: film.offsetTop + p * filmSpan(), behavior });
+$$('.links a[data-p]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); toP(+a.dataset.p); }));
+$$('a[href^="#"]:not([data-p])').forEach(a => a.addEventListener('click', e => {
+  const id = a.getAttribute('href');
+  if (id === '#top') { e.preventDefault(); toP(0); return; }
+  const t = $(id); if (!t) return;
+  e.preventDefault(); t.scrollIntoView({ behavior, block: 'start' });
+}));
+chev.addEventListener('click', () => {
+  if (after.getBoundingClientRect().top < innerHeight * .2) { scrollTo({ top: 0, behavior }); return; }
+  const p = prog(), next = STOPS.find(s => s > p + .02);
+  if (next === undefined) $('#specs').scrollIntoView({ behavior, block: 'start' }); else toP(next);
+});
+$('#replay').addEventListener('click', () => { if (scrollY < 40) { if (USE_VIDEO) vids.intro.pause(); playIntro(); } });
+
+/* =====================================================================
+   HERO CARD · live clock + activity chart
+   ===================================================================== */
+const clock = $('#clock'), secs = $('#secs');
+function tickClock() {
+  const d = new Date(), pad = n => String(n).padStart(2, '0');
+  clock.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
+  secs.textContent = ':' + pad(d.getSeconds());
+}
+tickClock(); setInterval(tickClock, 1000);
+const cLine = $('#cLine'), cArea = $('#cArea'), cDot = $('#cDot');
+let T = 0;
+function chart() {
+  let d = '';
+  for (let i = 0; i <= 40; i++) {
+    const x = i / 40 * 168, y = 40 - 22 * (i / 40) - 6 * Math.sin(.55 * i + T) - 5 * Math.sin(.21 * i + .6 * T);
+    d += (i ? 'L' : 'M') + x.toFixed(2) + ',' + y.toFixed(2) + ' ';
+    if (i === 30) { cDot.setAttribute('cx', x.toFixed(2)); cDot.setAttribute('cy', y.toFixed(2)); }
+  }
+  cLine.setAttribute('d', d); cArea.setAttribute('d', d + 'L168,56 L0,56 Z');
+}
+chart();
+if (!RM) (function loop() {
+  T += .02;
+  if (!body.classList.contains('dim') && prog() < .1) chart();
+  requestAnimationFrame(loop);
+})();
+
+/* =====================================================================
+   DIAL (ticks + live thumbnail of the camera)
+   ===================================================================== */
+function drawDial() {
+  const d = $('#dial'), c = d.getContext('2d'), R = 132;
+  c.clearRect(0, 0, 264, 264); c.lineCap = 'round';
+  for (let i = 0; i < 60; i++) {
+    const a = -Math.PI / 2 + i * TAU / 60, long = i % 5 === 0, r0 = R - 6, r1 = long ? R - 24 : R - 16;
+    c.strokeStyle = i < 38 ? 'rgba(242,242,240,.85)' : 'rgba(242,242,240,.22)';
+    c.lineWidth = long ? 3 : 2;
+    c.beginPath(); c.moveTo(R + Math.cos(a) * r0, R + Math.sin(a) * r0); c.lineTo(R + Math.cos(a) * r1, R + Math.sin(a) * r1); c.stroke();
+  }
+  const th = $('#thumb'), s = Math.round((th.clientWidth || 80) * 2);
+  if (!s) return;
+  th.width = s; th.height = s;
+  render(th.getContext('2d'), s, s, { x: s * .02, y: s * .04, k: s * .19, yaw: 140, pitch: -13, roll: 0, e: 0, lab: 0 }, '#141416', false);
+}
+
+/* =====================================================================
+   BOOT
+   ===================================================================== */
+resize();
+drawDial();
+if (USE_VIDEO) initVideo(); else loader.classList.add('done');
+updateFx(prog());
+if (USE_VIDEO) startIntro();
+else {
+  ctx.fillStyle = '#0A0A0B'; ctx.fillRect(0, 0, W, H);
+  requestAnimationFrame(startIntro);
+}
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { lastKey = ''; schedule(); });
+})();
+</script>
+</body>
+</html>
