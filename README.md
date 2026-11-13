@@ -17,3 +17,11 @@ Settings → Pages → Source: **Deploy from a branch** → Branch: `main` / `(r
 - WhatsApp e telefone: `5500000000000` (aparece em `const WA` no script e nos links `wa.me` / `tel:`)
 - E-mail: `contato@exemplo.com.br`
 - Números da faixa de destaques (24h, 48h, 30 dias, visita grátis): confirmar com o cliente
+
+## Modo prévia (demonstração)
+Enquanto o site não é oficial, todas as páginas carregam `preview.js`, que mostra a tela de aviso "Prévia não oficial", a marca-d'água e a etiqueta no canto, e desativa WhatsApp, telefone, e-mail e formulários. A página também é bloqueada para buscadores (`meta robots noindex` e `robots.txt`).
+
+Para publicar o site oficial:
+1. Apague `preview.js`.
+2. Remova de cada página as linhas `<script src="preview.js"></script>` (ou `../preview.js`) e `<meta name="robots" content="noindex, nofollow">`.
+3. Troque o `robots.txt` por `User-agent: *` / `Allow: /`.
