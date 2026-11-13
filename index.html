@@ -3,1140 +3,346 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sentinela Segurança</title>
-<meta name="description" content="Instalação de CFTV e monitoramento remoto de câmeras para residências. Veja sua casa pelo celular, em tempo real.">
-<meta name="theme-color" content="#141417">
+<title>Sentinela Segurança · Câmeras e monitoramento 24h</title>
+<meta name="description" content="Câmeras, alarmes e monitoramento 24 horas para residências. Visita técnica e orçamento grátis.">
+<meta name="theme-color" content="#E11D2E">
+<meta property="og:title" content="Sentinela Segurança">
+<meta property="og:description" content="Sua casa protegida 24 horas, mesmo quando você não está.">
+<meta property="og:image" content="img/casa-noite.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23E11D2E'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23fff' stroke-width='2.6'/%3E%3Ccircle cx='16' cy='16' r='3.2' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Sora:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
 <style>
 :root{
-  color-scheme:dark;
-  --bg:#141417; --ink:#F7F7F5; --ink-2:rgba(247,247,245,.80); --ink-3:rgba(247,247,245,.56);
-  --line:rgba(255,255,255,.2); --line-2:rgba(255,255,255,.42); --glass:rgba(28,28,32,.74); --acc:#E5243B; --acc-2:#FF4257; --rec:#FF4257;
-  --box:rgba(16,16,19,.66);
-  --f-display:"Michroma","Eurostile","Arial Black",system-ui,sans-serif;
-  --f-body:"Sora","Helvetica Neue",Arial,system-ui,sans-serif;
-  --gut:max(20px, env(safe-area-inset-left,0px)); --gut-r:max(20px, env(safe-area-inset-right,0px));
+  --bg:#F6F5F2; --card:#FFFFFF; --ink:#111214; --ink-2:#4A4D55; --ink-3:#83868F;
+  --line:#E4E2DD; --red:#E11D2E; --red-d:#B5121F; --red-soft:#FDECEE; --dark:#121316;
+  --r:22px; --shadow:0 18px 50px rgba(17,18,20,.08);
+  --f:"Manrope",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --gut:max(20px,env(safe-area-inset-left,0px));
 }
 *{box-sizing:border-box}
-html,body{background:var(--bg)}
-body{margin:0;color:var(--ink);font-family:var(--f-body);font-weight:300;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
-button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
-:focus-visible{outline:1.5px solid var(--ink);outline-offset:3px;border-radius:999px}
-.display{font-family:var(--f-display);font-weight:400;text-transform:uppercase;letter-spacing:.01em;line-height:1.08;margin:0}
-.thin{color:var(--ink-3)}
-svg{display:block}
+img{display:block;max-width:100%}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 var(--gut)}
+h1,h2,h3{margin:0;letter-spacing:-.025em;line-height:1.08}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+.eyebrow::before{content:"";width:8px;height:8px;background:var(--red);border-radius:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:52px;padding:0 26px;border-radius:999px;font-weight:700;font-size:15px;border:1.5px solid transparent;transition:transform .2s,background .2s,box-shadow .2s,border-color .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 12px 28px rgba(225,29,46,.28)}
+.btn-red:hover{background:var(--red-d)}
+.btn-line{border-color:var(--ink);color:var(--ink);background:transparent}
+.btn-line:hover{background:var(--ink);color:#fff}
 
-/* ---------- stage ---------- */
-#stage{position:fixed;inset:0;z-index:0}
-#stage canvas{width:100%;height:100%;display:block;transition:opacity .6s}
-#stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0,0,0,.38) 100%)}
-body.dim #stage canvas{opacity:.36}
-#clips{position:fixed;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
-#film{position:relative;z-index:10;height:620vh}
-
-/* ---------- chrome ---------- */
-.nav{position:fixed;top:env(safe-area-inset-top);left:0;right:0;z-index:40;padding:0 var(--gut-r) 0 var(--gut)}
-.nav::before{content:"";position:absolute;inset:calc(-1 * env(safe-area-inset-top)) 0 -18px;background:linear-gradient(rgba(20,20,23,.94) 60%,rgba(20,20,23,0));opacity:0;transition:opacity .5s;pointer-events:none;z-index:-1}
-body.dim .nav::before{opacity:1}
-.nav .row{position:relative;height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px}
-.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-size:11px;letter-spacing:.18em;text-transform:uppercase}
-.links{display:flex;gap:44px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
-.links a{transition:color .2s}
-.links a:hover{color:var(--ink)}
-.nav-cta{height:34px;padding:0 16px;border-radius:999px;background:var(--acc);color:#fff;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.3);transition:background .2s}
-.nav-cta:hover{background:var(--acc-2)}
-.social{position:fixed;right:var(--gut-r);top:50%;transform:translateY(-50%);z-index:30;display:flex;flex-direction:column;gap:26px}
-.social a{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:9px;letter-spacing:.08em;color:var(--ink-2);border:1px solid var(--line-2);background:rgba(16,16,19,.55);transition:color .2s,border-color .2s}
-.social a:hover{color:var(--ink);border-color:var(--acc)}
-.chev{position:fixed;right:var(--gut-r);bottom:calc(22px + env(safe-area-inset-bottom));z-index:30;width:34px;height:34px;border-radius:50%;border:1px solid var(--line-2);color:var(--ink-2);display:grid;place-items:center;background:rgba(16,16,19,.55);transition:transform .4s,color .2s,border-color .2s}
-.chev:hover{color:var(--ink);border-color:var(--acc)}
-.chev.up{transform:rotate(180deg)}
-.loader{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:35;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);transition:opacity .6s;pointer-events:none}
-.loader.done{opacity:0}
-
-/* ---------- overlay layers ---------- */
-.layer{position:fixed;inset:0;z-index:10;pointer-events:none;padding:96px calc(var(--gut-r) + 56px) 48px var(--gut);transition:opacity .5s}
-.layer .in{position:relative;height:100%}
-body.dim .layer{opacity:0}
-.layer a,.layer button{pointer-events:auto}
-body.dim .layer a,body.dim .layer button{pointer-events:none}
-.fx{opacity:var(--o,0);transform:translateY(calc((1 - var(--o,0)) * 28px));visibility:hidden}
-.fx.on{visibility:visible}
-body.revealing .fx{transition:opacity .8s cubic-bezier(.22,.61,.36,1),transform .8s cubic-bezier(.22,.61,.36,1)}
+/* nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(246,245,242,.86);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .3s}
+.nav.scrolled{border-color:var(--line)}
+.nav .wrap{height:74px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:-.02em}
+.logo i{width:30px;height:30px;border-radius:9px;background:var(--red);display:grid;place-items:center}
+.menu{display:flex;gap:34px;font-size:14px;font-weight:600;color:var(--ink-2)}
+.menu a:hover{color:var(--red)}
+.nav .btn{height:42px;padding:0 20px;font-size:14px}
 
 /* hero */
-.h-title{position:absolute;left:0;top:8%;font-size:clamp(30px,4.6vw,74px)}
-.h-title span{display:block}
-.h-title span:nth-child(2){padding-left:.62em}
-.tbox{background:var(--box);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--line-2);border-left:3px solid var(--acc);border-radius:14px;padding:14px 18px}
-.h-sub{position:absolute;left:.4em;top:calc(8% + clamp(30px,4.6vw,74px) * 3.5);max-width:36ch;font-size:14px;color:var(--ink-2);margin:0}
-.h-cta{position:absolute;left:.4em;bottom:6%;display:flex;gap:10px}
-.buy{height:46px;padding:0 26px;border-radius:999px;background:var(--acc);color:#fff;border:1px solid rgba(255,255,255,.35);box-shadow:0 8px 28px rgba(229,36,59,.35);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;display:inline-flex;align-items:center;gap:10px;transition:filter .2s}
-.buy:hover{background:var(--acc-2)}
-.arrow{width:46px;height:46px;border-radius:50%;border:1px solid var(--line-2);background:rgba(16,16,19,.6);display:grid;place-items:center;transition:border-color .2s}
-.arrow:hover{border-color:var(--acc)}
-.play{position:absolute;left:49%;top:47%;width:62px;height:62px;border-radius:50%;background:rgba(229,36,59,.18);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1.5px solid var(--acc);display:grid;place-items:center;box-shadow:0 0 0 6px rgba(229,36,59,.1)}
-.play svg{transform:translateX(3px)}
+.hero{padding:56px 0 80px}
+.hero .wrap{display:grid;grid-template-columns:1.02fr 1fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(38px,5.2vw,68px);font-weight:800;margin:18px 0 20px}
+.hero h1 em{font-style:normal;color:var(--red)}
+.hero p.sub{font-size:18px;color:var(--ink-2);max-width:46ch;margin:0 0 30px}
+.ctas{display:flex;flex-wrap:wrap;gap:12px}
+.trust{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:30px;font-size:14px;font-weight:600;color:var(--ink-2)}
+.trust span{display:flex;align-items:center;gap:8px}
+.trust svg{color:var(--red);flex:none}
+.visual{position:relative}
+.visual .photo{border-radius:30px;overflow:hidden;aspect-ratio:4/4.4;box-shadow:var(--shadow);position:relative}
+.visual .photo img{width:100%;height:100%;object-fit:cover;transform:scale(1.06);transition:transform 1.6s cubic-bezier(.2,.7,.2,1)}
+.loaded .visual .photo img{transform:scale(1)}
+.visual .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.45))}
+.live{position:absolute;left:22px;top:22px;z-index:2;display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:999px;background:rgba(17,18,20,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;font-size:12.5px;font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;background:#FF3B4E;box-shadow:0 0 0 0 rgba(255,59,78,.6);animation:ping 1.6s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 9px rgba(255,59,78,0)}100%{box-shadow:0 0 0 0 rgba(255,59,78,0)}}
+.cam-label{position:absolute;left:22px;bottom:20px;z-index:2;color:#fff;font-size:13px;font-weight:600;opacity:.92}
+.notif{position:absolute;right:-26px;top:16%;z-index:3;width:270px;background:var(--card);border-radius:18px;padding:14px 16px;box-shadow:0 24px 60px rgba(17,18,20,.18);display:flex;gap:12px;align-items:flex-start;transform:translateY(12px);opacity:0;transition:opacity .5s,transform .5s cubic-bezier(.2,.8,.2,1)}
+.notif.show{opacity:1;transform:none}
+.notif .ic{width:38px;height:38px;border-radius:12px;background:var(--red-soft);color:var(--red);display:grid;place-items:center;flex:none}
+.notif b{display:block;font-size:14px}
+.notif small{font-size:12.5px;color:var(--ink-3)}
+.status{position:absolute;left:-26px;bottom:12%;z-index:3;background:var(--card);border-radius:18px;padding:14px 18px;box-shadow:0 24px 60px rgba(17,18,20,.16);display:flex;align-items:center;gap:14px}
+.status .sw{width:44px;height:26px;border-radius:999px;background:var(--red);position:relative}
+.status .sw::after{content:"";position:absolute;right:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff}
+.status b{font-size:14px;display:block}
+.status small{font-size:12px;color:var(--ink-3)}
 
-.card{position:absolute;width:200px;padding:14px 16px 12px;border-radius:18px;background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);border:1px solid var(--line-2);border-top:2px solid var(--acc);box-shadow:0 18px 40px rgba(0,0,0,.35)}
-.card .top{display:flex;justify-content:space-between;align-items:center}
-.card .lbl{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);display:flex;align-items:center;gap:7px}
-.chip{width:22px;height:22px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;color:var(--ink-2)}
-.rec{width:6px;height:6px;border-radius:50%;background:var(--rec);box-shadow:0 0 8px var(--rec);animation:blink 1.4s steps(2,start) infinite}
-@keyframes blink{to{opacity:.2}}
-.val{font-family:var(--f-display);font-size:30px;line-height:1;margin:12px 0 6px;font-variant-numeric:tabular-nums}
-.val small{font-family:var(--f-body);font-size:9px;letter-spacing:.12em;color:var(--ink-3);vertical-align:top;margin-left:6px}
-.c-live{right:2%;top:6%}
-.c-live svg.chart{width:100%;height:56px}
-.c-cov{right:16%;bottom:4%;width:178px}
-.gauge{position:relative;height:84px;margin-top:8px}
-.gauge svg{width:100%;height:84px}
-.gauge b{position:absolute;left:0;right:0;bottom:0;text-align:center;font-family:var(--f-display);font-weight:400;font-size:24px;line-height:1}
-.gauge b small{font-size:11px;margin-left:2px;color:var(--ink-2)}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:-20px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px 24px}
+.stat .n{font-size:40px;font-weight:800;letter-spacing:-.03em;color:var(--red);line-height:1}
+.stat .l{font-size:14px;color:var(--ink-2);margin-top:8px;font-weight:500}
 
-/* design */
-.m-title{position:absolute;left:0;top:10%;font-size:clamp(26px,3.3vw,50px)}
-.m-title .thin{display:block}
-.m-copy{position:absolute;left:.3em;top:calc(10% + clamp(26px,3.3vw,50px) * 2.5 + 18px);max-width:34ch;color:var(--ink-2);margin:0}
-.stats{position:absolute;right:0;bottom:8%;display:grid;gap:12px;text-align:right}
-.stat{background:var(--box);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--line-2);border-right:3px solid var(--acc);border-radius:14px;padding:12px 16px}
-.stat .n{font-family:var(--f-display);font-size:clamp(26px,2.6vw,38px);line-height:1}
-.stat .n small{font-family:var(--f-body);font-size:10px;letter-spacing:.14em;color:var(--ink-3);margin-left:6px}
-.stat .l{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-top:6px}
+section{padding:110px 0 0}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:44px;flex-wrap:wrap}
+.head h2{font-size:clamp(30px,3.6vw,48px);font-weight:800;margin-top:14px;max-width:18ch}
+.head p{max-width:42ch;color:var(--ink-2);margin:0}
 
-/* breakdown */
-.x-title{position:absolute;left:0;top:2%;font-size:clamp(24px,3vw,46px)}
-.x-info{position:absolute;right:11%;bottom:2%;display:flex;align-items:center;gap:24px;max-width:520px}
-.dial{position:relative;width:132px;height:132px;flex:none}
-.dial canvas.ticks{width:100%;height:100%}
-.thumb{position:absolute;inset:26px;border-radius:50%;background:#1C1C20;border:1.5px solid var(--acc);overflow:hidden}
-.thumb canvas{width:100%;height:100%;display:block}
-.x-info h3{font-size:15px;font-weight:500;margin:0 0 10px}
-.x-info p{font-size:12.5px;color:var(--ink-2);max-width:40ch;margin:0}
+/* solutions */
+.sol{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.s-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .3s,box-shadow .3s,border-color .3s;display:flex;flex-direction:column}
+.s-card:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:transparent}
+.s-card .im{aspect-ratio:16/10;overflow:hidden}
+.s-card .im img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.s-card:hover .im img{transform:scale(1.05)}
+.s-card .tx{padding:22px 24px 26px}
+.s-card h3{font-size:19px;font-weight:700;margin-bottom:8px}
+.s-card p{margin:0;color:var(--ink-2);font-size:15px}
+.s-card.ico .tx{padding-top:28px}
+.s-card .badge{width:46px;height:46px;border-radius:14px;background:var(--red-soft);color:var(--red);display:grid;place-items:center;margin-bottom:18px}
 
-/* ---------- after the film ---------- */
-.after{position:relative;z-index:12}
-.panel{padding:120px calc(var(--gut-r) + 56px) 40px var(--gut)}
-.wrap{max-width:1180px;margin:0 auto}
-.eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc-2);font-weight:500;display:inline-flex;align-items:center;gap:10px}
-.eyebrow::before{content:"";width:9px;height:9px;background:var(--acc)}
-.eyebrow.light{color:#fff}.eyebrow.light::before{background:#fff}
-.panel h2{font-size:clamp(26px,3.4vw,48px);margin:16px 0 48px;max-width:20ch}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.cell{padding:26px 22px;border-radius:20px;background:var(--glass);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid var(--line-2);border-top:3px solid var(--acc)}
-.cell .n{font-family:var(--f-display);font-size:clamp(28px,3vw,44px);line-height:1}
-.cell .n small{font-family:var(--f-body);font-size:11px;letter-spacing:.12em;color:var(--ink-3);margin-left:6px}
-.cell p{font-size:13px;color:var(--ink-2);margin:12px 0 0}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
-.lay{padding:18px 20px;border-radius:16px;border:1px solid var(--line-2);border-left:3px solid var(--acc);background:var(--box)}
-.lay .k{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
-.lay .v{font-weight:500;margin-top:4px}
+/* split */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.split .im{border-radius:30px;overflow:hidden;aspect-ratio:5/4.6}
+.split .im img{width:100%;height:100%;object-fit:cover}
+.split h2{font-size:clamp(30px,3.6vw,46px);font-weight:800;margin:14px 0 18px}
+.split p{color:var(--ink-2);margin:0 0 26px}
+.steps{display:grid;gap:14px;margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{display:flex;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;counter-increment:s}
+.steps li::before{content:counter(s,decimal-leading-zero);font-weight:800;color:var(--red);font-size:15px;min-width:26px}
+.steps b{display:block}
+.steps span{color:var(--ink-2);font-size:14.5px}
 
-.svc{padding:26px 22px 24px;border-radius:20px;background:var(--glass);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid var(--line-2);transition:border-color .25s,transform .25s}
-.svc:hover{border-color:var(--acc);transform:translateY(-3px)}
-.svc .ic{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--acc);background:rgba(229,36,59,.12);display:grid;place-items:center;color:#fff;margin-bottom:20px}
-.svc h3{font-size:15px;font-weight:500;margin:0 0 8px}
-.svc p{font-size:13px;color:var(--ink-2);margin:0}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
-.step{padding:20px 22px;border-radius:16px;border:1px solid var(--line-2);background:var(--box);display:flex;gap:16px;align-items:baseline}
-.step b{font-family:var(--f-display);font-weight:400;font-size:12px;color:var(--acc-2)}
-.step span{font-size:13px;color:var(--ink-2)}
-.step span strong{display:block;color:var(--ink);font-weight:500;font-size:14px;margin-bottom:2px}
+/* faq */
+.faq{display:grid;gap:12px;max-width:860px}
+.faq details{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:0 24px}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 0;font-weight:700;font-size:17px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:26px;font-weight:500;color:var(--red);transition:transform .3s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{margin:0 0 22px;color:var(--ink-2)}
 
-.lead{color:var(--ink-2);max-width:72ch;margin:-28px 0 40px;font-size:15.5px}
-.lead strong{color:var(--ink);font-weight:500}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.kpi{background:var(--acc);border-radius:18px;padding:30px 18px;text-align:center;border:1px solid rgba(255,255,255,.25);box-shadow:0 14px 36px rgba(229,36,59,.22)}
-.kpi .n{font-family:var(--f-display);font-size:clamp(26px,2.8vw,40px);line-height:1;color:#fff}
-.kpi .l{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.92);margin-top:12px;font-weight:500;line-height:1.5}
-.quote{margin:40px 0 0;padding:34px 38px;border:1px solid var(--line-2);border-left:4px solid var(--acc);border-radius:18px;background:var(--box)}
-.quote p{font-family:var(--f-display);text-transform:uppercase;font-size:clamp(17px,1.9vw,26px);line-height:1.35;margin:0 0 16px;max-width:44ch}
-.quote cite{font-style:normal;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc-2)}
-.final{padding:120px calc(var(--gut-r) + 56px) 120px var(--gut)}
-.cta-box{background:linear-gradient(135deg,var(--acc),#B5162A);border-radius:26px;padding:56px;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;border:1px solid rgba(255,255,255,.3);box-shadow:0 30px 80px rgba(229,36,59,.25)}
-.cta-copy h2{font-size:clamp(26px,3.4vw,46px);margin:16px 0 18px;max-width:16ch;color:#fff}
-.cta-copy p{color:rgba(255,255,255,.92);max-width:44ch;margin:0 0 22px}
-.checks{list-style:none;margin:0;padding:0;display:grid;gap:10px;font-weight:400}
-.checks li{display:flex;gap:10px;align-items:center}
-.checks li::before{content:"";width:16px;height:16px;flex:none;border-radius:50%;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4.5 8.2 2.3 2.3 4.7-5' fill='none' stroke='%23E5243B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat}
-.lead-form{background:#fff;color:#141417;border-radius:20px;padding:30px 28px;display:grid;gap:14px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
-.lead-form h3{margin:0 0 4px;color:var(--acc);font-weight:600;font-size:16px;text-transform:uppercase;letter-spacing:.04em}
-.lead-form label{display:grid;gap:4px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#6B6B72;font-weight:500}
-.lead-form input,.lead-form select{font:inherit;font-size:15px;letter-spacing:0;text-transform:none;color:#141417;background:#F4F4F6;border:1px solid #DADAE0;border-radius:10px;height:44px;padding:0 12px;outline:none;transition:border-color .2s}
-.lead-form input:focus,.lead-form select:focus{border-color:var(--acc)}
-.lead-form .buy{justify-content:center;margin-top:6px;box-shadow:none}
-.lead-form small{font-size:11px;color:#6B6B72;text-align:center}
-.wa-float{position:fixed;right:var(--gut-r);bottom:calc(22px + 34px + 14px + env(safe-area-inset-bottom));z-index:31;width:48px;height:48px;border-radius:50%;background:#25D366;color:#fff;display:grid;place-items:center;box-shadow:0 10px 26px rgba(0,0,0,.35);border:2px solid #fff;transition:transform .2s}
-.wa-float:hover{transform:scale(1.06)}
-.wa-float{opacity:0;pointer-events:none;transition:opacity .4s,transform .2s}
-body.dim .wa-float{opacity:1;pointer-events:auto}
+/* cta */
+.cta{margin-top:110px;background:var(--dark);color:#fff;border-radius:34px;padding:64px;display:grid;grid-template-columns:1fr .9fr;gap:56px;align-items:center;position:relative;overflow:hidden}
+.cta::before{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(225,29,46,.55),rgba(225,29,46,0) 70%)}
+.cta h2{font-size:clamp(30px,3.8vw,50px);font-weight:800;margin:14px 0 16px;position:relative}
+.cta p{color:rgba(255,255,255,.75);margin:0;position:relative}
+.form{background:#fff;color:var(--ink);border-radius:24px;padding:30px;display:grid;gap:14px;position:relative}
+.form h3{font-size:19px}
+.form label{display:grid;gap:6px;font-size:13px;font-weight:700;color:var(--ink-2)}
+.form input,.form select{font:inherit;font-size:15px;height:50px;border-radius:14px;border:1.5px solid var(--line);background:#FAFAF8;padding:0 14px;outline:none;transition:border-color .2s}
+.form input:focus,.form select:focus{border-color:var(--red)}
+.form .btn{width:100%;margin-top:4px}
+.form small{color:var(--ink-3);font-size:12.5px;text-align:center}
 
-#servicos{background:linear-gradient(rgba(255,255,255,0),rgba(255,255,255,.03) 30%,rgba(255,255,255,0))}
-footer{padding:40px calc(var(--gut-r) + 56px) 30px var(--gut);border-top:3px solid var(--acc);display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:28px;font-size:12px;color:var(--ink-2);background:rgba(16,16,19,.92)}
-.f-col{display:grid;gap:8px;align-content:start}
-.f-col b{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc-2);font-weight:600}
-.f-col a:hover{color:var(--ink)}
-.f-bottom{grid-column:1/-1;border-top:1px solid var(--line);padding-top:18px;font-size:11px;color:var(--ink-3)}
+footer{margin-top:90px;border-top:1px solid var(--line);padding:46px 0 34px}
+footer .wrap{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:30px;font-size:14.5px;color:var(--ink-2)}
+footer b{display:block;color:var(--ink);margin-bottom:10px}
+footer a{display:block;margin-bottom:6px}
+footer a:hover{color:var(--red)}
+.copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:22px;font-size:13px;color:var(--ink-3)}
 
-/* ---------- responsive ---------- */
+.wa{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:60;width:58px;height:58px;border-radius:50%;background:#25D366;color:#fff;display:grid;place-items:center;box-shadow:0 14px 30px rgba(37,211,102,.4);transition:transform .2s}
+.wa:hover{transform:scale(1.07)}
+
+.rv{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+
 @media (max-width:980px){
-  .links{display:none}
-  .c-cov{display:none}
-  .stats{gap:14px}
-  .grid4{grid-template-columns:repeat(2,1fr)}
-  .kpis{grid-template-columns:repeat(2,1fr)}
-  .cta-box{grid-template-columns:1fr;padding:40px 32px}
+  .menu{display:none}
+  .hero .wrap,.split,.cta{grid-template-columns:1fr}
+  .visual{max-width:560px}
+  .stats{grid-template-columns:repeat(2,1fr);margin-top:0}
+  .sol{grid-template-columns:repeat(2,1fr)}
+  .cta{padding:44px 32px}
+  footer .wrap{grid-template-columns:1fr 1fr}
 }
 @media (max-width:640px){
-  .social{display:none}
-  .layer{padding:84px var(--gut-r) 28px var(--gut)}
-  .panel{padding:96px var(--gut-r) 32px var(--gut)}
-  footer{padding:32px var(--gut-r) 30px var(--gut);grid-template-columns:1fr}
-  .final{padding:80px var(--gut-r) 90px var(--gut)}
-  .cta-box{padding:30px 20px;border-radius:22px}
-  .lead-form{padding:24px 18px}
-  .quote{padding:24px 22px}
-  .lead{margin-top:-24px}
-  .nav-cta{height:30px;padding:0 12px;font-size:9px}
-  .h-title{top:2%}
-  .h-sub{top:calc(2% + clamp(30px,4.6vw,74px) * 3.5);font-size:13px}
-  .play{left:calc(50% - 31px);top:50%}
-  .c-live{right:0;top:auto;bottom:14%;width:170px}
-  .h-cta{bottom:2%}
-  .m-title{top:2%}
-  .m-copy{top:calc(2% + clamp(26px,3.3vw,50px) * 2.5 + 14px);font-size:13px}
-  .stats{left:0;right:44px;bottom:2%;grid-template-columns:repeat(3,1fr);text-align:left;gap:8px}
-  .stat{border-right:1px solid var(--line-2);border-left:3px solid var(--acc);padding:10px 10px}
-  .tbox{padding:12px 14px}
-  .x-info{padding:12px}
-  .x-title{top:2%}
-  .x-info{left:0;right:auto;bottom:2%;gap:16px}
-  .dial{width:96px;height:96px}
-  .thumb{inset:18px}
-  .x-info p{font-size:12px}
-  .grid4{grid-template-columns:repeat(2,1fr)}
-  .grid3{grid-template-columns:repeat(2,1fr)}
-  .grid3.svcs{grid-template-columns:1fr}
-  .steps{grid-template-columns:1fr}
-  .final .ctas .buy{padding:0 20px}
+  .hero{padding:28px 0 56px}
+  .hero p.sub{font-size:16.5px}
+  .notif{right:10px;top:auto;bottom:-24px;width:250px}
+  .status{left:10px;bottom:auto;top:66px;padding:10px 14px}
+  .stats{margin-top:20px}
+  .stat{padding:20px 18px}.stat .n{font-size:32px}
+  .sol{grid-template-columns:1fr}
+  section{padding-top:80px}
+  .cta{padding:34px 20px;border-radius:26px;margin-top:80px}
+  .form{padding:22px 18px}
+  footer .wrap{grid-template-columns:1fr}
+  .nav .btn{display:none}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  #stage canvas{transition:none}
-  .rec{animation:none}
+  .rv{opacity:1;transform:none;transition:none}
+  .dot{animation:none}
 }
 </style>
 </head>
 <body>
 
-<div id="stage" aria-hidden="true"><canvas id="cv"></canvas></div>
-<div id="clips" aria-hidden="true"></div>
-
-<header class="nav">
-  <div class="row">
-    <a class="brand" href="#top" aria-label="Sentinela, início">
-      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-        <circle cx="10" cy="10" r="7.5"/><circle cx="10" cy="10" r="2.6" fill="currentColor" stroke="none"/>
-      </svg>
-      Sentinela
-    </a>
-    <nav class="links" aria-label="Seções">
-      <a href="#top" data-p="0">Início</a>
-      <a href="#top" data-p="0.43">Câmera</a>
-      <a href="#top" data-p="0.93">Por dentro</a>
-      <a href="#sobre">Sobre</a>
-      <a href="#servicos">Soluções</a>
-      <a href="#contato">Contato</a>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="#"><i><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2"><circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="2.4" fill="#fff" stroke="none"/></svg></i>Sentinela</a>
+    <nav class="menu" aria-label="Seções">
+      <a href="#solucoes">Soluções</a><a href="#como">Como funciona</a><a href="#duvidas">Dúvidas</a><a href="#contato">Contato</a>
     </nav>
-    <a class="nav-cta" href="#contato">Solicitar orçamento</a>
+    <a class="btn btn-red" href="#contato">Solicitar orçamento</a>
   </div>
 </header>
 
-<nav class="social" aria-label="Redes sociais">
-  <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram">IG</a>
-  <a href="https://wa.me/5500000000000" target="_blank" rel="noopener" aria-label="WhatsApp">WA</a>
-  <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook">FB</a>
-</nav>
-
-<button class="chev" id="chev" aria-label="Próxima seção">
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4.5 6 8.5l4-4"/></svg>
-</button>
-
-<main id="top">
-  <section id="film" aria-label="Filme da câmera"></section>
-
-  <!-- HERO -->
-  <div class="layer" id="l-hero">
-    <div class="in">
-      <h1 class="display h-title fx" data-in="-1" data-out="0.07" aria-label="Seus olhos em casa 24 horas">
-        <span aria-hidden="true">Seus olhos</span><span aria-hidden="true">em casa</span><span aria-hidden="true">24 horas</span>
-      </h1>
-      <p class="h-sub tbox fx" data-in="-1" data-out="0.07">Segurança eletrônica e monitoramento 24 horas para residências. Câmeras, alarmes e acesso pelo celular, com central própria e resposta rápida.</p>
-      <div class="h-cta fx" data-in="-1" data-out="0.07">
-        <a class="buy" href="#contato">Solicitar orçamento</a>
-        <a class="arrow" href="#servicos" aria-label="Ver soluções">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><path d="M4 10 10 4M5 4h5v5"/></svg>
-        </a>
-      </div>
-      <button class="play fx" id="replay" data-in="-1" data-out="0.05" aria-label="Rever o filme da câmera">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 1.8v12.4L13.6 8z"/></svg>
-      </button>
-
-      <div class="card c-live fx" data-in="-1" data-out="0.06">
-        <div class="top"><span class="lbl"><i class="rec" aria-hidden="true"></i>CAM 01 · Ao vivo</span>
-          <span class="chip" aria-hidden="true"><svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M2.5 7.5l5-5M3.5 2.5h4v4"/></svg></span></div>
-        <div class="val"><span id="clock">21:47</span><small id="secs">:09</small></div>
-        <svg class="chart" viewBox="0 0 168 56" preserveAspectRatio="none" aria-hidden="true">
-          <defs><linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF4257" stop-opacity=".4"/><stop offset="1" stop-color="#FF4257" stop-opacity="0"/></linearGradient></defs>
-          <path id="cArea" fill="url(#gfill)"/>
-          <path id="cLine" fill="none" stroke="#FF4257" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-          <circle id="cDot" r="3" fill="#F2F2F0"/>
-        </svg>
-      </div>
-
-      <div class="card c-cov fx" data-in="-1" data-out="0.06">
-        <div class="top"><span class="lbl">Cobertura</span>
-          <span class="chip" aria-hidden="true"><svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M2.5 7.5l5-5M3.5 2.5h4v4"/></svg></span></div>
-        <div class="gauge">
-          <svg viewBox="0 0 150 84" aria-hidden="true">
-            <path d="M15 78a60 60 0 0 1 120 0" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="8" stroke-linecap="round"/>
-            <path d="M15 78a60 60 0 0 1 120 0" fill="none" stroke="#E5243B" stroke-width="8" stroke-linecap="round" pathLength="100" stroke-dasharray="96 100"/>
-          </svg>
-          <b>96<small>%</small></b>
+<main>
+  <section class="hero" style="padding-top:56px">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow rv">Monitoramento 24h · Visita técnica grátis</div>
+        <h1 class="rv">Sua casa protegida <em>24 horas</em>, mesmo quando você não está.</h1>
+        <p class="sub rv">Câmeras, alarmes e monitoramento remoto para residências. Você acompanha tudo pelo celular, e a nossa central acompanha com você.</p>
+        <div class="ctas rv">
+          <a class="btn btn-red" href="#contato">Solicitar orçamento grátis</a>
+          <a class="btn btn-line" href="https://wa.me/5500000000000" target="_blank" rel="noopener">Falar no WhatsApp</a>
+        </div>
+        <div class="trust rv">
+          <span><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 10.5 3 3 7-7.5"/></svg>Instalação em até 48h</span>
+          <span><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 10.5 3 3 7-7.5"/></svg>Imagens no celular</span>
+          <span><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 10.5 3 3 7-7.5"/></svg>Suporte técnico local</span>
         </div>
       </div>
+      <div class="visual rv">
+        <div class="photo">
+          <img src="img/casa-noite.jpg" alt="Casa moderna iluminada à noite" fetchpriority="high">
+          <div class="live"><span class="dot"></span>CAM 01 · Ao vivo · <span id="clock">21:47:09</span></div>
+          <div class="cam-label">Entrada principal</div>
+        </div>
+        <div class="notif" id="notif" role="status" aria-live="polite">
+          <div class="ic"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 14V9a5 5 0 0 1 10 0v5l1.5 2h-13z"/><path d="M8.5 18h3"/></svg></div>
+          <div><b id="nT">Movimento detectado</b><small id="nS">Portão da garagem · agora</small></div>
+        </div>
+        <div class="status"><div class="sw"></div><div><b>Alarme ativado</b><small>Todos os sensores online</small></div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat rv"><div class="n" data-count="24" data-suf="h">0</div><div class="l">de monitoramento, todos os dias</div></div>
+      <div class="stat rv"><div class="n" data-count="48" data-suf="h">0</div><div class="l">prazo médio de instalação</div></div>
+      <div class="stat rv"><div class="n" data-count="30" data-suf=" dias">0</div><div class="l">de gravação em nuvem</div></div>
+      <div class="stat rv"><div class="n">Grátis</div><div class="l">visita técnica e orçamento</div></div>
     </div>
   </div>
 
-  <!-- DESIGN -->
-  <div class="layer" id="l-design">
-    <div class="in">
-      <h2 class="display m-title fx" data-in="0.30" data-out="0.53">Visão 4K <span class="thin">dia e noite</span></h2>
-      <p class="m-copy tbox fx" data-in="0.34" data-out="0.53">Sensor Starlight que mantém as cores na penumbra e infravermelho até 40 metros. Carcaça IP67 que aguenta sol, chuva e poeira.</p>
-      <div class="stats">
-        <div class="stat fx" data-in="0.36" data-out="0.53"><div class="n">8<small>MP</small></div><div class="l">Resolução</div></div>
-        <div class="stat fx" data-in="0.39" data-out="0.53"><div class="n">40<small>M</small></div><div class="l">Visão noturna</div></div>
-        <div class="stat fx" data-in="0.42" data-out="0.53"><div class="n">30<small>DIAS</small></div><div class="l">Em nuvem</div></div>
+  <section id="solucoes">
+    <div class="wrap">
+      <div class="head">
+        <div><div class="eyebrow rv">Nossas soluções</div><h2 class="rv">Tudo o que sua casa precisa em um só lugar</h2></div>
+        <p class="rv">Projetamos cada sistema conforme o imóvel e a rotina da sua família, do primeiro ponto de câmera ao suporte depois da instalação.</p>
+      </div>
+      <div class="sol">
+        <article class="s-card rv"><div class="im"><img src="img/cam-poste.jpg" alt="Câmeras de segurança instaladas em poste" loading="lazy"></div><div class="tx"><h3>Câmeras e CFTV</h3><p>Imagem em alta definição de dia e de noite, com projeto de cobertura sem pontos cegos.</p></div></article>
+        <article class="s-card rv"><div class="im"><img src="img/sala.jpg" alt="Sala de estar moderna" loading="lazy"></div><div class="tx"><h3>Alarmes e sensores</h3><p>Sensores de presença e abertura que disparam alerta no celular e na central.</p></div></article>
+        <article class="s-card rv"><div class="im"><img src="img/fechadura.jpg" alt="Fechadura inteligente controlada pelo celular" loading="lazy"></div><div class="tx"><h3>Acesso pelo celular</h3><p>Veja as câmeras ao vivo, receba notificações e controle tudo pelo aplicativo.</p></div></article>
+        <article class="s-card ico rv"><div class="tx"><div class="badge"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2.5 16 5v4.5c0 4-2.6 6.6-6 8-3.4-1.4-6-4-6-8V5z"/><path d="m7.3 10 1.9 1.9 3.6-3.8"/></svg></div><h3>Monitoramento 24h</h3><p>Central acompanhando os alertas da sua casa dia e noite, com acionamento rápido quando necessário.</p></div></article>
+        <article class="s-card ico rv"><div class="tx"><div class="badge"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 15.5h9a3.5 3.5 0 0 0 .4-7A5 5 0 0 0 5.2 8 3.8 3.8 0 0 0 5.5 15.5z"/></svg></div><h3>Gravação em nuvem</h3><p>Imagens guardadas fora de casa, seguras mesmo que o gravador seja danificado ou levado.</p></div></article>
+        <article class="s-card ico rv"><div class="tx"><div class="badge"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 3.5a4 4 0 0 0-4.9 5.2L3 13.3 6.7 17l4.6-4.6a4 4 0 0 0 5.2-4.9l-2.4 2.4-2.6-.6-.6-2.6z"/></svg></div><h3>Manutenção preventiva</h3><p>Revisões periódicas, limpeza de lentes e atualização dos equipamentos.</p></div></article>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- BREAKDOWN -->
-  <div class="layer" id="l-break">
-    <div class="in">
-      <h2 class="display x-title fx" data-in="0.86" data-out="2">Feita <span class="thin">para</span><br>durar <span class="thin">anos</span></h2>
-      <div class="x-info tbox fx" data-in="0.89" data-out="2">
-        <div class="dial" aria-hidden="true">
-          <canvas class="ticks" id="dial" width="264" height="264"></canvas>
-          <div class="thumb"><canvas id="thumb"></canvas></div>
-        </div>
-        <div>
-          <h3>Seis camadas, uma câmera</h3>
-          <p>Vidro temperado, anel de LEDs infravermelhos, lente varifocal, sensor Starlight, carcaça IP67 e tampa traseira com PoE e suporte articulado.</p>
-        </div>
+  <section id="como">
+    <div class="wrap split">
+      <div class="im rv"><img src="img/tecnico.jpg" alt="Técnico instalando equipamento de segurança" loading="lazy"></div>
+      <div>
+        <div class="eyebrow rv">Como funciona</div>
+        <h2 class="rv">Do primeiro contato ao app no seu celular</h2>
+        <p class="rv">Um processo simples, com equipe própria e acompanhamento em cada etapa.</p>
+        <ol class="steps">
+          <li class="rv"><div><b>Visita técnica gratuita</b><span>Avaliamos os acessos e os pontos cegos do imóvel.</span></div></li>
+          <li class="rv"><div><b>Projeto sob medida</b><span>Você recebe a proposta com equipamentos e posicionamento.</span></div></li>
+          <li class="rv"><div><b>Instalação limpa</b><span>Cabeamento organizado e tudo testado na hora.</span></div></li>
+          <li class="rv"><div><b>Tudo no seu celular</b><span>Configuramos o aplicativo junto com você.</span></div></li>
+        </ol>
       </div>
+    </div>
+  </section>
+
+  <section id="duvidas">
+    <div class="wrap">
+      <div class="head"><div><div class="eyebrow rv">Dúvidas frequentes</div><h2 class="rv">Perguntas que sempre recebemos</h2></div></div>
+      <div class="faq">
+        <details class="rv"><summary>As câmeras funcionam à noite?</summary><p>Sim. Os modelos que instalamos têm visão noturna por infravermelho, e alguns mantêm imagem colorida mesmo com pouca luz.</p></details>
+        <details class="rv"><summary>Consigo ver as imagens pelo celular?</summary><p>Sim. Configuramos o aplicativo no seu celular e no de quem você quiser, com acesso ao vivo e às gravações.</p></details>
+        <details class="rv"><summary>E se faltar internet ou energia?</summary><p>O gravador continua registrando localmente, e indicamos opções de nobreak e internet reserva conforme o projeto.</p></details>
+        <details class="rv"><summary>Quanto custa?</summary><p>Depende do imóvel e do número de câmeras. A visita técnica e o orçamento são gratuitos e sem compromisso.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta" id="contato">
+      <div>
+        <div class="eyebrow">Orçamento sem compromisso</div>
+        <h2>Fale com um especialista ainda hoje</h2>
+        <p>Atendimento rápido, com resposta em poucos minutos. Preencha os dados e continuamos a conversa pelo WhatsApp.</p>
+      </div>
+      <form class="form" id="leadForm">
+        <h3>Solicite sua visita técnica</h3>
+        <label>Nome<input name="nome" required autocomplete="name"></label>
+        <label>WhatsApp<input name="tel" type="tel" required autocomplete="tel" placeholder="(DDD) 9 0000-0000"></label>
+        <label>Tipo de imóvel<select name="tipo"><option>Casa</option><option>Apartamento</option><option>Condomínio</option><option>Comércio</option></select></label>
+        <button class="btn btn-red" type="submit">Enviar pelo WhatsApp</button>
+        <small>O WhatsApp abre com a sua mensagem pronta.</small>
+      </form>
     </div>
   </div>
 </main>
 
-<div class="after">
-  <section id="sobre" class="panel">
-    <div class="wrap">
-      <div class="eyebrow">Sobre nós</div>
-      <h2 class="display">Segurança que <span class="thin">se antecipa</span></h2>
-      <p class="lead">A Sentinela é especializada em <strong>segurança eletrônica residencial</strong>: projeto, instalação e monitoramento de câmeras, alarmes e sensores. Unimos tecnologia, <strong>atendimento próximo</strong> e suporte técnico local para prevenir riscos e proteger o que realmente importa.</p>
-      <div class="kpis">
-        <div class="kpi"><div class="n">24H</div><div class="l">Monitoramento<br>com central própria</div></div>
-        <div class="kpi"><div class="n">48H</div><div class="l">Prazo médio<br>de instalação</div></div>
-        <div class="kpi"><div class="n">30</div><div class="l">Dias de gravação<br>em nuvem</div></div>
-        <div class="kpi"><div class="n">GRÁTIS</div><div class="l">Visita técnica<br>e orçamento</div></div>
-      </div>
-      <blockquote class="quote">
-        <p>“Proteger não é correr atrás do prejuízo. É enxergar o risco antes que ele chegue à sua porta.”</p>
-        <cite>Equipe Sentinela</cite>
-      </blockquote>
-    </div>
-  </section>
+<footer>
+  <div class="wrap">
+    <div><a class="logo" href="#" style="margin-bottom:12px"><i><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2"><circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="2.4" fill="#fff" stroke="none"/></svg></i>Sentinela</a>Segurança eletrônica e monitoramento 24 horas para residências.</div>
+    <div><b>Atendimento</b><a href="tel:+5500000000000">(00) 0000-0000</a><a href="mailto:contato@exemplo.com.br">contato@exemplo.com.br</a></div>
+    <div><b>Navegação</b><a href="#solucoes">Soluções</a><a href="#como">Como funciona</a><a href="#contato">Orçamento</a></div>
+    <div class="copy">© 2026 Sentinela · Fotos: Unsplash</div>
+  </div>
+</footer>
 
-  <section id="specs" class="panel">
-    <div class="wrap">
-      <div class="eyebrow">Especificações</div>
-      <h2 class="display">Instalação limpa, <span class="thin">sem fios à mostra</span></h2>
-      <div class="grid4">
-        <div class="cell"><div class="n">8<small>MP</small></div><p>Imagem 4K com HDR para identificar rostos e placas.</p></div>
-        <div class="cell"><div class="n">40<small>M</small></div><p>Visão noturna por infravermelho, mesmo no escuro total.</p></div>
-        <div class="cell"><div class="n">IP67</div><p>Resistente a chuva forte, sol e poeira o ano todo.</p></div>
-        <div class="cell"><div class="n">30<small>DIAS</small></div><p>Gravação em nuvem criptografada, acessível pelo app.</p></div>
-      </div>
-      <div class="grid3">
-        <div class="lay"><div class="k">Camada 1 · frontal</div><div class="v">Vidro temperado antirreflexo</div></div>
-        <div class="lay"><div class="k">Camada 2</div><div class="v">Anel IR com 8 LEDs</div></div>
-        <div class="lay"><div class="k">Camada 3</div><div class="v">Lente varifocal 2,8–12 mm</div></div>
-        <div class="lay"><div class="k">Camada 4</div><div class="v">Sensor Starlight 1/1,8"</div></div>
-        <div class="lay"><div class="k">Camada 5</div><div class="v">Carcaça IP67 com capa solar</div></div>
-        <div class="lay"><div class="k">Camada 6 · traseira</div><div class="v">Placa PoE e suporte articulado</div></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="servicos" class="panel">
-    <div class="wrap">
-      <div class="eyebrow">Nossas soluções</div>
-      <h2 class="display">Proteção completa <span class="thin">para sua casa</span></h2>
-      <div class="grid3 svcs">
-        <div class="svc"><div class="ic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.5h11l4-2v7l-4-2h-11z"/><path d="M6 9.5v5M3.5 14.5h5"/></svg></div><h3>Instalação de CFTV</h3><p>Projeto de cobertura, cabeamento embutido e configuração completa das câmeras.</p></div>
-        <div class="svc"><div class="ic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="8" height="16" rx="2"/><path d="M9 15h2"/></svg></div><h3>Acesso pelo celular</h3><p>Veja todas as câmeras ao vivo e receba alertas de movimento no app.</p></div>
-        <div class="svc"><div class="ic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5 16 5v4.5c0 4-2.6 6.6-6 8-3.4-1.4-6-4-6-8V5z"/><path d="m7.3 10 1.9 1.9 3.6-3.8"/></svg></div><h3>Monitoramento remoto 24h</h3><p>Central acompanhando sua casa dia e noite, com acionamento rápido.</p></div>
-        <div class="svc"><div class="ic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 15.5h9a3.5 3.5 0 0 0 .4-7A5 5 0 0 0 5.2 8 3.8 3.8 0 0 0 5.5 15.5z"/></svg></div><h3>Gravação em nuvem</h3><p>Imagens guardadas fora de casa, seguras mesmo se o gravador for levado.</p></div>
-        <div class="svc"><div class="ic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 14V9a5 5 0 0 1 10 0v5l1.5 2h-13z"/><path d="M8.5 18h3"/></svg></div><h3>Alarmes e sensores</h3><p>Sensores de abertura e presença integrados às câmeras e ao app.</p></div>
-        <div class="svc"><div class="ic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.5 3.5a4 4 0 0 0-4.9 5.2L3 13.3 6.7 17l4.6-4.6a4 4 0 0 0 5.2-4.9l-2.4 2.4-2.6-.6-.6-2.6z"/></svg></div><h3>Manutenção preventiva</h3><p>Revisões periódicas, limpeza de lentes e atualização de firmware.</p></div>
-      </div>
-      <div class="steps">
-        <div class="step"><b>01</b><span><strong>Visita técnica gratuita</strong>Avaliamos os pontos cegos da sua casa.</span></div>
-        <div class="step"><b>02</b><span><strong>Instalação em até 48h</strong>Equipe própria, acabamento limpo.</span></div>
-        <div class="step"><b>03</b><span><strong>Tudo no seu celular</strong>Configuramos o app com você.</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="contato" class="final">
-    <div class="wrap cta-box">
-      <div class="cta-copy">
-        <div class="eyebrow light">Visita técnica gratuita</div>
-        <h2 class="display">Sua casa protegida, sua família tranquila</h2>
-        <p>Atendimento rápido, com resposta em poucos minutos. Análise de segurança e orçamento sem custo, com um especialista da nossa equipe.</p>
-        <ul class="checks">
-          <li>Projeto sob medida para cada imóvel</li>
-          <li>Instalação limpa, sem fios à mostra</li>
-          <li>Acesso às câmeras pelo celular</li>
-        </ul>
-      </div>
-      <form class="lead-form" id="leadForm">
-        <h3>Solicite uma análise de segurança grátis</h3>
-        <label>Nome<input name="nome" required autocomplete="name"></label>
-        <label>WhatsApp<input name="tel" type="tel" required autocomplete="tel" placeholder="(DDD) 9 0000-0000"></label>
-        <label>Bairro / cidade<input name="local" autocomplete="address-level2"></label>
-        <label>Tipo de imóvel
-          <select name="tipo"><option>Casa</option><option>Apartamento</option><option>Condomínio</option><option>Comércio</option></select>
-        </label>
-        <button class="buy" type="submit">Falar com especialista</button>
-        <small>Ao enviar, o WhatsApp abre com a sua mensagem pronta.</small>
-      </form>
-    </div>
-  </section>
-
-  <footer>
-    <div class="f-col">
-      <span class="brand">Sentinela</span>
-      <span>Segurança eletrônica e monitoramento 24 horas para residências.</span>
-    </div>
-    <div class="f-col">
-      <b>Central de atendimento</b>
-      <a href="tel:+5500000000000">(00) 0000-0000</a>
-      <a href="mailto:contato@exemplo.com.br">contato@exemplo.com.br</a>
-    </div>
-    <div class="f-col">
-      <b>Links</b>
-      <a href="#servicos">Nossas soluções</a>
-      <a href="#contato">Solicitar orçamento</a>
-    </div>
-    <div class="f-bottom">© 2026 Sentinela · Todos os direitos reservados</div>
-  </footer>
-</div>
-
-<a class="wa-float" href="https://wa.me/5500000000000" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a9.8 9.8 0 0 0-8.4 14.8L2.3 21.8l4.9-1.3A9.8 9.8 0 1 0 12 2.2zm0 17.8a8 8 0 0 1-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.7 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.5-.2z"/></svg>
-</a>
-
-<div class="loader" id="loader">Carregando</div>
+<a class="wa" href="https://wa.me/5500000000000" target="_blank" rel="noopener" aria-label="Falar no WhatsApp"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a9.8 9.8 0 0 0-8.4 14.8L2.3 21.8l4.9-1.3A9.8 9.8 0 1 0 12 2.2zm0 17.8a8 8 0 0 1-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.7 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.5-.2z"/></svg></a>
 
 <script>
 (() => {
-'use strict';
-
-/* =====================================================================
-   Optional: real product film.
-   Leave empty to use the live 3D camera drawn in the canvas.
-   To use your own clips (e.g. generated in Google Flow), set the three
-   all-intra MP4 URLs; intro ends on the first frame of turn, turn ends
-   on the first frame of explode.
-   ===================================================================== */
-const CLIPS = { intro: '', turn: '', explode: '' };
-const USE_VIDEO = !!(CLIPS.intro && CLIPS.turn && CLIPS.explode);
-
-const HERO_SETTLE = 1.85, INTRO_LEN = 2.7, BG = '#141417';
-const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-const clamp = (v, a = 0, b = 1) => v < a ? a : v > b ? b : v;
-const lerp = (a, b, t) => a + (b - a) * t;
-const smooth = t => t * t * (3 - 2 * t);
-const TAU = Math.PI * 2, RAD = Math.PI / 180;
-
-const body = document.body, film = $('#film'), after = $('.after');
-const cv = $('#cv'), ctx = cv.getContext('2d'), loader = $('#loader');
-let W = 0, H = 0, DPR = 1;
-
-const filmSpan = () => Math.max(1, film.offsetHeight - innerHeight);
-const prog = () => clamp(scrollY / filmSpan());
-
-/* =====================================================================
-   3D CAMERA MODEL  (local axis +X = lens direction)
-   ===================================================================== */
-const MAT = {
-  white: { c: [240, 240, 236], s: .5, h: 24, amb: .36 },
-  hood:  { c: [246, 246, 242], s: .55, h: 28, amb: .38 },
-  inner: { c: [40, 41, 44],    s: .1,  h: 8,  amb: .5 },
-  alu:   { c: [158, 161, 166], s: .7,  h: 20, amb: .25 },
-  dark:  { c: [32, 34, 38],    s: .5,  h: 24, amb: .4 },
-  black: { c: [13, 14, 17],    s: .9,  h: 50, amb: .5 },
-  glass: { c: [16, 20, 28],    s: 1.2, h: 90, amb: .6, a: .42 },
-  lens:  { c: [30, 40, 86],    s: 1.4, h: 70, amb: .5 },
-  pcb:   { c: [14, 58, 40],    s: .3,  h: 12, amb: .35 },
-  chip:  { c: [20, 20, 23],    s: .7,  h: 40, amb: .45 },
-  gold:  { c: [200, 160, 82],  s: .8,  h: 30, amb: .4 },
-  led:   { c: [96, 16, 26],    s: 1.0, h: 60, amb: .5, glow: 1 },
-  red:   { c: [255, 66, 87],   e: 1 }
-};
-
-const V = [], VP = [], F = [];
-let cur = 0;
-function vx(x, y, z) { V.push(x, y, z); VP.push(cur); return VP.length - 1; }
-function face(ids, m, hx, hy, hz) {
-  const a = ids[0] * 3, b = ids[1] * 3, c = ids[2] * 3;
-  const ux = V[b] - V[a], uy = V[b + 1] - V[a + 1], uz = V[b + 2] - V[a + 2];
-  const wx = V[c] - V[a], wy = V[c + 1] - V[a + 1], wz = V[c + 2] - V[a + 2];
-  const nx = uy * wz - uz * wy, ny = uz * wx - ux * wz, nz = ux * wy - uy * wx;
-  if (nx * hx + ny * hy + nz * hz < 0) ids = ids.slice().reverse();
-  const o = { i: ids, m: MAT[m], p: cur }; F.push(o); return o;
-}
-// lathe surface around X; y = r cos a, z = r sin a (a = 0 is the top)
-function tube(r, x0, x1, n, ls, m, inward, a0 = 0, a1 = TAU) {
-  const full = Math.abs(a1 - a0 - TAU) < 1e-6, na = full ? n : n + 1, g = [];
-  for (let j = 0; j <= ls; j++) {
-    const x = x0 + (x1 - x0) * j / ls, row = [];
-    for (let k = 0; k < na; k++) { const a = a0 + (a1 - a0) * k / n; row.push(vx(x, r * Math.cos(a), r * Math.sin(a))); }
-    g.push(row);
-  }
-  const s = inward ? -1 : 1;
-  for (let j = 0; j < ls; j++) for (let k = 0; k < n; k++) {
-    const k2 = full ? (k + 1) % n : k + 1, a = a0 + (a1 - a0) * (k + .5) / n;
-    const o = face([g[j][k], g[j][k2], g[j + 1][k2], g[j + 1][k]], m, 0, s * Math.cos(a), s * Math.sin(a));
-    const ka = a0 + (a1 - a0) * k / n, kb = a0 + (a1 - a0) * (k + 1) / n;
-    o.sa = [g[j][k], g[j + 1][k]]; o.sb = [g[j][k2], g[j + 1][k2]];
-    o.na = [0, s * Math.cos(ka), s * Math.sin(ka)]; o.nb = [0, s * Math.cos(kb), s * Math.sin(kb)];
-  }
-}
-function disc(x, r0, r1, n, m, dir, a0 = 0, a1 = TAU, cy = 0, cz = 0) {
-  for (let k = 0; k < n; k++) {
-    const a = a0 + (a1 - a0) * k / n, b = a0 + (a1 - a0) * (k + 1) / n;
-    const P = (r, t) => vx(x, cy + r * Math.cos(t), cz + r * Math.sin(t));
-    if (r0 <= 0) face([vx(x, cy, cz), P(r1, a), P(r1, b)], m, dir, 0, 0);
-    else face([P(r0, a), P(r1, a), P(r1, b), P(r0, b)], m, dir, 0, 0);
-  }
-}
-function cyl(r, x0, x1, n, m, cy = 0, cz = 0, mf) { // small solid cylinder, off-axis allowed
-  const g0 = [], g1 = [];
-  for (let k = 0; k < n; k++) { const a = TAU * k / n; g0.push(vx(x0, cy + r * Math.cos(a), cz + r * Math.sin(a))); g1.push(vx(x1, cy + r * Math.cos(a), cz + r * Math.sin(a))); }
-  for (let k = 0; k < n; k++) { const k2 = (k + 1) % n, a = TAU * (k + .5) / n; face([g0[k], g0[k2], g1[k2], g1[k]], m, 0, Math.cos(a), Math.sin(a)); }
-  disc(x1, 0, r, n, mf || m, 1, 0, TAU, cy, cz);
-  disc(x0, 0, r, n, m, -1, 0, TAU, cy, cz);
-}
-function box(x0, x1, y0, y1, z0, z1, m) {
-  const p = [vx(x0, y0, z0), vx(x1, y0, z0), vx(x1, y1, z0), vx(x0, y1, z0), vx(x0, y0, z1), vx(x1, y0, z1), vx(x1, y1, z1), vx(x0, y1, z1)];
-  face([p[0], p[1], p[2], p[3]], m, 0, 0, -1); face([p[4], p[5], p[6], p[7]], m, 0, 0, 1);
-  face([p[0], p[1], p[5], p[4]], m, 0, -1, 0); face([p[3], p[2], p[6], p[7]], m, 0, 1, 0);
-  face([p[0], p[3], p[7], p[4]], m, -1, 0, 0); face([p[1], p[2], p[6], p[5]], m, 1, 0, 0);
-}
-
-// Part 0 · front glass + bezel
-cur = 0;
-disc(1.56, 0, .79, 40, 'glass', 1);
-tube(.86, 1.44, 1.56, 48, 1, 'white');
-disc(1.56, .79, .86, 48, 'white', 1);
-disc(1.565, 0, .028, 10, 'red', 1, 0, TAU, .825, 0);
-// Part 1 · IR LED ring
-cur = 1;
-disc(1.34, .40, .74, 40, 'dark', 1);
-disc(1.30, .40, .74, 40, 'dark', -1);
-tube(.74, 1.30, 1.34, 40, 1, 'dark');
-for (let k = 0; k < 8; k++) { const a = TAU * k / 8 + TAU / 16; cyl(.07, 1.34, 1.39, 10, 'led', .57 * Math.cos(a), .57 * Math.sin(a)); }
-// Part 2 · varifocal lens
-cur = 2;
-tube(.34, .55, 1.30, 32, 3, 'black');
-disc(1.30, .22, .34, 32, 'black', 1);
-disc(1.26, 0, .22, 28, 'lens', 1);
-disc(.55, 0, .34, 32, 'black', -1);
-tube(.37, .78, .96, 32, 1, 'alu');
-disc(.96, .34, .37, 32, 'alu', 1); disc(.78, .34, .37, 32, 'alu', -1);
-// Part 3 · Starlight sensor board
-cur = 3;
-box(.40, .46, -.6, .6, -.6, .6, 'pcb');
-box(.46, .50, -.22, .22, -.22, .22, 'chip');
-box(.50, .505, -.14, .14, -.14, .14, 'lens');
-for (const [y, z] of [[.45, .45], [-.45, .45], [.45, -.45], [-.45, -.45]]) box(.46, .48, y - .05, y + .05, z - .05, z + .05, 'gold');
-box(.46, .49, -.5, -.36, -.12, .12, 'chip');
-// Part 4 · IP67 housing + sun hood
-cur = 4;
-tube(.85, -1.6, 1.44, 72, 8, 'white');
-tube(.80, -1.6, 1.44, 40, 6, 'inner', true);
-disc(1.44, .80, .85, 48, 'white', 1);
-{
-  const A0 = -1.9, A1 = 1.9, ri = .9, ro = .95, x0 = -1.25, x1 = 1.98;
-  tube(ro, x0, x1, 44, 8, 'hood', false, A0, A1);
-  tube(ri, x0, x1, 44, 8, 'inner', true, A0, A1);
-  disc(x1, ri, ro, 44, 'hood', 1, A0, A1);
-  disc(x0, ri, ro, 44, 'hood', -1, A0, A1);
-  for (const [a, sg] of [[A0, -1], [A1, 1]]) {
-    for (let j = 0; j < 8; j++) {
-      const xa = x0 + (x1 - x0) * j / 8, xb = x0 + (x1 - x0) * (j + 1) / 8;
-      face([vx(xa, ri * Math.cos(a), ri * Math.sin(a)), vx(xb, ri * Math.cos(a), ri * Math.sin(a)), vx(xb, ro * Math.cos(a), ro * Math.sin(a)), vx(xa, ro * Math.cos(a), ro * Math.sin(a))],
-        'hood', 0, -sg * Math.sin(a), sg * Math.cos(a));
-    }
-  }
-}
-// Part 5 · rear cap, PoE board, articulated wall mount
-cur = 5;
-tube(.85, -1.92, -1.6, 48, 2, 'white');
-disc(-1.92, .3, .85, 48, 'white', -1);
-disc(-1.95, 0, .3, 24, 'dark', -1);
-tube(.3, -1.95, -1.92, 24, 1, 'dark');
-box(-1.56, -1.5, -.58, .58, -.58, .58, 'pcb');
-box(-1.5, -1.47, -.2, .2, -.3, .1, 'chip');
-cyl(.14, -2.42, -1.95, 16, 'alu');
-cyl(.21, -2.6, -2.42, 18, 'alu');
-cyl(.13, -2.98, -2.6, 16, 'alu');
-cyl(.62, -3.1, -2.98, 40, 'white');
-
-const NV = VP.length, NF = F.length;
-const OFF = [5.5, 4.4, 3.4, 2.3, 0, -1.8];
-const DELAY = [0, .06, .12, .18, 0, .1];      // explode stagger per part
-const ARC = [.55, -.45, .4, -.35, 0, .3];     // each part arcs off-axis as it slides out
-const EI = new Float32Array(6);
-const LEDS = Array.from({ length: 8 }, (_, k) => { const a = TAU * k / 8 + TAU / 16; return [1.395, .57 * Math.cos(a), .57 * Math.sin(a)]; });
-const LABEL = [[1.5, .86], [1.36, .74], [.95, .37], [.43, .6], [.3, .95], [-2.6, .62]];
-const TX = new Float32Array(NV), TY = new Float32Array(NV), TZ = new Float32Array(NV);
-const SX = new Float32Array(NV), SY = new Float32Array(NV);
-const LDIR = (() => { const l = [-.45, .72, -.55], m = Math.hypot(...l); return l.map(v => v / m); })();
-
-/* render one frame of the model. pose in device px / degrees */
-const rgb = (r, g, b, a = 1) => `rgba(${r > 255 ? 255 : r < 0 ? 0 : r | 0},${g > 255 ? 255 : g < 0 ? 0 : g | 0},${b > 255 ? 255 : b < 0 ? 0 : b | 0},${a})`;
-function shade(m, nx, ny, nz, vX, vY, vZ, glow) {
-  const dif = Math.max(0, nx * LDIR[0] + ny * LDIR[1] + nz * LDIR[2]);
-  const hx = LDIR[0] + vX, hy = LDIR[1] + vY, hz = LDIR[2] + vZ, hl = Math.hypot(hx, hy, hz);
-  const spec = Math.pow(Math.max(0, (nx * hx + ny * hy + nz * hz) / hl), m.h) * m.s;
-  const nv = Math.max(0, nx * vX + ny * vY + nz * vZ);
-  const rim = Math.pow(1 - nv, 3) * .34;
-  const fill = Math.max(0, nx * .8 - ny * .1 + nz * .2) * .14;
-  const bounce = Math.max(0, -ny) * .1;                       // floor bounce light from below
-  const k = m.amb + dif * .72 + fill + bounce;
-  let r = m.c[0] * k + 255 * spec + 120 * rim, g = m.c[1] * k + 255 * spec + 130 * rim, b = m.c[2] * k + 255 * spec + 150 * rim;
-  if (m.glow && glow > 0) { r = lerp(r, 255, glow * .85); g = lerp(g, 54, glow * .7); b = lerp(b, 70, glow * .7); }
-  return [r, g, b, spec];
-}
-function render(c, w, h, P, bg = BG, floor = true) {
-  c.fillStyle = bg; c.fillRect(0, 0, w, h);
-  const D = 14, Fz = P.k * D, cx0 = w / 2 + P.x, cy0 = h / 2 + P.y;
-  const yw = P.yaw * RAD, pt = P.pitch * RAD, rl = P.roll * RAD;
-  const cyw = Math.cos(yw), syw = Math.sin(yw), cp = Math.cos(pt), sp = Math.sin(pt), cr = Math.cos(rl), sr = Math.sin(rl);
-  const E = P.e, center = lerp(-.57, 1.0, E), glow = P.glow || 0;
-  for (let i = 0; i < 6; i++) EI[i] = smooth(clamp((E - DELAY[i]) / (1 - .18)));
-  const rot = (x, y, z) => {
-    const x1 = x * cyw + z * syw, z1 = -x * syw + z * cyw;
-    const y2 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
-    return [x1 * cr - y2 * sr, x1 * sr + y2 * cr, z2];
-  };
-  const xform = (x, y, z, part) => {
-    const ei = EI[part];
-    const t = rot(x + OFF[part] * ei - center, y + Math.sin(ei * Math.PI) * ARC[part], z);
-    t[2] += D; return t;
-  };
-  const proj = t => [cx0 + t[0] * Fz / t[2], cy0 - t[1] * Fz / t[2]];
-  let minX = 1e9, maxX = -1e9, maxY = -1e9;
-  for (let i = 0; i < NV; i++) {
-    const t = xform(V[i * 3], V[i * 3 + 1], V[i * 3 + 2], VP[i]);
-    TX[i] = t[0]; TY[i] = t[1]; TZ[i] = t[2];
-    const sx = cx0 + t[0] * Fz / t[2], sy = cy0 - t[1] * Fz / t[2];
-    SX[i] = sx; SY[i] = sy;
-    if (sx < minX) minX = sx; if (sx > maxX) maxX = sx; if (sy > maxY) maxY = sy;
-  }
-  // studio: back light, floor pool and contact shadow
-  const mx = (minX + maxX) / 2, span = Math.max(40, maxX - minX);
-  let g = c.createRadialGradient(mx, cy0, 0, mx, cy0, Math.max(w, h) * .62);
-  g.addColorStop(0, 'rgba(255,255,255,.10)'); g.addColorStop(.5, 'rgba(255,255,255,.03)'); g.addColorStop(1, 'rgba(255,255,255,0)');
-  c.fillStyle = g; c.fillRect(0, 0, w, h);
-  const fa = floor ? (1 - E) : 0;
-  if (fa > .01) {
-    const fy = maxY + span * .06;
-    c.save(); c.translate(mx, fy); c.scale(1, .14);
-    g = c.createRadialGradient(0, 0, 0, 0, 0, span * .8);
-    g.addColorStop(0, `rgba(255,255,255,${.12 * fa})`); g.addColorStop(1, 'rgba(255,255,255,0)');
-    c.fillStyle = g; c.beginPath(); c.arc(0, 0, span * .8, 0, TAU); c.fill();
-    g = c.createRadialGradient(0, 0, 0, 0, 0, span * .42);
-    g.addColorStop(0, `rgba(0,0,0,${.7 * fa})`); g.addColorStop(1, 'rgba(0,0,0,0)');
-    c.fillStyle = g; c.beginPath(); c.arc(0, 0, span * .42, 0, TAU); c.fill();
-    c.restore();
-  }
-  // faces: cull, sort
-  const vis = [];
-  for (let f = 0; f < NF; f++) {
-    const fc = F[f], ids = fc.i, a = ids[0], b = ids[1], d = ids[2];
-    const ux = TX[b] - TX[a], uy = TY[b] - TY[a], uz = TZ[b] - TZ[a];
-    const wx = TX[d] - TX[a], wy = TY[d] - TY[a], wz = TZ[d] - TZ[a];
-    let nx = uy * wz - uz * wy, ny = uz * wx - ux * wz, nz = ux * wy - uy * wx;
-    const nl = Math.hypot(nx, ny, nz) || 1; nx /= nl; ny /= nl; nz /= nl;
-    let gx = 0, gy = 0, gz = 0;
-    for (const k of ids) { gx += TX[k]; gy += TY[k]; gz += TZ[k]; }
-    const q = ids.length; gx /= q; gy /= q; gz /= q;
-    const vl = Math.hypot(gx, gy, gz), vX = -gx / vl, vY = -gy / vl, vZ = -gz / vl;
-    if (nx * vX + ny * vY + nz * vZ <= 0) continue;
-    vis.push({ z: gz, f: fc, nx, ny, nz, vX: 0, vY: 0, vZ: -1 });
-  }
-  vis.sort((A, B) => B.z - A.z);
-  c.lineJoin = 'round'; c.lineWidth = Math.max(.6, P.k / 300);
-  for (const o of vis) {
-    const fc = o.f, m = fc.m, ids = fc.i;
-    let style, al = m.a || 1;
-    if (m.e) style = rgb(...m.c);
-    else if (fc.sa && al >= 1) {
-      // smooth (Gouraud-like) shading across curved surfaces
-      const na = rot(...fc.na), nb = rot(...fc.nb);
-      const A = shade(m, na[0], na[1], na[2], o.vX, o.vY, o.vZ, glow), B = shade(m, nb[0], nb[1], nb[2], o.vX, o.vY, o.vZ, glow);
-      const ax = (SX[fc.sa[0]] + SX[fc.sa[1]]) / 2, ay = (SY[fc.sa[0]] + SY[fc.sa[1]]) / 2;
-      const bx = (SX[fc.sb[0]] + SX[fc.sb[1]]) / 2, by = (SY[fc.sb[0]] + SY[fc.sb[1]]) / 2;
-      // gradient perpendicular to the strip's long edges, so neighbouring segments line up exactly
-      const ex = SX[fc.sa[1]] - SX[fc.sa[0]], ey = SY[fc.sa[1]] - SY[fc.sa[0]], el = Math.hypot(ex, ey) || 1;
-      const px = -ey / el, py = ex / el, dd = (bx - ax) * px + (by - ay) * py;
-      if (Math.abs(dd) < .5) style = rgb((A[0] + B[0]) / 2, (A[1] + B[1]) / 2, (A[2] + B[2]) / 2);
-      else { style = c.createLinearGradient(ax, ay, ax + px * dd, ay + py * dd); style.addColorStop(0, rgb(A[0], A[1], A[2])); style.addColorStop(1, rgb(B[0], B[1], B[2])); }
-    } else {
-      const S = shade(m, o.nx, o.ny, o.nz, o.vX, o.vY, o.vZ, glow);
-      if (al < 1) al = Math.min(1, al + S[3] * .8);
-      style = rgb(S[0], S[1], S[2], al);
-    }
-    c.beginPath(); c.moveTo(SX[ids[0]], SY[ids[0]]);
-    for (let j = 1; j < ids.length; j++) c.lineTo(SX[ids[j]], SY[ids[j]]);
-    c.closePath(); c.fillStyle = style; c.fill();
-    if (al >= 1) { c.strokeStyle = style; c.stroke(); }
-  }
-  // lens direction in view space (negative z = toward the viewer)
-  const fwd = rot(1, 0, 0), facing = clamp(-fwd[2] * 1.6);
-  c.save(); c.globalCompositeOperation = 'lighter';
-  // IR LEDs and status light bloom
-  const bloom = smooth(clamp((glow - .4) / .45));
-  if (bloom > .01 && facing > 0) {
-    const rr = P.k * .22;
-    for (const L of LEDS) {
-      const [x, y] = proj(xform(L[0] + .02, L[1], L[2], 1));
-      g = c.createRadialGradient(x, y, 0, x, y, rr);
-      g.addColorStop(0, `rgba(255,60,80,${.55 * bloom * facing})`); g.addColorStop(1, 'rgba(255,40,60,0)');
-      c.fillStyle = g; c.fillRect(x - rr, y - rr, rr * 2, rr * 2);
-    }
-  }
-  if (facing > 0 && (P.led || 0) > 0) {
-    const [x, y] = proj(xform(1.57, .825, 0, 0)), rr = P.k * .16;
-    g = c.createRadialGradient(x, y, 0, x, y, rr);
-    g.addColorStop(0, `rgba(255,70,90,${.8 * P.led * facing})`); g.addColorStop(1, 'rgba(255,40,60,0)');
-    c.fillStyle = g; c.fillRect(x - rr, y - rr, rr * 2, rr * 2);
-  }
-  // field-of-view beam out of the lens
-  if ((P.beam || 0) > .01) {
-    const L = 9, R = 3.1, n = 24, apex = proj(xform(1.62, 0, 0, 0)), ring = [];
-    for (let k = 0; k < n; k++) { const a = TAU * k / n; ring.push(proj(xform(1.62 + L, R * Math.cos(a), R * Math.sin(a), 0))); }
-    const far = proj(xform(1.62 + L, 0, 0, 0));
-    g = c.createLinearGradient(apex[0], apex[1], far[0], far[1]);
-    const pulse = .8 + .2 * Math.sin((P.t || 0) * 2);
-    g.addColorStop(0, `rgba(255,50,70,${.2 * P.beam * pulse})`); g.addColorStop(.55, `rgba(255,50,70,${.05 * P.beam * pulse})`); g.addColorStop(1, 'rgba(255,50,70,0)');
-    c.fillStyle = g; c.beginPath();
-    for (let k = 0; k < n; k++) { const p1 = ring[k], p2 = ring[(k + 1) % n]; c.moveTo(apex[0], apex[1]); c.lineTo(p1[0], p1[1]); c.lineTo(p2[0], p2[1]); c.closePath(); }
-    c.fill();
-  }
-  c.restore();
-  // part numbers in the exploded view
-  if (P.lab > .01) {
-    c.save(); c.globalAlpha = P.lab;
-    const fs = Math.max(9, P.k * .16);
-    c.font = `500 ${fs}px Sora, Helvetica, Arial, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
-    LABEL.forEach(([lx, ly], i) => {
-      const [ax, ay] = proj(xform(lx, ly, 0, i)), [bx, by] = proj(xform(lx, ly + .95, 0, i));
-      c.strokeStyle = 'rgba(247,247,245,.5)'; c.lineWidth = Math.max(1, P.k / 160);
-      c.beginPath(); c.moveTo(ax, ay); c.lineTo(bx, by); c.stroke();
-      c.fillStyle = '#FF4257'; c.beginPath(); c.arc(ax, ay, Math.max(2, P.k * .03), 0, TAU); c.fill();
-      const tw = fs * 2.4, th = fs * 1.6;
-      c.fillStyle = 'rgba(16,16,19,.85)'; c.strokeStyle = '#E5243B';
-      c.beginPath(); c.roundRect ? c.roundRect(bx - tw / 2, by - th, tw, th, th / 2) : c.rect(bx - tw / 2, by - th, tw, th); c.fill(); c.stroke();
-      c.fillStyle = '#F7F7F5'; c.fillText('0' + (i + 1), bx, by - th / 2);
-    });
-    c.restore();
-  }
-}
-
-/* pose for scroll progress p */
-function poseAt(p, w, h) {
-  const port = h > w * 1.05;
-  const s1 = smooth(clamp((p - .08) / .22)), s2 = smooth(clamp((p - .56) / .30));
-  let A, B, C;
-  if (!port) {
-    const u = Math.min(w, h * 1.75);
-    A = { x: .17 * w, y: .03 * h, k: .082 * u, yaw: 140, pitch: -13, roll: 0 };
-    B = { x: 0, y: 0, k: .165 * u, yaw: 106, pitch: -10, roll: 0 };
-    C = { x: .02 * w, y: .01 * h, k: .05 * u, yaw: 126, pitch: -14, roll: 17 };
-  } else {
-    A = { x: .06 * w, y: .02 * h, k: .15 * w, yaw: 140, pitch: -13, roll: 0 };
-    B = { x: .04 * w, y: -.01 * h, k: .22 * w, yaw: 106, pitch: -10, roll: 0 };
-    C = { x: .03 * w, y: -.02 * h, k: .112 * w, yaw: 122, pitch: -14, roll: 54 };
-  }
-  // a small extra half-turn of the camera while it travels to the close-up
-  const swing = Math.sin(s1 * Math.PI) * 14;
-  const o = {};
-  for (const key in A) o[key] = lerp(lerp(A[key], B[key], s1), C[key], s2);
-  o.yaw -= swing; o.pitch += swing * .35;
-  o.e = s2; o.lab = clamp((p - .84) / .05);
-  const close = smooth(clamp((p - .22) / .08)) * (1 - smooth(clamp((p - .56) / .1)));
-  o.glow = .3 + .7 * close;                      // night vision switches on in the close-up
-  o.beam = 1 - smooth(clamp(p / .1));
-  o.led = 1;
-  return o;
-}
-/* pose during the intro, t in seconds */
-function introPose(t, w, h) {
-  const base = poseAt(0, w, h);
-  const q = clamp(t / HERO_SETTLE), e = 1 - Math.pow(1 - q, 3);
-  const o = Object.assign({}, base);
-  o.x = lerp(w * .75, base.x, e);
-  o.yaw = base.yaw + 330 * (1 - e);
-  o.roll = 24 * (1 - e) * Math.sin(q * Math.PI * 2.2);
-  // two bounces that die out as it lands
-  o.y = base.y - Math.abs(Math.sin(q * Math.PI * 2.5)) * Math.pow(1 - q, 1.6) * h * .09;
-  // power-on: status LED flickers, IR ring warms up, then the view beam opens
-  const on = t - HERO_SETTLE;
-  o.led = on < 0 ? 0 : on < .35 ? (Math.sin(on * 60) > 0 ? 1 : .15) : 1;
-  o.glow = on < 0 ? 0 : base.glow * smooth(clamp((on - .2) / .5)) + .5 * Math.max(0, 1 - Math.abs(on - .45) / .25);
-  o.beam = smooth(clamp((on - .25) / .6));
-  o.t = t;
-  return o;
-}
-
-/* =====================================================================
-   CANVAS SIZE
-   ===================================================================== */
-function resize() {
-  DPR = Math.min(2, devicePixelRatio || 1);
-  W = Math.round(cv.clientWidth * DPR); H = Math.round(cv.clientHeight * DPR);
-  if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
-  lastKey = '';
-}
-let lastKey = '';
-
-/* =====================================================================
-   VIDEO ENGINE (only when CLIPS are set)
-   ===================================================================== */
-const vids = {};
-let curClip = null, loaded = 0, framing = { FX: .66, Z: 1.7, LZ: 1, LY: 0, LX: 0 };
-function drawVideo(v) {
-  if (!v || !v.videoWidth) return;
-  const key = v.src + '|' + v.currentTime.toFixed(3) + '|' + JSON.stringify(framing) + W + 'x' + H;
-  if (key === lastKey) return; lastKey = key;
-  const vw = v.videoWidth, vh = v.videoHeight;
-  ctx.fillStyle = '#0A0A0B'; ctx.fillRect(0, 0, W, H);
-  let dw, dh, x, y;
-  if (H <= W * 1.05) {
-    const s = Math.max(W / vw, H / vh) * framing.LZ; dw = vw * s; dh = vh * s;
-    x = (W - dw) / 2 - framing.LX * W; y = (H - dh) / 2 + framing.LY * H;
-  } else {
-    const s = (W / vw) * framing.Z; dw = vw * s; dh = vh * s;
-    x = clamp(W / 2 - framing.FX * dw, W - dw, 0); y = (H - dh) / 2;
-  }
-  ctx.drawImage(v, x, y, dw, dh);
-  const bg = '#0A0A0B', bgT = 'rgba(10,10,11,0)';
-  if (y > 0) {
-    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, y + 1); ctx.fillRect(0, y + dh - 1, W, H - y - dh + 1);
-    const f = dh * .18;
-    let g = ctx.createLinearGradient(0, y, 0, y + f); g.addColorStop(0, bg); g.addColorStop(1, bgT); ctx.fillStyle = g; ctx.fillRect(0, y, W, f);
-    g = ctx.createLinearGradient(0, y + dh, 0, y + dh - f); g.addColorStop(0, bg); g.addColorStop(1, bgT); ctx.fillStyle = g; ctx.fillRect(0, y + dh - f, W, f);
-  }
-  if (x > 0) {
-    ctx.fillStyle = bg; ctx.fillRect(0, 0, x + 1, H); ctx.fillRect(x + dw - 1, 0, W - x - dw + 1, H);
-    const f = dw * .08;
-    let g = ctx.createLinearGradient(x, 0, x + f, 0); g.addColorStop(0, bg); g.addColorStop(1, bgT); ctx.fillStyle = g; ctx.fillRect(x, 0, f, H);
-    g = ctx.createLinearGradient(x + dw, 0, x + dw - f, 0); g.addColorStop(0, bg); g.addColorStop(1, bgT); ctx.fillStyle = g; ctx.fillRect(x + dw - f, 0, f, H);
-  }
-}
-function seek(key, frac) {
-  curClip = key; const v = vids[key];
-  if (!v || !v.duration) return;
-  const t = clamp(frac * v.duration, 0, v.duration - .04); v._target = t;
-  if (Math.abs(v.currentTime - t) < .02) drawVideo(v);
-  else if (!v.seeking) v.currentTime = t;
-}
-function initVideo() {
-  loader.textContent = 'Carregando filme 0%';
-  for (const k of ['intro', 'turn', 'explode']) {
-    const v = document.createElement('video');
-    v.muted = true; v.playsInline = true; v.preload = 'auto';
-    v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
-    v._target = 0; v.src = CLIPS[k];
-    v.addEventListener('seeked', () => {
-      if (curClip === k) drawVideo(v);
-      if (Math.abs(v.currentTime - v._target) > .02) v.currentTime = v._target;
-    });
-    v.addEventListener('loadeddata', () => {
-      loaded++; loader.textContent = `Carregando filme ${Math.round(loaded / 3 * 100)}%`;
-      if (loaded === 3) loader.classList.add('done');
-      if (introDone) schedule();
-    }, { once: true });
-    $('#clips').appendChild(v); vids[k] = v;
-  }
-}
-function videoTimeline(p) {
-  const port = H > W * 1.05;
-  if (p < .30) { const t = clamp((p - .08) / .22); framing = { FX: lerp(.66, .5, t), Z: lerp(1.7, 1.55, t), LZ: 1, LY: 0, LX: 0 }; }
-  else if (p < .56) framing = { FX: .5, Z: 1.55, LZ: 1, LY: 0, LX: 0 };
-  else { const t = clamp((p - .56) / .30); framing = { FX: .5, Z: lerp(1.55, 1.02, t), LZ: lerp(1, .84, t), LY: lerp(0, .05, t), LX: lerp(0, .02, t) }; }
-  void port;
-  if (p < .08) seek('turn', 0);
-  else if (p < .30) seek('turn', (p - .08) / .22);
-  else if (p < .56) seek('turn', 1);
-  else if (p < .86) seek('explode', (p - .56) / .30);
-  else seek('explode', 1);
-}
-
-/* =====================================================================
-   INTRO
-   ===================================================================== */
-let introDone = false, introPlaying = false, introRaf = 0, revealTimers = [];
-const heroEls = $$('#l-hero .fx');
-
-function reveal(instant) {
-  revealTimers.forEach(clearTimeout); revealTimers = [];
-  if (instant || RM) {
-    body.classList.remove('revealing');
-    heroEls.forEach(el => el._rev = true);
-    introDone = true; updateFx(pNow()); return;
-  }
-  body.classList.add('revealing');
-  heroEls.forEach((el, i) => revealTimers.push(setTimeout(() => {
-    el._rev = true; updateFx(pNow());
-    if (i === heroEls.length - 1) {
-      introDone = true;
-      revealTimers.push(setTimeout(() => body.classList.remove('revealing'), 900));
-    }
-  }, i * 70)));
-}
-function hideHero() {
-  revealTimers.forEach(clearTimeout); revealTimers = [];
-  body.classList.remove('revealing');
-  heroEls.forEach(el => el._rev = false);
-  updateFx(pNow());
-}
-function playIntro() {
-  cancelAnimationFrame(introRaf);
-  hideHero(); introDone = false;
-  if (USE_VIDEO) return playIntroVideo();
-  introPlaying = true;
-  const t0 = performance.now(); let shown = false;
-  const tick = now => {
-    const t = (now - t0) / 1000;
-    render(ctx, W, H, introPose(t, W, H));
-    if (!shown && t >= HERO_SETTLE) { shown = true; reveal(); }
-    if (t < INTRO_LEN) introRaf = requestAnimationFrame(tick);
-    else { introPlaying = false; idleT0 = performance.now(); }
-  };
-  introRaf = requestAnimationFrame(tick);
-}
-function playIntroVideo() {
-  const v = vids.intro; let shown = false;
-  const go = () => {
-    introPlaying = true; v.currentTime = 0;
-    const tick = () => {
-      lastKey = ''; drawVideo(v);
-      if (!shown && v.currentTime >= HERO_SETTLE) { shown = true; reveal(); }
-      if (!v.ended) introRaf = requestAnimationFrame(tick);
-      else { introPlaying = false; if (!shown) reveal(); schedule(); }
-    };
-    v.play().then(() => { introRaf = requestAnimationFrame(tick); }).catch(() => {
-      introPlaying = false; v.currentTime = Math.max(0, (v.duration || INTRO_LEN) - .04);
-      curClip = 'intro'; reveal(); schedule();
-    });
-  };
-  if (v.readyState >= 3) go(); else v.addEventListener('canplay', go, { once: true });
-}
-function startIntro() {
-  if (scrollY > 4 || RM) {
-    if (USE_VIDEO) {
-      const v = vids.intro;
-      const jump = () => { v.currentTime = Math.max(0, v.duration - .04); curClip = 'intro'; };
-      if (v.readyState >= 1) jump(); else v.addEventListener('loadedmetadata', jump, { once: true });
-    }
-    reveal(true); schedule(); return;
-  }
-  playIntro();
-}
-
-/* =====================================================================
-   SCROLL-DRIVEN UPDATE
-   ===================================================================== */
-const fxEls = $$('.fx').map(el => ({ el, i: +el.dataset.in, o: +el.dataset.out, hero: +el.dataset.in < 0, last: -1 }));
-function updateFx(p) {
-  for (const f of fxEls) {
-    let o = clamp((p - f.i) / .05);
-    if (p > f.o) o = Math.max(0, 1 - (p - f.o) / .04);
-    if (f.hero && !f.el._rev) o = 0;
-    o = Math.round(o * 1000) / 1000;
-    if (o !== f.last) {
-      f.last = o; f.el.style.setProperty('--o', o);
-      f.el.classList.toggle('on', o > .01);
-    }
-  }
-}
-const chev = $('#chev');
-let raf = 0, ps = 0, idleT0 = performance.now();
-const par = { x: 0, y: 0, tx: 0, ty: 0 };
-const pNow = () => USE_VIDEO ? prog() : ps;
-function ui(p) {
-  updateFx(p);
-  const top = after.getBoundingClientRect().top;
-  body.classList.toggle('dim', top < innerHeight * .55);
-  const up = top < innerHeight * .2;
-  if (chev.classList.contains('up') !== up) {
-    chev.classList.toggle('up', up);
-    chev.setAttribute('aria-label', up ? 'Voltar ao topo' : 'Próxima seção');
-  }
-}
-function schedule() { if (USE_VIDEO && !raf) raf = requestAnimationFrame(update); }
-function update() {
-  raf = 0;
-  const p = prog();
-  ui(p);
-  if (introPlaying) return;
-  if (!introDone && curClip === null) { drawVideo(vids.intro); return; }
-  videoTimeline(p);
-}
-/* live 3D loop: eased scroll, idle float, pointer parallax, IR pulse */
-function loop(now) {
-  requestAnimationFrame(loop);
-  const target = prog();
-  ps = RM ? target : ps + (target - ps) * .14;
-  if (Math.abs(target - ps) < .0004) ps = target;
-  ui(ps);
-  if (introPlaying) return;
-  const P = poseAt(ps, W, H), t = now / 1000;
-  P.t = t;
-  if (!RM) {
-    const amp = smooth(clamp((now - idleT0) / 1400));
-    par.x += (par.tx - par.x) * .05; par.y += (par.ty - par.y) * .05;
-    P.y += Math.sin(t * 1.1) * H * .008 * amp * (1 - P.e * .6);
-    P.yaw += (Math.sin(t * .45) * 3 + par.x * 7) * amp;
-    P.pitch += (Math.sin(t * .7) * 1.2 - par.y * 4) * amp;
-    P.roll += Math.sin(t * .6) * .8 * amp * (1 - P.e);
-    P.glow *= .86 + .14 * Math.sin(t * 2.6);
-    P.led = Math.sin(t * 3.2) > -.6 ? 1 : .25;
-  }
-  if (body.classList.contains('dim')) P.lab = 0;
-  render(ctx, W, H, P);
-}
-addEventListener('scroll', schedule, { passive: true });
-addEventListener('pointermove', e => {
-  if (e.pointerType !== 'mouse') return;
-  par.tx = e.clientX / innerWidth * 2 - 1; par.ty = e.clientY / innerHeight * 2 - 1;
-}, { passive: true });
-document.addEventListener('mouseleave', () => { par.tx = 0; par.ty = 0; });
-addEventListener('resize', () => { resize(); drawDial(); schedule(); });
-
-/* =====================================================================
-   NAVIGATION
-   ===================================================================== */
-const STOPS = [0, .43, .93];
-const behavior = RM ? 'auto' : 'smooth';
-const toP = p => scrollTo({ top: film.offsetTop + p * filmSpan(), behavior });
-$$('.links a[data-p]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); toP(+a.dataset.p); }));
-$$('a[href^="#"]:not([data-p])').forEach(a => a.addEventListener('click', e => {
-  const id = a.getAttribute('href');
-  if (id === '#top') { e.preventDefault(); toP(0); return; }
-  const t = $(id); if (!t) return;
-  e.preventDefault(); t.scrollIntoView({ behavior, block: 'start' });
-}));
-chev.addEventListener('click', () => {
-  if (after.getBoundingClientRect().top < innerHeight * .2) { scrollTo({ top: 0, behavior }); return; }
-  const p = prog(), next = STOPS.find(s => s > p + .02);
-  if (next === undefined) $('#sobre').scrollIntoView({ behavior, block: 'start' }); else toP(next);
-});
-$('#replay').addEventListener('click', () => { if (scrollY < 40) { if (USE_VIDEO) vids.intro.pause(); playIntro(); } });
-
-/* =====================================================================
-   LEAD FORM -> WhatsApp with the message ready
-   ===================================================================== */
-const WA = '5500000000000';
-$('#leadForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const f = new FormData(e.target);
-  const msg = `Olá! Gostaria de uma análise de segurança grátis.\nNome: ${f.get('nome')}\nWhatsApp: ${f.get('tel')}\nBairro/cidade: ${f.get('local') || '-'}\nImóvel: ${f.get('tipo')}`;
+const WA = '5500000000000', RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+addEventListener('load', () => document.body.classList.add('loaded'));
+// reveal on scroll
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
+document.querySelectorAll('.rv').forEach((el, i) => { el.style.transitionDelay = (el.closest('.hero') ? i * 70 : 0) + 'ms'; io.observe(el); });
+// counters
+const co = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return; co.unobserve(e.target);
+  const el = e.target, to = +el.dataset.count, suf = el.dataset.suf || '', t0 = performance.now(), d = RM ? 0 : 1200;
+  const step = now => { const k = d ? Math.min(1, (now - t0) / d) : 1; el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))) + suf; if (k < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}), { threshold: .5 });
+document.querySelectorAll('[data-count]').forEach(el => co.observe(el));
+// nav border
+const nav = document.getElementById('nav');
+addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 10), { passive: true });
+// live clock
+const clock = document.getElementById('clock'), pad = n => String(n).padStart(2, '0');
+const tick = () => { const d = new Date(); clock.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; };
+tick(); setInterval(tick, 1000);
+// rotating notifications
+const N = [['Movimento detectado', 'Portão da garagem · agora'], ['Entrega identificada', 'Porta da frente · agora'], ['Alarme ativado', 'Todos os sensores online'], ['Câmera 03 online', 'Quintal · imagem nítida']];
+const nb = document.getElementById('notif'), nT = document.getElementById('nT'), nS = document.getElementById('nS');
+let ni = 0;
+const show = () => { [nT.textContent, nS.textContent] = N[ni % N.length]; nb.classList.add('show'); ni++; setTimeout(() => nb.classList.remove('show'), 3800); };
+setTimeout(show, 900); if (!RM) setInterval(show, 4800);
+// form -> WhatsApp
+document.getElementById('leadForm').addEventListener('submit', e => {
+  e.preventDefault(); const f = new FormData(e.target);
+  const msg = `Olá! Gostaria de uma visita técnica.\nNome: ${f.get('nome')}\nWhatsApp: ${f.get('tel')}\nImóvel: ${f.get('tipo')}`;
   open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
 });
-
-/* =====================================================================
-   HERO CARD · live clock + activity chart
-   ===================================================================== */
-const clock = $('#clock'), secs = $('#secs');
-function tickClock() {
-  const d = new Date(), pad = n => String(n).padStart(2, '0');
-  clock.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
-  secs.textContent = ':' + pad(d.getSeconds());
-}
-tickClock(); setInterval(tickClock, 1000);
-const cLine = $('#cLine'), cArea = $('#cArea'), cDot = $('#cDot');
-let T = 0;
-function chart() {
-  let d = '';
-  for (let i = 0; i <= 40; i++) {
-    const x = i / 40 * 168, y = 40 - 22 * (i / 40) - 6 * Math.sin(.55 * i + T) - 5 * Math.sin(.21 * i + .6 * T);
-    d += (i ? 'L' : 'M') + x.toFixed(2) + ',' + y.toFixed(2) + ' ';
-    if (i === 30) { cDot.setAttribute('cx', x.toFixed(2)); cDot.setAttribute('cy', y.toFixed(2)); }
-  }
-  cLine.setAttribute('d', d); cArea.setAttribute('d', d + 'L168,56 L0,56 Z');
-}
-chart();
-if (!RM) (function loop() {
-  T += .02;
-  if (!body.classList.contains('dim') && prog() < .1) chart();
-  requestAnimationFrame(loop);
-})();
-
-/* =====================================================================
-   DIAL (ticks + live thumbnail of the camera)
-   ===================================================================== */
-function drawDial() {
-  const d = $('#dial'), c = d.getContext('2d'), R = 132;
-  c.clearRect(0, 0, 264, 264); c.lineCap = 'round';
-  for (let i = 0; i < 60; i++) {
-    const a = -Math.PI / 2 + i * TAU / 60, long = i % 5 === 0, r0 = R - 6, r1 = long ? R - 24 : R - 16;
-    c.strokeStyle = i < 38 ? 'rgba(242,242,240,.85)' : 'rgba(242,242,240,.22)';
-    c.lineWidth = long ? 3 : 2;
-    c.beginPath(); c.moveTo(R + Math.cos(a) * r0, R + Math.sin(a) * r0); c.lineTo(R + Math.cos(a) * r1, R + Math.sin(a) * r1); c.stroke();
-  }
-  const th = $('#thumb'), s = Math.round((th.clientWidth || 80) * 2);
-  if (!s) return;
-  th.width = s; th.height = s;
-  render(th.getContext('2d'), s, s, { x: s * .02, y: s * .04, k: s * .19, yaw: 140, pitch: -13, roll: 0, e: 0, lab: 0, glow: .6, led: 1 }, '#1C1C20', false);
-}
-
-/* =====================================================================
-   BOOT
-   ===================================================================== */
-resize();
-drawDial();
-if (USE_VIDEO) initVideo(); else loader.classList.add('done');
-updateFx(prog()); ps = prog();
-if (USE_VIDEO) startIntro();
-else {
-  ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
-  ps = prog();
-  requestAnimationFrame(startIntro);
-  requestAnimationFrame(loop);
-}
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { lastKey = ''; schedule(); });
 })();
 </script>
 </body>
