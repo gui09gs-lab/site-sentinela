@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sentinela · Opção 2 Central ao vivo</title>
+<meta name="description" content="Veja sua casa ao vivo de qualquer lugar. Câmeras, alarmes e monitoramento 24h.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0B0D12; --panel:#12151D; --panel-2:#171B25; --ink:#F3F4F7; --ink-2:#A9AFBD; --ink-3:#6E7484;
+  --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.16); --red:#FF3B4E; --red-d:#E02238; --ok:#3DDC84;
+  --f:"Space Grotesk",system-ui,-apple-system,"Segoe UI",Arial,sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --gut:max(20px,env(safe-area-inset-left,0px));
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(900px 500px at 70% -10%,rgba(255,59,78,.16),transparent 70%),radial-gradient(700px 500px at 0% 30%,rgba(90,110,255,.08),transparent 70%)}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 var(--gut)}
+h1,h2,h3{margin:0;letter-spacing:-.03em;line-height:1.05;font-weight:700}
+.tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);padding:7px 12px;border:1px solid var(--line-2);border-radius:999px;background:rgba(255,255,255,.03)}
+.tag .d{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:52px;padding:0 26px;border-radius:14px;font-weight:600;font-size:15px;border:1px solid transparent;transition:transform .2s,background .2s,border-color .2s;cursor:pointer;font-family:inherit}
+.btn:hover{transform:translateY(-2px)}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 10px 30px rgba(255,59,78,.35)}
+.btn-red:hover{background:var(--red-d)}
+.btn-ghost{border-color:var(--line-2);color:var(--ink);background:rgba(255,255,255,.04)}
+.btn-ghost:hover{border-color:var(--ink-2)}
+
+.nav{position:sticky;top:0;z-index:50;background:rgba(11,13,18,.72);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.nav .wrap{height:70px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
+.logo i{width:28px;height:28px;border-radius:8px;border:1.5px solid var(--red);display:grid;place-items:center}
+.logo i::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red)}
+.menu{display:flex;gap:30px;font-size:14px;color:var(--ink-2)}
+.menu a:hover{color:var(--ink)}
+.nav .btn{height:40px;padding:0 18px;font-size:14px;border-radius:11px}
+
+/* hero */
+.hero{padding:70px 0 40px;text-align:center}
+.hero h1{font-size:clamp(40px,6.4vw,84px);margin:22px auto 20px;max-width:14ch}
+.hero h1 span{color:var(--red)}
+.hero p{color:var(--ink-2);font-size:18px;max-width:52ch;margin:0 auto 32px}
+.hero .ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* console */
+.console{margin:56px auto 0;max-width:1180px;background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line-2);border-radius:24px;padding:14px;box-shadow:0 40px 120px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.02) inset;text-align:left}
+.c-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 8px 14px;font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.c-top .l{display:flex;gap:7px}
+.c-top .l i{width:10px;height:10px;border-radius:50%;background:#2A2F3B}
+.c-top .st{display:flex;align-items:center;gap:8px;color:var(--ink-2)}
+.c-body{display:grid;grid-template-columns:1fr 300px;gap:14px}
+.feeds{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.feed{position:relative;aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:#000}
+.feed img{width:100%;height:100%;object-fit:cover;filter:saturate(.75) contrast(1.08) brightness(.92);transform:scale(1.04);animation:drift 16s ease-in-out infinite alternate}
+.feed:nth-child(2) img{animation-delay:-4s}.feed:nth-child(3) img{animation-delay:-8s}.feed:nth-child(4) img{animation-delay:-12s}
+@keyframes drift{to{transform:scale(1.1) translate(-1.5%,1%)}}
+.feed::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
+.feed::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.5),transparent 30%,transparent 70%,rgba(0,0,0,.55))}
+.f-lab{position:absolute;z-index:2;left:12px;top:10px;font-family:var(--mono);font-size:11px;color:#fff;display:flex;gap:8px;align-items:center;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.rec{display:inline-flex;align-items:center;gap:5px;color:#fff;background:rgba(255,59,78,.9);padding:2px 7px;border-radius:5px;font-size:10px}
+.rec::before{content:"";width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1.2s steps(2,start) infinite}
+@keyframes blink{to{opacity:.2}}
+.f-time{position:absolute;z-index:2;right:12px;bottom:10px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.85)}
+.f-name{position:absolute;z-index:2;left:12px;bottom:10px;font-size:13px;font-weight:600;color:#fff}
+.box{position:absolute;z-index:2;border:2px solid var(--red);border-radius:6px;opacity:0;transition:opacity .3s;box-shadow:0 0 0 1px rgba(0,0,0,.3)}
+.box.on{opacity:1}
+.box span{position:absolute;left:-2px;top:-22px;background:var(--red);color:#fff;font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px 4px 4px 0;white-space:nowrap}
+.side{background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px;min-height:0}
+.side h4{margin:0;font-size:13px;font-family:var(--mono);font-weight:500;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em}
+.arm{display:flex;align-items:center;justify-content:space-between;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.arm b{font-size:15px}
+.arm small{display:block;font-size:12px;color:var(--ok)}
+.toggle{width:46px;height:26px;border-radius:999px;background:var(--red);position:relative;border:0;cursor:pointer;transition:background .3s}
+.toggle::after{content:"";position:absolute;top:3px;left:23px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .3s}
+.toggle[aria-pressed="false"]{background:#3A3F4C}
+.toggle[aria-pressed="false"]::after{left:3px}
+.log{list-style:none;margin:0;padding:0;display:grid;gap:8px;overflow:hidden;max-height:260px}
+.log li{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;font-size:13px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid var(--line);animation:in .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes in{from{opacity:0;transform:translateY(-8px)}}
+.log li i{width:8px;height:8px;border-radius:50%;margin-top:6px;background:var(--ink-3)}
+.log li.alert i{background:var(--red);box-shadow:0 0 8px var(--red)}
+.log li.ok i{background:var(--ok)}
+.log li small{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+
+/* logos/marquee */
+.strip{margin-top:80px;border-block:1px solid var(--line);overflow:hidden;padding:18px 0}
+.track{display:flex;gap:56px;width:max-content;animation:mq 32s linear infinite;font-family:var(--mono);font-size:13px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.1em}
+.track span{display:flex;align-items:center;gap:56px}
+.track span::after{content:"";width:6px;height:6px;background:var(--red);border-radius:50%}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+section{padding:110px 0 0}
+.sh{max-width:720px;margin-bottom:44px}
+.sh h2{font-size:clamp(32px,4vw,54px);margin:18px 0 14px}
+.sh p{color:var(--ink-2);margin:0;font-size:17px}
+
+/* bento */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:minmax(220px,auto);gap:14px}
+.b{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:28px;overflow:hidden;transition:border-color .3s,transform .3s}
+.b:hover{border-color:var(--line-2);transform:translateY(-3px)}
+.b h3{font-size:22px;margin-bottom:10px;position:relative}
+.b p{color:var(--ink-2);margin:0;font-size:15px;position:relative;max-width:40ch}
+.b .ic{width:44px;height:44px;border-radius:12px;background:rgba(255,59,78,.12);color:var(--red);display:grid;place-items:center;margin-bottom:22px;position:relative}
+.b1{grid-column:span 4;grid-row:span 2;padding:0;display:flex;flex-direction:column;justify-content:flex-end}
+.b1 img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.7}
+.b1::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,13,18,0) 30%,rgba(11,13,18,.95))}
+.b1 .in{position:relative;z-index:1;padding:32px}
+.b2,.b3{grid-column:span 2}
+.b4,.b5,.b6{grid-column:span 2}
+.big{font-size:64px;font-weight:700;letter-spacing:-.04em;line-height:1;color:var(--ink)}
+.big small{font-size:22px;color:var(--red);margin-left:4px}
+.bar{height:6px;border-radius:999px;background:rgba(255,255,255,.08);margin-top:20px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),#FF8A5B);border-radius:inherit;transition:width 1.6s cubic-bezier(.2,.7,.2,1)}
+.in-view .bar i{width:var(--w)}
+
+/* app */
+.app{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.phone{justify-self:center;width:300px;aspect-ratio:9/19;border-radius:44px;background:#05060A;border:1px solid var(--line-2);padding:12px;box-shadow:0 40px 100px rgba(0,0,0,.6),0 0 80px rgba(255,59,78,.12)}
+.screen{width:100%;height:100%;border-radius:34px;background:var(--panel);overflow:hidden;display:flex;flex-direction:column}
+.sc-top{padding:18px 18px 10px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.sc-top b{font-size:17px}
+.sc-feed{margin:0 12px;border-radius:16px;overflow:hidden;position:relative;aspect-ratio:16/11}
+.sc-feed img{width:100%;height:100%;object-fit:cover}
+.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 12px}
+.sc-grid div{aspect-ratio:1/.8;border-radius:12px;overflow:hidden;position:relative}
+.sc-grid img{width:100%;height:100%;object-fit:cover;filter:saturate(.8)}
+.sc-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:auto 12px 16px}
+.sc-btns span{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:10px 4px;text-align:center;font-size:11px;color:var(--ink-2)}
+.sc-btns span.on{background:var(--red);color:#fff;border-color:var(--red)}
+.list{list-style:none;padding:0;margin:26px 0 30px;display:grid;gap:14px}
+.list li{display:flex;gap:14px;align-items:flex-start}
+.list li b{display:block}
+.list li span{color:var(--ink-2);font-size:15px}
+.list .n{font-family:var(--mono);color:var(--red);font-size:13px;margin-top:3px}
+
+/* cta */
+.cta{margin-top:110px;border-radius:28px;border:1px solid var(--line-2);background:linear-gradient(135deg,rgba(255,59,78,.18),rgba(255,59,78,.02) 60%),var(--panel);padding:60px;display:grid;grid-template-columns:1fr .9fr;gap:50px;align-items:center}
+.cta h2{font-size:clamp(32px,4vw,52px);margin:18px 0 14px}
+.cta p{color:var(--ink-2);margin:0}
+.form{display:grid;gap:12px}
+.form label{display:grid;gap:6px;font-size:12px;font-family:var(--mono);color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+.form input,.form select{font:inherit;font-family:var(--f);font-size:15px;text-transform:none;letter-spacing:0;color:var(--ink);height:52px;border-radius:12px;border:1px solid var(--line-2);background:rgba(0,0,0,.3);padding:0 14px;outline:none}
+.form input:focus,.form select:focus{border-color:var(--red)}
+.form .btn{margin-top:6px}
+.form small{color:var(--ink-3);font-size:12.5px;text-align:center}
+
+footer{margin-top:90px;border-top:1px solid var(--line);padding:40px 0 30px;color:var(--ink-3);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+footer a:hover{color:var(--ink)}
+
+.wa{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:60;width:56px;height:56px;border-radius:16px;background:#25D366;color:#fff;display:grid;place-items:center;box-shadow:0 14px 30px rgba(37,211,102,.35)}
+
+.rv{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+
+@media (max-width:1020px){
+  .menu{display:none}
+  .c-body{grid-template-columns:1fr}
+  .log{max-height:180px}
+  .bento{grid-template-columns:repeat(2,1fr)}
+  .b1{grid-column:span 2;grid-row:span 1;min-height:340px}
+  .b2,.b3,.b4,.b5,.b6{grid-column:span 1}
+  .app,.cta{grid-template-columns:1fr}
+  .cta{padding:40px 30px}
+}
+@media (max-width:640px){
+  .hero{padding-top:44px}
+  .hero p{font-size:16.5px}
+  .console{padding:8px;border-radius:18px;margin-top:40px}
+  .c-top > span:nth-child(2){display:none}
+  .feeds{gap:6px}
+  .f-lab{font-size:9.5px;left:8px;top:7px}.f-time{font-size:9.5px;right:8px;bottom:7px}.f-name{font-size:11px;left:8px;bottom:7px}
+  .box span{font-size:9px;top:-19px}
+  .bento{grid-template-columns:1fr}
+  .b1,.b2,.b3,.b4,.b5,.b6{grid-column:span 1}
+  section{padding-top:80px}
+  .cta{padding:30px 20px;margin-top:80px}
+  .nav .btn{display:none}
+  .phone{width:260px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none;transition:none}
+  .feed img,.track,.rec::before{animation:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="#"><i></i>Sentinela</a>
+    <nav class="menu" aria-label="Seções"><a href="#recursos">Recursos</a><a href="#app">Aplicativo</a><a href="#contato">Contato</a></nav>
+    <a class="btn btn-red" href="#contato">Solicitar orçamento</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero" style="padding-top:70px">
+    <div class="wrap">
+      <div class="tag rv"><span class="d"></span>Central online · monitoramento 24h</div>
+      <h1 class="rv">Veja sua casa <span>ao vivo</span>. De qualquer lugar.</h1>
+      <p class="rv">Câmeras inteligentes, alarmes e uma central acompanhando cada alerta. Instalação completa, e tudo no seu celular.</p>
+      <div class="ctas rv">
+        <a class="btn btn-red" href="#contato">Quero proteger minha casa</a>
+        <a class="btn btn-ghost" href="#recursos">Ver como funciona</a>
+      </div>
+
+      <div class="console rv" aria-label="Demonstração do painel de monitoramento">
+        <div class="c-top"><div class="l"><i></i><i></i><i></i></div><span>sentinela://central/residencia-01</span><span class="st"><span class="tag" style="padding:4px 9px"><span class="d"></span>4/4 online</span></span></div>
+        <div class="c-body">
+          <div class="feeds">
+            <div class="feed"><img src="img/casa-madeira.jpg" alt="Câmera da entrada"><div class="f-lab"><span class="rec">REC</span>CAM 01</div><div class="f-name">Entrada</div><div class="f-time" data-clock></div><div class="box" id="bx1" style="left:46%;top:44%;width:16%;height:40%"><span>Pessoa · 96%</span></div></div>
+            <div class="feed"><img src="img/sala-2.jpg" alt="Câmera da sala"><div class="f-lab"><span class="rec">REC</span>CAM 02</div><div class="f-name">Sala</div><div class="f-time" data-clock></div></div>
+            <div class="feed"><img src="img/casa-piscina.jpg" alt="Câmera do quintal"><div class="f-lab"><span class="rec">REC</span>CAM 03</div><div class="f-name">Quintal</div><div class="f-time" data-clock></div><div class="box" id="bx3" style="left:18%;top:52%;width:22%;height:26%"><span>Movimento</span></div></div>
+            <div class="feed"><img src="img/casa-classica.jpg" alt="Câmera da garagem"><div class="f-lab"><span class="rec">REC</span>CAM 04</div><div class="f-name">Garagem</div><div class="f-time" data-clock></div></div>
+          </div>
+          <aside class="side">
+            <h4>Sistema</h4>
+            <div class="arm"><div><b>Alarme</b><small id="armS">Ativado · 12 sensores</small></div><button class="toggle" id="armT" aria-pressed="true" aria-label="Ligar ou desligar alarme"></button></div>
+            <h4>Eventos</h4>
+            <ul class="log" id="log" aria-live="polite"></ul>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="strip" aria-hidden="true"><div class="track"><span>Câmeras 4K</span><span>Visão noturna</span><span>Alarmes</span><span>Sensores</span><span>Gravação em nuvem</span><span>Monitoramento 24h</span><span>App no celular</span><span>Câmeras 4K</span><span>Visão noturna</span><span>Alarmes</span><span>Sensores</span><span>Gravação em nuvem</span><span>Monitoramento 24h</span><span>App no celular</span></div></div>
+
+  <section id="recursos">
+    <div class="wrap">
+      <div class="sh"><div class="tag rv">Recursos</div><h2 class="rv">Tecnologia de verdade, sem complicação</h2><p class="rv">Cada sistema é projetado para o seu imóvel e entregue funcionando, com o aplicativo configurado.</p></div>
+      <div class="bento">
+        <div class="b b1 rv"><img src="img/cam-poste.jpg" alt="Câmeras de segurança externas" loading="lazy"><div class="in"><div class="ic"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.5h11l4-2v7l-4-2h-11z"/><path d="M6 9.5v5M3.5 14.5h5"/></svg></div><h3>Câmeras com imagem nítida, dia e noite</h3><p>Alta definição com visão noturna por infravermelho e detecção de pessoas e veículos.</p></div></div>
+        <div class="b b2 rv"><div class="big">24<small>h</small></div><h3 style="margin-top:14px">Central acompanhando</h3><p>Alertas tratados por pessoas, a qualquer hora.</p></div>
+        <div class="b b3 rv"><div class="big">30<small>dias</small></div><h3 style="margin-top:14px">Gravação em nuvem</h3><p>Histórico seguro fora de casa.</p><div class="bar"><i style="--w:78%"></i></div></div>
+        <div class="b b4 rv"><div class="ic"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 14V9a5 5 0 0 1 10 0v5l1.5 2h-13z"/><path d="M8.5 18h3"/></svg></div><h3>Alarmes e sensores</h3><p>Presença, abertura de portas e janelas e sirene integrados.</p></div>
+        <div class="b b5 rv"><div class="ic"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="8" height="16" rx="2"/><path d="M9 15h2"/></svg></div><h3>Notificação no celular</h3><p>Saiba na hora quando algo acontece, com a imagem do evento.</p></div>
+        <div class="b b6 rv"><div class="ic"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 3.5a4 4 0 0 0-4.9 5.2L3 13.3 6.7 17l4.6-4.6a4 4 0 0 0 5.2-4.9l-2.4 2.4-2.6-.6-.6-2.6z"/></svg></div><h3>Instalação e manutenção</h3><p>Equipe própria, acabamento limpo e revisões periódicas.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="app">
+    <div class="wrap app">
+      <div class="phone rv" aria-hidden="true">
+        <div class="screen">
+          <div class="sc-top"><b>Minha casa</b><span class="tag" style="padding:3px 8px;font-size:10px"><span class="d"></span>Protegida</span></div>
+          <div class="sc-feed"><img src="img/casa-madeira.jpg" alt=""><div class="f-lab"><span class="rec">AO VIVO</span></div><div class="f-time" data-clock></div></div>
+          <div class="sc-grid"><div><img src="img/sala-2.jpg" alt=""></div><div><img src="img/casa-piscina.jpg" alt=""></div></div>
+          <div class="sc-btns"><span class="on">Alarme</span><span>Portão</span><span>Luzes</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="tag rv">Aplicativo</div>
+        <h2 class="rv" style="font-size:clamp(32px,4vw,52px);margin:18px 0 14px">Sua segurança na palma da mão</h2>
+        <p class="rv" style="color:var(--ink-2);margin:0">Configuramos tudo com você no dia da instalação.</p>
+        <ul class="list">
+          <li class="rv"><span class="n">01</span><div><b>Ao vivo e gravações</b><span>Todas as câmeras em uma tela, com linha do tempo.</span></div></li>
+          <li class="rv"><span class="n">02</span><div><b>Ative o alarme de qualquer lugar</b><span>Um toque para armar ou desarmar.</span></div></li>
+          <li class="rv"><span class="n">03</span><div><b>Acesso para a família</b><span>Cada pessoa com o seu login.</span></div></li>
+        </ul>
+        <a class="btn btn-red rv" href="#contato">Agendar visita grátis</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta" id="contato">
+      <div>
+        <div class="tag"><span class="d"></span>Resposta em poucos minutos</div>
+        <h2>Comece com uma visita técnica gratuita</h2>
+        <p>Avaliamos a sua casa, montamos o projeto e você decide sem compromisso.</p>
+      </div>
+      <form class="form" id="leadForm">
+        <label>Nome<input name="nome" required autocomplete="name"></label>
+        <label>WhatsApp<input name="tel" type="tel" required autocomplete="tel" placeholder="(DDD) 9 0000-0000"></label>
+        <label>Tipo de imóvel<select name="tipo"><option>Casa</option><option>Apartamento</option><option>Condomínio</option><option>Comércio</option></select></label>
+        <button class="btn btn-red" type="submit">Enviar pelo WhatsApp</button>
+        <small>O WhatsApp abre com a sua mensagem pronta.</small>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer><div class="wrap"><span>© 2026 Sentinela · Segurança eletrônica residencial</span><span><a href="tel:+5500000000000">(00) 0000-0000</a> · <a href="mailto:contato@exemplo.com.br">contato@exemplo.com.br</a> · Fotos: Unsplash</span></div></footer>
+
+<a class="wa" href="https://wa.me/5500000000000" target="_blank" rel="noopener" aria-label="Falar no WhatsApp"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a9.8 9.8 0 0 0-8.4 14.8L2.3 21.8l4.9-1.3A9.8 9.8 0 1 0 12 2.2zm0 17.8a8 8 0 0 1-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.7 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.5-.2z"/></svg></a>
+
+<script>
+(() => {
+const WA = '5500000000000', RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in', 'in-view'); io.unobserve(e.target); } }), { threshold: .12 });
+document.querySelectorAll('.rv').forEach((el, i) => { if (el.closest('.hero')) el.style.transitionDelay = i * 80 + 'ms'; io.observe(el); });
+// clocks
+const pad = n => String(n).padStart(2, '0'), clocks = document.querySelectorAll('[data-clock]');
+const tick = () => { const d = new Date(), s = `${pad(d.getDate())}/${pad(d.getMonth() + 1)} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; clocks.forEach(c => c.textContent = s); };
+tick(); setInterval(tick, 1000);
+// event log + detection boxes
+const log = document.getElementById('log'), b1 = document.getElementById('bx1'), b3 = document.getElementById('bx3');
+const EV = [['alert', 'Pessoa detectada', 'CAM 01 · Entrada', b1], ['', 'Portão fechado', 'Sensor 04 · Garagem'], ['alert', 'Movimento no quintal', 'CAM 03 · Quintal', b3], ['ok', 'Câmeras verificadas', 'Central · 4/4 online'], ['', 'Porta da sala aberta', 'Sensor 02 · Sala'], ['ok', 'Alerta tratado pela central', 'Operador · Equipe 24h']];
+let k = 0;
+const add = () => {
+  const [cls, t, s, box] = EV[k++ % EV.length], d = new Date();
+  const li = document.createElement('li'); if (cls) li.className = cls;
+  li.innerHTML = `<i></i><div>${t}<small>${s} · ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}</small></div>`;
+  log.prepend(li); while (log.children.length > 5) log.lastChild.remove();
+  if (box) { box.classList.add('on'); setTimeout(() => box.classList.remove('on'), 2600); }
+};
+for (let i = 0; i < 3; i++) add();
+if (!RM) setInterval(add, 3200);
+// alarm toggle
+const t = document.getElementById('armT'), sLab = document.getElementById('armS');
+t.addEventListener('click', () => { const on = t.getAttribute('aria-pressed') !== 'true'; t.setAttribute('aria-pressed', on); sLab.textContent = on ? 'Ativado · 12 sensores' : 'Desativado'; sLab.style.color = on ? '' : 'var(--ink-3)'; });
+// form
+document.getElementById('leadForm').addEventListener('submit', e => {
+  e.preventDefault(); const f = new FormData(e.target);
+  const msg = `Olá! Gostaria de uma visita técnica.\nNome: ${f.get('nome')}\nWhatsApp: ${f.get('tel')}\nImóvel: ${f.get('tipo')}`;
+  open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+});
+})();
+</script>
+</body>
+</html>

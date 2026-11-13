@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sentinela · Opção 1 Confiança</title>
+<meta name="description" content="Câmeras, alarmes e monitoramento 24 horas para residências.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#F6F5F2; --card:#FFFFFF; --ink:#111214; --ink-2:#4A4D55; --ink-3:#83868F;
+  --line:#E4E2DD; --red:#E11D2E; --red-d:#B5121F; --red-soft:#FDECEE; --dark:#121316;
+  --r:22px; --shadow:0 18px 50px rgba(17,18,20,.08);
+  --f:"Manrope",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --gut:max(20px,env(safe-area-inset-left,0px));
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 var(--gut)}
+h1,h2,h3{margin:0;letter-spacing:-.025em;line-height:1.08}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+.eyebrow::before{content:"";width:8px;height:8px;background:var(--red);border-radius:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:52px;padding:0 26px;border-radius:999px;font-weight:700;font-size:15px;border:1.5px solid transparent;transition:transform .2s,background .2s,box-shadow .2s,border-color .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 12px 28px rgba(225,29,46,.28)}
+.btn-red:hover{background:var(--red-d)}
+.btn-line{border-color:var(--ink);color:var(--ink);background:transparent}
+.btn-line:hover{background:var(--ink);color:#fff}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(246,245,242,.86);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .3s}
+.nav.scrolled{border-color:var(--line)}
+.nav .wrap{height:74px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:-.02em}
+.logo i{width:30px;height:30px;border-radius:9px;background:var(--red);display:grid;place-items:center}
+.menu{display:flex;gap:34px;font-size:14px;font-weight:600;color:var(--ink-2)}
+.menu a:hover{color:var(--red)}
+.nav .btn{height:42px;padding:0 20px;font-size:14px}
+
+/* hero */
+.hero{padding:56px 0 80px}
+.hero .wrap{display:grid;grid-template-columns:1.02fr 1fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(38px,5.2vw,68px);font-weight:800;margin:18px 0 20px}
+.hero h1 em{font-style:normal;color:var(--red)}
+.hero p.sub{font-size:18px;color:var(--ink-2);max-width:46ch;margin:0 0 30px}
+.ctas{display:flex;flex-wrap:wrap;gap:12px}
+.trust{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:30px;font-size:14px;font-weight:600;color:var(--ink-2)}
+.trust span{display:flex;align-items:center;gap:8px}
+.trust svg{color:var(--red);flex:none}
+.visual{position:relative}
+.visual .photo{border-radius:30px;overflow:hidden;aspect-ratio:4/4.4;box-shadow:var(--shadow);position:relative}
+.visual .photo img{width:100%;height:100%;object-fit:cover;transform:scale(1.06);transition:transform 1.6s cubic-bezier(.2,.7,.2,1)}
+.loaded .visual .photo img{transform:scale(1)}
+.visual .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.45))}
+.live{position:absolute;left:22px;top:22px;z-index:2;display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:999px;background:rgba(17,18,20,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;font-size:12.5px;font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;background:#FF3B4E;box-shadow:0 0 0 0 rgba(255,59,78,.6);animation:ping 1.6s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 9px rgba(255,59,78,0)}100%{box-shadow:0 0 0 0 rgba(255,59,78,0)}}
+.cam-label{position:absolute;left:22px;bottom:20px;z-index:2;color:#fff;font-size:13px;font-weight:600;opacity:.92}
+.notif{position:absolute;right:-26px;top:16%;z-index:3;width:270px;background:var(--card);border-radius:18px;padding:14px 16px;box-shadow:0 24px 60px rgba(17,18,20,.18);display:flex;gap:12px;align-items:flex-start;transform:translateY(12px);opacity:0;transition:opacity .5s,transform .5s cubic-bezier(.2,.8,.2,1)}
+.notif.show{opacity:1;transform:none}
+.notif .ic{width:38px;height:38px;border-radius:12px;background:var(--red-soft);color:var(--red);display:grid;place-items:center;flex:none}
+.notif b{display:block;font-size:14px}
+.notif small{font-size:12.5px;color:var(--ink-3)}
+.status{position:absolute;left:-26px;bottom:12%;z-index:3;background:var(--card);border-radius:18px;padding:14px 18px;box-shadow:0 24px 60px rgba(17,18,20,.16);display:flex;align-items:center;gap:14px}
+.status .sw{width:44px;height:26px;border-radius:999px;background:var(--red);position:relative}
+.status .sw::after{content:"";position:absolute;right:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff}
+.status b{font-size:14px;display:block}
+.status small{font-size:12px;color:var(--ink-3)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:-20px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px 24px}
+.stat .n{font-size:40px;font-weight:800;letter-spacing:-.03em;color:var(--red);line-height:1}
+.stat .l{font-size:14px;color:var(--ink-2);margin-top:8px;font-weight:500}
+
+section{padding:110px 0 0}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:44px;flex-wrap:wrap}
+.head h2{font-size:clamp(30px,3.6vw,48px);font-weight:800;margin-top:14px;max-width:18ch}
+.head p{max-width:42ch;color:var(--ink-2);margin:0}
+
+/* solutions */
+.sol{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.s-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .3s,box-shadow .3s,border-color .3s;display:flex;flex-direction:column}
+.s-card:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:transparent}
+.s-card .im{aspect-ratio:16/10;overflow:hidden}
+.s-card .im img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.s-card:hover .im img{transform:scale(1.05)}
+.s-card .tx{padding:22px 24px 26px}
+.s-card h3{font-size:19px;font-weight:700;margin-bottom:8px}
+.s-card p{margin:0;color:var(--ink-2);font-size:15px}
+.s-card.ico .tx{padding-top:28px}
+.s-card .badge{width:46px;height:46px;border-radius:14px;background:var(--red-soft);color:var(--red);display:grid;place-items:center;margin-bottom:18px}
+
+/* split */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.split .im{border-radius:30px;overflow:hidden;aspect-ratio:5/4.6}
+.split .im img{width:100%;height:100%;object-fit:cover}
+.split h2{font-size:clamp(30px,3.6vw,46px);font-weight:800;margin:14px 0 18px}
+.split p{color:var(--ink-2);margin:0 0 26px}
+.steps{display:grid;gap:14px;margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{display:flex;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;counter-increment:s}
+.steps li::before{content:counter(s,decimal-leading-zero);font-weight:800;color:var(--red);font-size:15px;min-width:26px}
+.steps b{display:block}
+.steps span{color:var(--ink-2);font-size:14.5px}
+
+/* faq */
+.faq{display:grid;gap:12px;max-width:860px}
+.faq details{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:0 24px}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 0;font-weight:700;font-size:17px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:26px;font-weight:500;color:var(--red);transition:transform .3s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{margin:0 0 22px;color:var(--ink-2)}
+
+/* cta */
+.cta{margin-top:110px;background:var(--dark);color:#fff;border-radius:34px;padding:64px;display:grid;grid-template-columns:1fr .9fr;gap:56px;align-items:center;position:relative;overflow:hidden}
+.cta::before{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(225,29,46,.55),rgba(225,29,46,0) 70%)}
+.cta h2{font-size:clamp(30px,3.8vw,50px);font-weight:800;margin:14px 0 16px;position:relative}
+.cta p{color:rgba(255,255,255,.75);margin:0;position:relative}
+.form{background:#fff;color:var(--ink);border-radius:24px;padding:30px;display:grid;gap:14px;position:relative}
+.form h3{font-size:19px}
+.form label{display:grid;gap:6px;font-size:13px;font-weight:700;color:var(--ink-2)}
+.form input,.form select{font:inherit;font-size:15px;height:50px;border-radius:14px;border:1.5px solid var(--line);background:#FAFAF8;padding:0 14px;outline:none;transition:border-color .2s}
+.form input:focus,.form select:focus{border-color:var(--red)}
+.form .btn{width:100%;margin-top:4px}
+.form small{color:var(--ink-3);font-size:12.5px;text-align:center}
+
+footer{margin-top:90px;border-top:1px solid var(--line);padding:46px 0 34px}
+footer .wrap{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:30px;font-size:14.5px;color:var(--ink-2)}
+footer b{display:block;color:var(--ink);margin-bottom:10px}
+footer a{display:block;margin-bottom:6px}
+footer a:hover{color:var(--red)}
+.copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:22px;font-size:13px;color:var(--ink-3)}
+
+.wa{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:60;width:58px;height:58px;border-radius:50%;background:#25D366;color:#fff;display:grid;place-items:center;box-shadow:0 14px 30px rgba(37,211,102,.4);transition:transform .2s}
+.wa:hover{transform:scale(1.07)}
+
+.rv{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+
+@media (max-width:980px){
+  .menu{display:none}
+  .hero .wrap,.split,.cta{grid-template-columns:1fr}
+  .visual{max-width:560px}
+  .stats{grid-template-columns:repeat(2,1fr);margin-top:0}
+  .sol{grid-template-columns:repeat(2,1fr)}
+  .cta{padding:44px 32px}
+  footer .wrap{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  .hero{padding:28px 0 56px}
+  .hero p.sub{font-size:16.5px}
+  .notif{right:10px;top:auto;bottom:-24px;width:250px}
+  .status{left:10px;bottom:auto;top:66px;padding:10px 14px}
+  .stats{margin-top:20px}
+  .stat{padding:20px 18px}.stat .n{font-size:32px}
+  .sol{grid-template-columns:1fr}
+  section{padding-top:80px}
+  .cta{padding:34px 20px;border-radius:26px;margin-top:80px}
+  .form{padding:22px 18px}
+  footer .wrap{grid-template-columns:1fr}
+  .nav .btn{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none;transition:none}
+  .dot{animation:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="#"><i><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2"><circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="2.4" fill="#fff" stroke="none"/></svg></i>Sentinela</a>
+    <nav class="menu" aria-label="Seções">
+      <a href="#solucoes">Soluções</a><a href="#como">Como funciona</a><a href="#duvidas">Dúvidas</a><a href="#contato">Contato</a>
+    </nav>
+    <a class="btn btn-red" href="#contato">Solicitar orçamento</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero" style="padding-top:56px">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow rv">Monitoramento 24h · Visita técnica grátis</div>
+        <h1 class="rv">Sua casa protegida <em>24 horas</em>, mesmo quando você não está.</h1>
+        <p class="sub rv">Câmeras, alarmes e monitoramento remoto para residências. Você acompanha tudo pelo celular, e a nossa central acompanha com você.</p>
+        <div class="ctas rv">
+          <a class="btn btn-red" href="#contato">Solicitar orçamento grátis</a>
+          <a class="btn btn-line" href="https://wa.me/5500000000000" target="_blank" rel="noopener">Falar no WhatsApp</a>
+        </div>
+        <div class="trust rv">
+          <span><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 10.5 3 3 7-7.5"/></svg>Instalação em até 48h</span>
+          <span><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 10.5 3 3 7-7.5"/></svg>Imagens no celular</span>
+          <span><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 10.5 3 3 7-7.5"/></svg>Suporte técnico local</span>
+        </div>
+      </div>
+      <div class="visual rv">
+        <div class="photo">
+          <img src="img/casa-noite.jpg" alt="Casa moderna iluminada à noite" fetchpriority="high">
+          <div class="live"><span class="dot"></span>CAM 01 · Ao vivo · <span id="clock">21:47:09</span></div>
+          <div class="cam-label">Entrada principal</div>
+        </div>
+        <div class="notif" id="notif" role="status" aria-live="polite">
+          <div class="ic"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 14V9a5 5 0 0 1 10 0v5l1.5 2h-13z"/><path d="M8.5 18h3"/></svg></div>
+          <div><b id="nT">Movimento detectado</b><small id="nS">Portão da garagem · agora</small></div>
+        </div>
+        <div class="status"><div class="sw"></div><div><b>Alarme ativado</b><small>Todos os sensores online</small></div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat rv"><div class="n" data-count="24" data-suf="h">0</div><div class="l">de monitoramento, todos os dias</div></div>
+      <div class="stat rv"><div class="n" data-count="48" data-suf="h">0</div><div class="l">prazo médio de instalação</div></div>
+      <div class="stat rv"><div class="n" data-count="30" data-suf=" dias">0</div><div class="l">de gravação em nuvem</div></div>
+      <div class="stat rv"><div class="n">Grátis</div><div class="l">visita técnica e orçamento</div></div>
+    </div>
+  </div>
+
+  <section id="solucoes">
+    <div class="wrap">
+      <div class="head">
+        <div><div class="eyebrow rv">Nossas soluções</div><h2 class="rv">Tudo o que sua casa precisa em um só lugar</h2></div>
+        <p class="rv">Projetamos cada sistema conforme o imóvel e a rotina da sua família, do primeiro ponto de câmera ao suporte depois da instalação.</p>
+      </div>
+      <div class="sol">
+        <article class="s-card rv"><div class="im"><img src="img/cam-poste.jpg" alt="Câmeras de segurança instaladas em poste" loading="lazy"></div><div class="tx"><h3>Câmeras e CFTV</h3><p>Imagem em alta definição de dia e de noite, com projeto de cobertura sem pontos cegos.</p></div></article>
+        <article class="s-card rv"><div class="im"><img src="img/sala.jpg" alt="Sala de estar moderna" loading="lazy"></div><div class="tx"><h3>Alarmes e sensores</h3><p>Sensores de presença e abertura que disparam alerta no celular e na central.</p></div></article>
+        <article class="s-card rv"><div class="im"><img src="img/fechadura.jpg" alt="Fechadura inteligente controlada pelo celular" loading="lazy"></div><div class="tx"><h3>Acesso pelo celular</h3><p>Veja as câmeras ao vivo, receba notificações e controle tudo pelo aplicativo.</p></div></article>
+        <article class="s-card ico rv"><div class="tx"><div class="badge"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2.5 16 5v4.5c0 4-2.6 6.6-6 8-3.4-1.4-6-4-6-8V5z"/><path d="m7.3 10 1.9 1.9 3.6-3.8"/></svg></div><h3>Monitoramento 24h</h3><p>Central acompanhando os alertas da sua casa dia e noite, com acionamento rápido quando necessário.</p></div></article>
+        <article class="s-card ico rv"><div class="tx"><div class="badge"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 15.5h9a3.5 3.5 0 0 0 .4-7A5 5 0 0 0 5.2 8 3.8 3.8 0 0 0 5.5 15.5z"/></svg></div><h3>Gravação em nuvem</h3><p>Imagens guardadas fora de casa, seguras mesmo que o gravador seja danificado ou levado.</p></div></article>
+        <article class="s-card ico rv"><div class="tx"><div class="badge"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 3.5a4 4 0 0 0-4.9 5.2L3 13.3 6.7 17l4.6-4.6a4 4 0 0 0 5.2-4.9l-2.4 2.4-2.6-.6-.6-2.6z"/></svg></div><h3>Manutenção preventiva</h3><p>Revisões periódicas, limpeza de lentes e atualização dos equipamentos.</p></div></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="como">
+    <div class="wrap split">
+      <div class="im rv"><img src="img/tecnico.jpg" alt="Técnico instalando equipamento de segurança" loading="lazy"></div>
+      <div>
+        <div class="eyebrow rv">Como funciona</div>
+        <h2 class="rv">Do primeiro contato ao app no seu celular</h2>
+        <p class="rv">Um processo simples, com equipe própria e acompanhamento em cada etapa.</p>
+        <ol class="steps">
+          <li class="rv"><div><b>Visita técnica gratuita</b><span>Avaliamos os acessos e os pontos cegos do imóvel.</span></div></li>
+          <li class="rv"><div><b>Projeto sob medida</b><span>Você recebe a proposta com equipamentos e posicionamento.</span></div></li>
+          <li class="rv"><div><b>Instalação limpa</b><span>Cabeamento organizado e tudo testado na hora.</span></div></li>
+          <li class="rv"><div><b>Tudo no seu celular</b><span>Configuramos o aplicativo junto com você.</span></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section id="duvidas">
+    <div class="wrap">
+      <div class="head"><div><div class="eyebrow rv">Dúvidas frequentes</div><h2 class="rv">Perguntas que sempre recebemos</h2></div></div>
+      <div class="faq">
+        <details class="rv"><summary>As câmeras funcionam à noite?</summary><p>Sim. Os modelos que instalamos têm visão noturna por infravermelho, e alguns mantêm imagem colorida mesmo com pouca luz.</p></details>
+        <details class="rv"><summary>Consigo ver as imagens pelo celular?</summary><p>Sim. Configuramos o aplicativo no seu celular e no de quem você quiser, com acesso ao vivo e às gravações.</p></details>
+        <details class="rv"><summary>E se faltar internet ou energia?</summary><p>O gravador continua registrando localmente, e indicamos opções de nobreak e internet reserva conforme o projeto.</p></details>
+        <details class="rv"><summary>Quanto custa?</summary><p>Depende do imóvel e do número de câmeras. A visita técnica e o orçamento são gratuitos e sem compromisso.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta" id="contato">
+      <div>
+        <div class="eyebrow">Orçamento sem compromisso</div>
+        <h2>Fale com um especialista ainda hoje</h2>
+        <p>Atendimento rápido, com resposta em poucos minutos. Preencha os dados e continuamos a conversa pelo WhatsApp.</p>
+      </div>
+      <form class="form" id="leadForm">
+        <h3>Solicite sua visita técnica</h3>
+        <label>Nome<input name="nome" required autocomplete="name"></label>
+        <label>WhatsApp<input name="tel" type="tel" required autocomplete="tel" placeholder="(DDD) 9 0000-0000"></label>
+        <label>Tipo de imóvel<select name="tipo"><option>Casa</option><option>Apartamento</option><option>Condomínio</option><option>Comércio</option></select></label>
+        <button class="btn btn-red" type="submit">Enviar pelo WhatsApp</button>
+        <small>O WhatsApp abre com a sua mensagem pronta.</small>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><a class="logo" href="#" style="margin-bottom:12px"><i><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2"><circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="2.4" fill="#fff" stroke="none"/></svg></i>Sentinela</a>Segurança eletrônica e monitoramento 24 horas para residências.</div>
+    <div><b>Atendimento</b><a href="tel:+5500000000000">(00) 0000-0000</a><a href="mailto:contato@exemplo.com.br">contato@exemplo.com.br</a></div>
+    <div><b>Navegação</b><a href="#solucoes">Soluções</a><a href="#como">Como funciona</a><a href="#contato">Orçamento</a></div>
+    <div class="copy">© 2026 Sentinela · Fotos: Unsplash</div>
+  </div>
+</footer>
+
+<a class="wa" href="https://wa.me/5500000000000" target="_blank" rel="noopener" aria-label="Falar no WhatsApp"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a9.8 9.8 0 0 0-8.4 14.8L2.3 21.8l4.9-1.3A9.8 9.8 0 1 0 12 2.2zm0 17.8a8 8 0 0 1-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.7 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.5-.2z"/></svg></a>
+
+<script>
+(() => {
+const WA = '5500000000000', RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+addEventListener('load', () => document.body.classList.add('loaded'));
+// reveal on scroll
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
+document.querySelectorAll('.rv').forEach((el, i) => { el.style.transitionDelay = (el.closest('.hero') ? i * 70 : 0) + 'ms'; io.observe(el); });
+// counters
+const co = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return; co.unobserve(e.target);
+  const el = e.target, to = +el.dataset.count, suf = el.dataset.suf || '', t0 = performance.now(), d = RM ? 0 : 1200;
+  const step = now => { const k = d ? Math.min(1, (now - t0) / d) : 1; el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))) + suf; if (k < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}), { threshold: .5 });
+document.querySelectorAll('[data-count]').forEach(el => co.observe(el));
+// nav border
+const nav = document.getElementById('nav');
+addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 10), { passive: true });
+// live clock
+const clock = document.getElementById('clock'), pad = n => String(n).padStart(2, '0');
+const tick = () => { const d = new Date(); clock.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; };
+tick(); setInterval(tick, 1000);
+// rotating notifications
+const N = [['Movimento detectado', 'Portão da garagem · agora'], ['Entrega identificada', 'Porta da frente · agora'], ['Alarme ativado', 'Todos os sensores online'], ['Câmera 03 online', 'Quintal · imagem nítida']];
+const nb = document.getElementById('notif'), nT = document.getElementById('nT'), nS = document.getElementById('nS');
+let ni = 0;
+const show = () => { [nT.textContent, nS.textContent] = N[ni % N.length]; nb.classList.add('show'); ni++; setTimeout(() => nb.classList.remove('show'), 3800); };
+setTimeout(show, 900); if (!RM) setInterval(show, 4800);
+// form -> WhatsApp
+document.getElementById('leadForm').addEventListener('submit', e => {
+  e.preventDefault(); const f = new FormData(e.target);
+  const msg = `Olá! Gostaria de uma visita técnica.\nNome: ${f.get('nome')}\nWhatsApp: ${f.get('tel')}\nImóvel: ${f.get('tipo')}`;
+  open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+});
+})();
+</script>
+</body>
+</html>

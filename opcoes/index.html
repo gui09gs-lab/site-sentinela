@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sentinela · Opções de layout</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#F4F3F0;--card:#fff;--ink:#121316;--ink-2:#565962;--line:#E2E0DB;--red:#E11D2E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Manrope",system-ui,Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding:56px 20px 80px}
+h1{font-size:clamp(30px,4vw,46px);letter-spacing:-.03em;line-height:1.1;margin:10px 0 12px}
+.k{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+.lead{color:var(--ink-2);max-width:60ch;margin:0 0 40px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;transition:transform .25s,box-shadow .25s}
+.card:hover{transform:translateY(-5px);box-shadow:0 20px 50px rgba(0,0,0,.08)}
+.card img{width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top;border-bottom:1px solid var(--line)}
+.tx{padding:22px 22px 24px;display:flex;flex-direction:column;gap:10px;flex:1}
+.tx h2{margin:0;font-size:21px;letter-spacing:-.02em}
+.tx p{margin:0;color:var(--ink-2);font-size:15px}
+.tx ul{margin:0;padding-left:18px;color:var(--ink-2);font-size:14px}
+.tag{font-size:12px;font-weight:700;color:var(--ink-2)}
+.tag b{color:var(--red)}
+.btn{margin-top:auto;display:inline-flex;justify-content:center;align-items:center;height:48px;border-radius:999px;background:var(--ink);color:#fff;text-decoration:none;font-weight:700;font-size:14.5px;transition:background .2s}
+.btn:hover{background:var(--red)}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="k">Sentinela · proposta de layout</div>
+  <h1>3 direções para o site</h1>
+  <p class="lead">Mesmo conteúdo e mesmas fotos, três estilos diferentes. Abra cada uma no computador e no celular e escolha a que mais combina com o cliente. Depois dá para misturar partes de uma com a outra.</p>
+  <div class="grid">
+    <article class="card">
+      <img src="img/thumb-1.jpg" alt="Prévia da opção 1">
+      <div class="tx">
+        <h2>1 · Confiança</h2>
+        <p>Claro, limpo e corporativo moderno. Foto grande da casa com notificações "ao vivo" aparecendo por cima.</p>
+        <ul><li>Passa credibilidade logo de cara</li><li>Tem perguntas frequentes e passo a passo</li><li>Fácil de ler para qualquer idade</li></ul>
+        <span class="tag">Ideal para: <b>público familiar e residencial</b></span>
+        <a class="btn" href="opcao-1-confianca.html">Abrir opção 1</a>
+      </div>
+    </article>
+    <article class="card">
+      <img src="img/thumb-2.jpg" alt="Prévia da opção 2">
+      <div class="tx">
+        <h2>2 · Central ao vivo</h2>
+        <p>Escuro e tecnológico. O topo é um painel de monitoramento com 4 câmeras, detecção de pessoas e log de eventos.</p>
+        <ul><li>Mostra o produto funcionando</li><li>Destaque para o aplicativo no celular</li><li>Visual de empresa de tecnologia</li></ul>
+        <span class="tag">Ideal para: <b>vender o monitoramento e o app</b></span>
+        <a class="btn" href="opcao-2-central.html">Abrir opção 2</a>
+      </div>
+    </article>
+    <article class="card">
+      <img src="img/thumb-3.jpg" alt="Prévia da opção 3">
+      <div class="tx">
+        <h2>3 · Editorial</h2>
+        <p>Tipografia gigante, fundo creme e vermelho forte. Faixa animada, texto que "acende" ao rolar e fotos que aparecem no hover.</p>
+        <ul><li>O mais marcante e diferente</li><li>Cara de marca premium</li><li>Ótimo para Instagram e anúncios</li></ul>
+        <span class="tag">Ideal para: <b>se destacar da concorrência</b></span>
+        <a class="btn" href="opcao-3-editorial.html">Abrir opção 3</a>
+      </div>
+    </article>
+  </div>
+</div>
+</body>
+</html>
