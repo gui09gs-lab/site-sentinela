@@ -4,6 +4,7 @@ Site de câmeras, alarmes e monitoramento 24h. Página única (`index.html`), se
 
 ## Estrutura
 - `index.html`: o site (layout "Confiança")
+- `simulador.html`: simulador de câmeras (planta da casa, 4 tipos de câmera, área de cobertura, pontos cegos e envio do projeto pelo WhatsApp)
 - `img/`: fotos (Unsplash, licença de uso comercial livre). Troque por fotos reais do cliente quando possível.
 - `opcoes/`: as três propostas de layout que foram comparadas, mantidas como referência
 

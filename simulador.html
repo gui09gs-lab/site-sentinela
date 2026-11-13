@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulador de câmeras · Sentinela Segurança</title>
+<meta name="description" content="Monte o projeto de segurança da sua casa: posicione câmeras Bullet, Dome, PTZ e 360° na planta e veja a área de cobertura.">
+<meta name="theme-color" content="#E11D2E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23E11D2E'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23fff' stroke-width='2.6'/%3E%3Ccircle cx='16' cy='16' r='3.2' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#F6F5F2; --card:#FFFFFF; --ink:#111214; --ink-2:#4A4D55; --ink-3:#83868F;
+  --line:#E4E2DD; --red:#E11D2E; --red-d:#B5121F; --red-soft:#FDECEE; --dark:#121316;
+  --int:#F3EEE6; --ext:#E7F0E3;
+  --c-bullet:#E11D2E; --c-dome:#2563EB; --c-ptz:#D97706; --c-pano:#059669;
+  --r:20px; --shadow:0 18px 50px rgba(17,18,20,.08);
+  --f:"Manrope",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --gut:max(16px,env(safe-area-inset-left,0px));
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.wrap{max-width:1360px;margin:0 auto;padding:0 var(--gut)}
+h1,h2,h3{margin:0;letter-spacing:-.025em;line-height:1.1}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+.eyebrow::before{content:"";width:8px;height:8px;background:var(--red);border-radius:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 20px;border-radius:999px;font-weight:700;font-size:14px;border:1.5px solid transparent;transition:background .2s,transform .2s,border-color .2s,color .2s;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 10px 24px rgba(225,29,46,.25)}
+.btn-red:hover{background:var(--red-d)}
+.btn-line{border-color:var(--line);background:var(--card)}
+.btn-line:hover{border-color:var(--ink)}
+.btn-sm{height:36px;padding:0 14px;font-size:13px}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(246,245,242,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav .wrap{height:68px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:-.02em}
+.logo i{width:30px;height:30px;border-radius:9px;background:var(--red);display:grid;place-items:center}
+.menu{display:flex;gap:30px;font-size:14px;font-weight:600;color:var(--ink-2)}
+.menu a:hover,.menu a[aria-current]{color:var(--red)}
+
+/* intro */
+.intro{padding:40px 0 26px;display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap}
+.intro h1{font-size:clamp(30px,4vw,48px);font-weight:800;margin:12px 0 10px}
+.intro p{margin:0;color:var(--ink-2);max-width:56ch;font-size:16px}
+.how{display:flex;gap:10px;flex-wrap:wrap;margin:0;padding:0;list-style:none;counter-reset:h}
+.how li{counter-increment:h;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 16px 8px 8px;font-size:13.5px;font-weight:600}
+.how li::before{content:counter(h);width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-size:12.5px;font-weight:800}
+
+/* app */
+.app{display:grid;grid-template-columns:300px minmax(0,1fr) 330px;gap:16px;align-items:start;padding-bottom:20px}
+.pane{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.pane + .pane{margin-top:16px}
+.pane h2{font-size:15px;font-weight:800;display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.pane h2 .n{width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:12px}
+.hint{font-size:12.5px;color:var(--ink-3);margin:8px 0 0}
+.seg{display:flex;background:#F1F0EC;border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;background:transparent;border-radius:9px;padding:8px 6px;font-size:13px;font-weight:700;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+label.f{display:grid;gap:6px;font-size:12.5px;font-weight:700;color:var(--ink-2);margin-top:12px}
+select,input[type=text],input[type=number]{height:40px;border-radius:11px;border:1.5px solid var(--line);background:#FAFAF8;padding:0 10px;outline:none;width:100%}
+select:focus,input:focus{border-color:var(--red)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* palette */
+.pal{display:grid;gap:8px}
+.ptype{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:10px 12px;transition:border-color .2s,background .2s,box-shadow .2s}
+.ptype:hover{border-color:var(--ink-3)}
+.ptype[aria-pressed="true"]{border-color:var(--tc);background:color-mix(in srgb,var(--tc) 7%,#fff);box-shadow:0 0 0 3px color-mix(in srgb,var(--tc) 18%,transparent)}
+.ptype svg{width:44px;height:44px}
+.ptype b{display:block;font-size:14px}
+.ptype small{display:block;font-size:12px;color:var(--ink-3);line-height:1.35}
+.armed-msg{display:none;margin-top:10px;font-size:12.5px;font-weight:700;color:var(--red);background:var(--red-soft);border-radius:10px;padding:8px 10px}
+.armed .armed-msg{display:block}
+
+/* plan */
+.stage{position:sticky;top:84px}
+.board{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px;position:relative}
+.tools{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:2px 2px 12px}
+.tools .l,.tools .r{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chk{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;user-select:none}
+.chk input{accent-color:var(--red);width:16px;height:16px}
+#plan{width:100%;height:auto;display:block;border-radius:14px;background:#FBFAF7;touch-action:none;user-select:none;-webkit-user-select:none}
+#plan.armed,#plan.drawing{cursor:crosshair}
+#plan .cam{cursor:grab}
+#plan .rot{cursor:alias}
+#plan .area-hit{cursor:default}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);padding:12px 4px 2px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:14px;height:14px;border-radius:4px;border:1px solid rgba(0,0,0,.1)}
+.toast{position:absolute;left:50%;top:70px;transform:translateX(-50%) translateY(-8px);background:var(--dark);color:#fff;font-size:13px;font-weight:600;padding:9px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:5;width:max-content;max-width:calc(100% - 24px);text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%)}
+
+/* selected camera */
+.sel-empty{font-size:13.5px;color:var(--ink-3)}
+.sel-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.sel-head .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:12px;flex:none}
+.sel-head b{display:block;font-size:15px}
+.sel-head small{font-size:12.5px;color:var(--ink-3)}
+.desc{font-size:13px;color:var(--ink-2);background:#F7F6F3;border-radius:12px;padding:10px 12px;margin:10px 0 0}
+.rng{margin-top:12px}
+.rng .t{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:var(--ink-2)}
+.rng .t output{color:var(--ink);font-variant-numeric:tabular-nums}
+.rng input{width:100%;accent-color:var(--red);margin:6px 0 0}
+.sel-btns{display:flex;gap:8px;margin-top:14px}
+.sel-btns .btn{flex:1}
+.cam-list{list-style:none;margin:0;padding:0;display:grid;gap:6px;max-height:220px;overflow:auto}
+.cam-list button{width:100%;display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--card);border-radius:11px;padding:7px 10px;font-size:13px;text-align:left}
+.cam-list button[aria-current="true"]{border-color:var(--ink)}
+.cam-list i{width:10px;height:10px;border-radius:50%;flex:none}
+.cam-list small{margin-left:auto;color:var(--ink-3);font-size:12px}
+
+/* results */
+.score{display:grid;grid-template-columns:92px 1fr;gap:16px;align-items:center}
+.ring{position:relative;width:92px;height:92px}
+.ring svg{width:92px;height:92px;transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:22px;font-weight:800}
+.split{display:grid;gap:8px}
+.split div{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-2)}
+.split div b{color:var(--ink)}
+.bars{display:grid;gap:9px;margin-top:16px}
+.bar .t{display:flex;justify-content:space-between;font-size:12.5px;gap:8px}
+.bar .t span{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .t em{font-style:normal;color:var(--ink-3);font-weight:600;font-size:11.5px;margin-left:6px}
+.bar .tr{height:7px;border-radius:999px;background:#EEECE7;overflow:hidden;margin-top:4px}
+.bar .tr i{display:block;height:100%;border-radius:inherit;transition:width .4s}
+.counts{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.counts span{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+.counts i{width:9px;height:9px;border-radius:50%}
+.tips{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+.tips li{font-size:12.5px;line-height:1.45;border-radius:11px;padding:9px 11px;background:#FFF7E6;color:#7A4B00}
+.tips li.ok{background:#EAF7EF;color:#14532D}
+.res-btns{display:grid;gap:8px;margin-top:16px}
+
+/* types */
+.types{padding:70px 0 0}
+.types h2{font-size:clamp(26px,3vw,38px);font-weight:800;margin:12px 0 26px}
+.tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;border-top:4px solid var(--tc)}
+.tcard svg{width:64px;height:64px;margin-bottom:12px}
+.tcard h3{font-size:17px;margin-bottom:10px}
+.tcard dl{margin:0;display:grid;gap:8px;font-size:13.5px}
+.tcard dt{font-weight:800;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.tcard dd{margin:0;color:var(--ink-2)}
+
+.cta{margin:70px 0 0;background:var(--dark);color:#fff;border-radius:28px;padding:44px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.cta h2{font-size:clamp(24px,3vw,36px);font-weight:800}
+.cta p{margin:8px 0 0;color:rgba(255,255,255,.72)}
+footer{margin-top:60px;border-top:1px solid var(--line);padding:26px 0 34px;font-size:13px;color:var(--ink-3)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+@media (max-width:1180px){
+  .app{grid-template-columns:280px minmax(0,1fr)}
+  .col-r{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .col-r .pane + .pane{margin-top:0}
+  .tgrid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:820px){
+  .menu{display:none}
+  .app{grid-template-columns:1fr}
+  .stage{position:static;order:-1}
+  .col-l{display:grid;grid-template-columns:1fr;gap:16px}
+  .col-l .pane + .pane{margin-top:0}
+  .pal{grid-template-columns:1fr 1fr}
+  #palPane{order:-1}
+  .ptype{grid-template-columns:1fr;justify-items:center;text-align:center;padding:10px 8px}
+  .ptype small{display:none}
+  .col-r{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .intro{padding-top:26px}
+  .how li{font-size:12.5px}
+  .tgrid{grid-template-columns:1fr}
+  .cta{padding:30px 22px}
+  .nav .btn{display:none}
+  .board{padding:8px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="index.html"><i><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2"><circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="2.4" fill="#fff" stroke="none"/></svg></i>Sentinela</a>
+    <nav class="menu" aria-label="Seções">
+      <a href="index.html#solucoes">Soluções</a><a href="simulador.html" aria-current="page">Simulador</a><a href="index.html#duvidas">Dúvidas</a><a href="index.html#contato">Contato</a>
+    </nav>
+    <a class="btn btn-red" href="index.html#contato">Solicitar orçamento</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="intro">
+    <div>
+      <div class="eyebrow">Simulador de câmeras</div>
+      <h1>Monte o projeto da sua casa</h1>
+      <p>Escolha uma planta ou desenhe a sua, posicione as câmeras e veja na hora o que cada uma enxerga e onde ficam os pontos cegos.</p>
+    </div>
+    <ol class="how">
+      <li>Escolha a planta</li><li>Toque em um tipo de câmera</li><li>Toque na planta para instalar</li><li>Arraste para girar e ajustar</li>
+    </ol>
+  </div>
+
+  <div class="app">
+    <!-- LEFT: plan + palette -->
+    <div class="col-l">
+      <section class="pane" aria-labelledby="h-planta">
+        <h2 id="h-planta"><span class="n">1</span>Planta</h2>
+        <label class="f">Modelo
+          <select id="preset">
+            <option value="casa">Casa térrea com garagem</option>
+            <option value="apto">Apartamento com varanda</option>
+            <option value="branco">Em branco (desenhe a sua)</option>
+          </select>
+        </label>
+        <div class="seg" role="group" aria-label="Modo de edição" style="margin-top:12px">
+          <button type="button" id="mCam" aria-pressed="true">Câmeras</button>
+          <button type="button" id="mArea" aria-pressed="false">Editar áreas</button>
+        </div>
+        <div id="areaTools" hidden>
+          <p class="hint">Arraste na planta para desenhar uma área. Toque em uma área para editar.</p>
+          <div class="seg" role="group" aria-label="Tipo da nova área" style="margin-top:10px">
+            <button type="button" id="nInt" aria-pressed="true">Nova interna</button>
+            <button type="button" id="nExt" aria-pressed="false">Nova externa</button>
+          </div>
+          <div id="areaEdit" hidden>
+            <label class="f">Nome da área<input type="text" id="aName" maxlength="24"></label>
+            <div class="seg" role="group" aria-label="Tipo da área" style="margin-top:10px">
+              <button type="button" id="aInt" aria-pressed="true">Interna</button>
+              <button type="button" id="aExt" aria-pressed="false">Externa</button>
+            </div>
+            <button type="button" class="btn btn-line btn-sm" id="aDel" style="margin-top:10px;width:100%">Remover área</button>
+          </div>
+          <div class="row2" style="margin-top:4px">
+            <label class="f">Largura do terreno (m)<input type="number" id="lotW" min="6" max="60" step="1"></label>
+            <label class="f">Profundidade (m)<input type="number" id="lotH" min="6" max="60" step="1"></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="pane" id="palPane" aria-labelledby="h-cam">
+        <h2 id="h-cam"><span class="n">2</span>Câmeras</h2>
+        <div class="pal" id="pal"></div>
+        <div class="armed-msg" id="armedMsg">Toque na planta para instalar a câmera</div>
+      </section>
+    </div>
+
+    <!-- CENTER: plan -->
+    <div class="stage">
+      <div class="board">
+        <div class="tools">
+          <div class="l">
+            <label class="chk"><input type="checkbox" id="tBlind" checked>Pontos cegos</label>
+            <label class="chk"><input type="checkbox" id="tWalls" checked>Paredes bloqueiam</label>
+          </div>
+          <div class="r">
+            <button type="button" class="btn btn-line btn-sm" id="bClear">Limpar câmeras</button>
+            <button type="button" class="btn btn-line btn-sm" id="bPng">Baixar imagem</button>
+          </div>
+        </div>
+        <svg id="plan" role="application" aria-label="Planta da casa. Use o painel para escolher câmeras e toque na planta para instalar." tabindex="0">
+          <defs>
+            <clipPath id="lotClip"><rect id="lotClipR" x="0" y="0" width="1" height="1"/></clipPath>
+            <pattern id="grid" width="1" height="1" patternUnits="userSpaceOnUse"><path d="M1 0H0V1" fill="none" stroke="rgba(0,0,0,.05)" stroke-width=".03"/></pattern>
+            <pattern id="hatch" width=".35" height=".35" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width=".35" height=".35" fill="rgba(225,29,46,.10)"/><line x1="0" y1="0" x2="0" y2=".35" stroke="rgba(225,29,46,.55)" stroke-width=".07"/></pattern>
+          </defs>
+          <g id="gAreas"></g><rect id="gridR" fill="url(#grid)" pointer-events="none"/>
+          <g id="gBlind" pointer-events="none"></g><g id="gCov" pointer-events="none" clip-path="url(#lotClip)"></g>
+          <g id="gWalls" pointer-events="none"></g><g id="gLabels" pointer-events="none"></g>
+          <g id="gCams"></g><g id="gDraft" pointer-events="none"></g>
+        </svg>
+        <div class="legend" aria-hidden="true">
+          <span><i style="background:var(--int)"></i>Área interna</span>
+          <span><i style="background:var(--ext)"></i>Área externa</span>
+          <span><i style="background:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%226%22 height=%226%22%3E%3Cpath d=%22M0 6L6 0%22 stroke=%22%23E11D2E%22/%3E%3C/svg%3E')"></i>Ponto cego</span>
+          <span><i style="background:#333;height:4px;border:0"></i>Parede</span>
+        </div>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: selected + results -->
+    <div class="col-r">
+      <section class="pane" aria-labelledby="h-sel">
+        <h2 id="h-sel"><span class="n">3</span>Câmera selecionada</h2>
+        <div id="selBox"><p class="sel-empty">Toque em uma câmera na planta para ajustar a direção, a abertura e o alcance.</p></div>
+        <ul class="cam-list" id="camList" style="margin-top:14px"></ul>
+      </section>
+      <section class="pane" aria-labelledby="h-res">
+        <h2 id="h-res"><span class="n">4</span>Resultado</h2>
+        <div class="score">
+          <div class="ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#EEECE7" stroke-width="4"/><circle id="ringV" cx="18" cy="18" r="15.5" fill="none" stroke="#E11D2E" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="0 100"/></svg><b id="ringT">0%</b></div>
+          <div class="split"><div>Cobertura total<b id="sTot">0%</b></div><div>Áreas internas<b id="sInt">0%</b></div><div>Áreas externas<b id="sExt">0%</b></div></div>
+        </div>
+        <div class="counts" id="counts"></div>
+        <div class="bars" id="bars"></div>
+        <ul class="tips" id="tips"></ul>
+        <div class="res-btns">
+          <button type="button" class="btn btn-red" id="bSend">Enviar projeto pelo WhatsApp</button>
+        </div>
+        <p class="hint">Simulação ilustrativa. O projeto final é definido na visita técnica gratuita.</p>
+      </section>
+    </div>
+  </div>
+
+  <section class="types" id="tipos">
+    <div class="eyebrow">Conheça os modelos</div>
+    <h2>Tipos de câmera de segurança</h2>
+    <div class="tgrid" id="tgrid"></div>
+  </section>
+
+  <div class="cta">
+    <div><h2>Gostou do projeto?</h2><p>Um especialista confere tudo na visita técnica gratuita e monta o orçamento.</p></div>
+    <a class="btn btn-red" style="height:52px;padding:0 26px" href="index.html#contato">Agendar visita grátis</a>
+  </div>
+</main>
+
+<footer><div class="wrap"><span>© 2026 Sentinela · Segurança eletrônica residencial</span><a href="index.html">Voltar para o site</a></div></footer>
+
+<script>
+(() => {
+'use strict';
+const WA = '5500000000000';
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = s => document.querySelector(s);
+const NS = 'http://www.w3.org/2000/svg';
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const RAD = Math.PI / 180;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* ---------------- camera types ---------------- */
+const TYPES = {
+  bullet: { name: 'Bullet (canhão)', short: 'Bullet', tag: 'B', color: '#E11D2E', fov: 80, fovMin: 53, fovMax: 98, range: 16, rMin: 5, rMax: 30, uso: 'externa',
+    resumo: 'Externa · 53° a 98°',
+    formato: 'Tubular e alongada.',
+    usoTxt: 'Ideal para áreas externas, com proteção contra chuva e sol (IP67). O design visível ajuda a inibir a ação de criminosos.',
+    angulo: 'Lente fixa (ex.: 3,6 mm) com ângulo horizontal entre 53° e 98°, focada em uma direção: corredores, portões e garagens.' },
+  dome: { name: 'Dome', short: 'Dome', tag: 'D', color: '#2563EB', fov: 100, fovMin: 80, fovMax: 120, range: 9, rMin: 3, rMax: 15, uso: 'interna',
+    resumo: 'Interna · 80° a 110°+',
+    formato: 'Arredondada, em formato de cúpula.',
+    usoTxt: 'Mais discreta e compacta, muito usada em ambientes internos, no teto ou na parede.',
+    angulo: 'Boa abertura horizontal, entre 80° e 110° ou mais, cobrindo bem salas e ambientes amplos.' },
+  ptz: { name: 'Speed Dome / PTZ', short: 'PTZ', tag: 'P', color: '#D97706', uso: 'externa',
+    resumo: 'Externa · gira 360° e dá zoom',
+    formato: 'Esférica e motorizada.',
+    usoTxt: 'Monitoramento dinâmico de grandes áreas: pátios, estacionamentos e perímetros. Gira 360° e tem zoom óptico de longo alcance.',
+    angulo: 'Variável: aberta (wide) cobre amplos espaços; com zoom, fecha o ângulo para ver detalhes distantes.' },
+  pano: { name: 'Panorâmica 360°', short: '360°', tag: '360', color: '#059669', fov: 360, range: 7, rMin: 3, rMax: 12, uso: 'interna',
+    resumo: 'Teto · 360° sem pontos cegos',
+    formato: 'Dome achatada com lente olho de peixe.',
+    usoTxt: 'Instalada no centro do teto para monitorar todo o ambiente a partir de um único ponto.',
+    angulo: '360°, visão imersiva de parede a parede.' }
+};
+const camFov = c => c.type === 'ptz' ? lerp(110, 16, c.zoom) : c.type === 'pano' ? 360 : c.fov;
+const camRange = c => c.type === 'ptz' ? lerp(14, 45, c.zoom) : c.range;
+
+// small illustrative icon per type (top view + body)
+function typeIcon(t) {
+  const c = TYPES[t].color;
+  const wedge = (a, r) => { const h = a / 2 * RAD; return `M32 32 L${32 + r * Math.cos(-h)} ${32 + r * Math.sin(-h)} A${r} ${r} 0 0 1 ${32 + r * Math.cos(h)} ${32 + r * Math.sin(h)} Z`; };
+  if (t === 'bullet') return `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="${wedge(76, 30)}" fill="${c}" opacity=".16"/><rect x="12" y="25" width="26" height="14" rx="5" fill="#fff" stroke="${c}" stroke-width="2.5"/><rect x="36" y="27" width="6" height="10" rx="2" fill="${c}"/><rect x="15" y="39" width="4" height="9" fill="${c}"/></svg>`;
+  if (t === 'dome') return `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="${wedge(110, 28)}" fill="${c}" opacity=".16"/><path d="M14 36a14 14 0 0 1 28 0z" fill="#fff" stroke="${c}" stroke-width="2.5"/><rect x="11" y="35" width="34" height="5" rx="2.5" fill="${c}"/><circle cx="28" cy="30" r="3.5" fill="${c}"/></svg>`;
+  if (t === 'ptz') return `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="none" stroke="${c}" stroke-width="2" stroke-dasharray="3 4" opacity=".6"/><path d="${wedge(40, 28)}" fill="${c}" opacity=".18"/><rect x="26" y="10" width="12" height="8" rx="2" fill="${c}"/><circle cx="32" cy="32" r="13" fill="#fff" stroke="${c}" stroke-width="2.5"/><circle cx="38" cy="32" r="4" fill="${c}"/></svg>`;
+  return `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="27" fill="${c}" opacity=".14"/><ellipse cx="32" cy="34" rx="20" ry="8" fill="#fff" stroke="${c}" stroke-width="2.5"/><ellipse cx="32" cy="32" rx="8" ry="4" fill="${c}"/></svg>`;
+}
+
+/* ---------------- plans ---------------- */
+const PRESETS = {
+  casa: { lot: { w: 22, h: 18 }, areas: [
+    ['Entrada / jardim', 'externa', 0, 0, 22, 3], ['Garagem', 'externa', 0, 3, 6, 10], ['Sala', 'interna', 6, 3, 8, 6],
+    ['Cozinha', 'interna', 14, 3, 6, 6], ['Quarto 1', 'interna', 6, 9, 5, 4], ['Banheiro', 'interna', 11, 9, 3, 4],
+    ['Quarto 2', 'interna', 14, 9, 6, 4], ['Corredor lateral', 'externa', 20, 3, 2, 10], ['Quintal', 'externa', 0, 13, 22, 5]] },
+  apto: { lot: { w: 14, h: 11 }, areas: [
+    ['Varanda', 'externa', 0, 0, 14, 2], ['Sala', 'interna', 0, 2, 8, 5], ['Cozinha', 'interna', 8, 2, 6, 3],
+    ['Área de serviço', 'interna', 8, 5, 6, 2], ['Quarto 1', 'interna', 0, 7, 5, 4], ['Banheiro', 'interna', 5, 7, 3, 4], ['Quarto 2', 'interna', 8, 7, 6, 4]] },
+  branco: { lot: { w: 20, h: 15 }, areas: [] }
+};
+
+/* ---------------- state ---------------- */
+let S = null, uid = 1;
+const newId = () => 'i' + (uid++);
+function loadPreset(key) {
+  const p = PRESETS[key];
+  S = { preset: key, lot: { ...p.lot }, areas: p.areas.map(([name, type, x, y, w, h]) => ({ id: newId(), name, type, x, y, w, h })), cams: [] };
+}
+try {
+  const saved = JSON.parse(localStorage.getItem('sentinela-sim-v1') || 'null');
+  if (saved && saved.lot && Array.isArray(saved.areas) && Array.isArray(saved.cams)) { S = saved; uid = 1 + [...S.areas, ...S.cams].reduce((m, o) => Math.max(m, +String(o.id).slice(1) || 0), 0); }
+} catch (e) { /* storage unavailable */ }
+if (!S) loadPreset('casa');
+const save = () => { try { localStorage.setItem('sentinela-sim-v1', JSON.stringify(S)); } catch (e) {} };
+
+let mode = 'cam', armed = null, selCam = null, selArea = null, newAreaType = 'interna';
+let showBlind = true, wallsBlock = true;
+
+/* ---------------- DOM refs ---------------- */
+const svg = $('#plan'), gAreas = $('#gAreas'), gBlind = $('#gBlind'), gCov = $('#gCov'), gWalls = $('#gWalls'), gLabels = $('#gLabels'), gCams = $('#gCams'), gDraft = $('#gDraft');
+const M = 1; // viewBox margin (m)
+function ppm() { const r = svg.getBoundingClientRect(); return r.width / (S.lot.w + 2 * M) || 30; }
+function toM(e) { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const p = pt.matrixTransform(svg.getScreenCTM().inverse()); return { x: p.x, y: p.y }; }
+const el = (tag, attrs = {}, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; };
+
+/* ---------------- walls (from interior areas, with doors) ---------------- */
+let WALLS = [];
+function buildWalls() {
+  const segs = new Map(), EPS = 1e-6, DOOR = .9;
+  const add = (x1, y1, x2, y2) => { if (Math.hypot(x2 - x1, y2 - y1) < .05) return; const k = [x1, y1, x2, y2].map(v => v.toFixed(2)).join(','); segs.set(k, [x1, y1, x2, y2]); };
+  for (const A of S.areas) {
+    if (A.type !== 'interna') continue;
+    const edges = [
+      { h: true, c: A.y, a: A.x, b: A.x + A.w, side: 'top' }, { h: true, c: A.y + A.h, a: A.x, b: A.x + A.w, side: 'bottom' },
+      { h: false, c: A.x, a: A.y, b: A.y + A.h, side: 'left' }, { h: false, c: A.x + A.w, a: A.y, b: A.y + A.h, side: 'right' }];
+    for (const E of edges) {
+      const gaps = [];
+      for (const B of S.areas) {
+        if (B === A) continue;
+        let bc, ba, bb;
+        if (E.h) { bc = E.side === 'top' ? B.y + B.h : B.y; ba = B.x; bb = B.x + B.w; }
+        else { bc = E.side === 'left' ? B.x + B.w : B.x; ba = B.y; bb = B.y + B.h; }
+        if (Math.abs(bc - E.c) > EPS) continue;
+        const lo = Math.max(E.a, ba), hi = Math.min(E.b, bb);
+        if (hi - lo >= 1.2) { const m = (lo + hi) / 2; gaps.push([m - DOOR / 2, m + DOOR / 2]); }
+      }
+      gaps.sort((p, q) => p[0] - q[0]);
+      let s = E.a;
+      for (const [g0, g1] of gaps) { if (g0 > s) E.h ? add(s, E.c, g0, E.c) : add(E.c, s, E.c, g0); s = Math.max(s, g1); }
+      if (E.b > s) E.h ? add(s, E.c, E.b, E.c) : add(E.c, s, E.c, E.b);
+    }
+  }
+  WALLS = [...segs.values()];
+}
+const LOTW = () => { const { w, h } = S.lot; return [[0, 0, w, 0], [w, 0, w, h], [w, h, 0, h], [0, h, 0, 0]]; };
+
+/* ---------------- visibility (ray casting) ---------------- */
+function rayHit(px, py, dx, dy, maxT, segs) {
+  let best = maxT;
+  for (let i = 0; i < segs.length; i++) {
+    const s = segs[i], ex = s[2] - s[0], ey = s[3] - s[1];
+    const den = dx * ey - dy * ex;
+    if (Math.abs(den) < 1e-9) continue;
+    const fx = s[0] - px, fy = s[1] - py;
+    const t = (fx * ey - fy * ex) / den, u = (fx * dy - fy * dx) / den;
+    if (t > .06 && t < best && u >= 0 && u <= 1) best = t;
+  }
+  return best;
+}
+function visPoly(c, full) {
+  const fov = full ? 360 : camFov(c), R = camRange(c), segs = wallsBlock ? WALLS.concat(LOTW()) : LOTW();
+  const n = fov >= 360 ? 240 : Math.max(24, Math.ceil(fov / 1.1));
+  const pts = [], a0 = (c.dir - fov / 2) * RAD, step = fov * RAD / (fov >= 360 ? n : n - 1);
+  for (let i = 0; i < n; i++) {
+    const a = a0 + i * step, dx = Math.cos(a), dy = Math.sin(a), t = rayHit(c.x, c.y, dx, dy, R, segs);
+    pts.push([c.x + dx * t, c.y + dy * t]);
+  }
+  return fov >= 360 ? pts : [[c.x, c.y], ...pts];
+}
+function inPoly(x, y, P) {
+  let ins = false;
+  for (let i = 0, j = P.length - 1; i < P.length; j = i++) {
+    const xi = P[i][0], yi = P[i][1], xj = P[j][0], yj = P[j][1];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) ins = !ins;
+  }
+  return ins;
+}
+const bbox = P => { let a = 1e9, b = 1e9, c = -1e9, d = -1e9; for (const [x, y] of P) { if (x < a) a = x; if (y < b) b = y; if (x > c) c = x; if (y > d) d = y; } return [a, b, c, d]; };
+
+/* ---------------- helpers ---------------- */
+const areaAt = (x, y) => { let hit = null; for (const A of S.areas) if (x >= A.x && x <= A.x + A.w && y >= A.y && y <= A.y + A.h) hit = A; return hit; };
+const fmtPct = v => Math.round(v * 100) + '%';
+let toastT = 0;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2200); }
+
+/* ---------------- render ---------------- */
+function renderStatic() {
+  const { w, h } = S.lot;
+  svg.setAttribute('viewBox', `${-M} ${-M} ${w + 2 * M} ${h + 2 * M}`);
+  const lc = $('#lotClipR'); lc.setAttribute('width', w); lc.setAttribute('height', h);
+  const gr = $('#gridR'); gr.setAttribute('x', 0); gr.setAttribute('y', 0); gr.setAttribute('width', w); gr.setAttribute('height', h);
+  buildWalls();
+  gAreas.innerHTML = ''; gWalls.innerHTML = '';
+  el('rect', { x: 0, y: 0, width: w, height: h, fill: '#FBFAF7', stroke: '#B9B5AD', 'stroke-width': 1.5, 'stroke-dasharray': '6 4', 'vector-effect': 'non-scaling-stroke', class: 'area-hit' }, gAreas);
+  for (const A of S.areas) {
+    const r = el('rect', { x: A.x, y: A.y, width: A.w, height: A.h, fill: A.type === 'interna' ? '#F3EEE6' : '#E7F0E3', stroke: A.id === selArea ? '#E11D2E' : 'rgba(0,0,0,.08)', 'stroke-width': A.id === selArea ? 2.5 : 1, 'vector-effect': 'non-scaling-stroke', class: 'area-hit' }, gAreas);
+    r.dataset.area = A.id;
+  }
+  for (const s of WALLS) el('line', { x1: s[0], y1: s[1], x2: s[2], y2: s[3], stroke: '#2B2C30', 'stroke-width': Math.max(3, ppm() * .16), 'stroke-linecap': 'square', 'vector-effect': 'non-scaling-stroke' }, gWalls);
+  renderLabels();
+}
+let lastStats = null;
+function renderLabels() {
+  gLabels.innerHTML = '';
+  const k = ppm(), fs = Math.max(.42, 11.5 / k), fs2 = Math.max(.34, 9.5 / k);
+  for (const A of S.areas) {
+    const cx = A.x + A.w / 2, cy = A.y + A.h / 2;
+    const tall = A.h > A.w * 2.2, small = (tall ? A.h : A.w) * k < 70 || (tall ? A.w : A.h) * k < 44;
+    const t = el('text', { x: cx, y: cy - (small ? 0 : fs * .35), 'text-anchor': 'middle', 'dominant-baseline': small ? 'central' : 'auto', 'font-size': small ? fs2 : fs, 'font-weight': 800, fill: '#2B2C30', 'font-family': 'Manrope, Arial, sans-serif' }, gLabels);
+    if (tall) t.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
+    t.textContent = A.name;
+    if (!small) {
+      const st = lastStats && lastStats.per[A.id];
+      const t2 = el('text', { x: cx, y: cy + fs * .95, transform: tall ? `rotate(-90 ${cx} ${cy})` : '', 'text-anchor': 'middle', 'font-size': fs2, 'font-weight': 700, fill: A.type === 'interna' ? '#8A6D45' : '#4D7A3E', 'font-family': 'Manrope, Arial, sans-serif' }, gLabels);
+      t2.textContent = (A.type === 'interna' ? 'interna' : 'externa') + (st != null && S.cams.length ? ' · ' + fmtPct(st) : '');
+    }
+  }
+}
+const polyCache = new Map();
+function renderDynamic() {
+  gCov.innerHTML = ''; gCams.innerHTML = '';
+  const k = ppm(), r = Math.max(.42, 13 / k);
+  for (const c of S.cams) {
+    const T = TYPES[c.type], P = visPoly(c);
+    polyCache.set(c.id, P);
+    const d = 'M' + P.map(p => p[0].toFixed(3) + ' ' + p[1].toFixed(3)).join('L') + 'Z';
+    el('path', { d, fill: T.color, 'fill-opacity': c.id === selCam ? .26 : .17, stroke: T.color, 'stroke-opacity': .55, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round' }, gCov);
+    if (c.type === 'ptz' && c.patrol) el('circle', { cx: c.x, cy: c.y, r: camRange(c), fill: 'none', stroke: T.color, 'stroke-opacity': .5, 'stroke-dasharray': '5 5', 'stroke-width': 1.2, 'vector-effect': 'non-scaling-stroke' }, gCov);
+  }
+  S.cams.forEach((c, i) => {
+    const T = TYPES[c.type], g = el('g', { transform: `translate(${c.x} ${c.y})`, class: 'cam' }, gCams);
+    g.dataset.cam = c.id;
+    const sel = c.id === selCam;
+    if (sel) el('circle', { r: r * 1.6, fill: 'none', stroke: T.color, 'stroke-width': 2, 'stroke-dasharray': '4 3', 'vector-effect': 'non-scaling-stroke' }, g);
+    if (c.type !== 'pano') {
+      const a = c.dir * RAD;
+      el('line', { x1: 0, y1: 0, x2: Math.cos(a) * r * 1.9, y2: Math.sin(a) * r * 1.9, stroke: T.color, 'stroke-width': 3, 'stroke-linecap': 'round', 'vector-effect': 'non-scaling-stroke' }, g);
+    }
+    el('circle', { r, fill: '#fff', stroke: T.color, 'stroke-width': 2.5, 'vector-effect': 'non-scaling-stroke' }, g);
+    const t = el('text', { 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': r * (T.tag.length > 2 ? .72 : 1), 'font-weight': 800, fill: T.color, 'font-family': 'Manrope, Arial, sans-serif', 'pointer-events': 'none' }, g);
+    t.textContent = T.tag;
+    const n = el('text', { x: r * 1.15, y: -r * 1.05, 'font-size': r * .78, 'font-weight': 800, fill: '#2B2C30', 'font-family': 'Manrope, Arial, sans-serif', 'pointer-events': 'none', stroke: '#fff', 'stroke-width': r * .25, 'paint-order': 'stroke' }, g);
+    n.textContent = i + 1;
+    if (sel && c.type !== 'pano') {
+      const a = c.dir * RAD, hx = Math.cos(a) * r * 3.6, hy = Math.sin(a) * r * 3.6;
+      el('line', { x1: 0, y1: 0, x2: hx, y2: hy, stroke: '#2B2C30', 'stroke-opacity': .35, 'stroke-width': 1.2, 'stroke-dasharray': '3 3', 'vector-effect': 'non-scaling-stroke', 'pointer-events': 'none' }, g);
+      const h = el('circle', { cx: hx, cy: hy, r: r * .78, fill: '#2B2C30', stroke: '#fff', 'stroke-width': 2, 'vector-effect': 'non-scaling-stroke', class: 'rot' }, g);
+      h.dataset.rot = c.id;
+      const ar = el('path', { d: `M${hx - r * .35} ${hy} a${r * .35} ${r * .35} 0 1 1 ${r * .35} ${r * .35}`, fill: 'none', stroke: '#fff', 'stroke-width': 1.6, 'vector-effect': 'non-scaling-stroke', 'pointer-events': 'none' }, g);
+      void ar;
+    }
+  });
+}
+
+/* ---------------- stats ---------------- */
+function computeStats() {
+  const STEP = .25, per = {}, polys = S.cams.map(c => { const P = c.type === 'ptz' && c.patrol ? visPoly(c, true) : (polyCache.get(c.id) || visPoly(c)); return { P, bb: bbox(P) }; });
+  let tot = 0, cov = 0, ti = 0, ci = 0, te = 0, ce = 0;
+  const blind = [];
+  for (const A of S.areas) {
+    let n = 0, m = 0;
+    for (let y = A.y + STEP / 2; y < A.y + A.h; y += STEP) for (let x = A.x + STEP / 2; x < A.x + A.w; x += STEP) {
+      n++;
+      let hit = false;
+      for (const { P, bb } of polys) { if (x < bb[0] || x > bb[2] || y < bb[1] || y > bb[3]) continue; if (inPoly(x, y, P)) { hit = true; break; } }
+      if (hit) m++; else blind.push([x, y]);
+    }
+    per[A.id] = n ? m / n : 0;
+    tot += n; cov += m;
+    if (A.type === 'interna') { ti += n; ci += m; } else { te += n; ce += m; }
+  }
+  return { per, tot: tot ? cov / tot : 0, int: ti ? ci / ti : null, ext: te ? ce / te : null, blind, step: STEP };
+}
+function renderBlind(st) {
+  gBlind.innerHTML = '';
+  if (!showBlind || !S.cams.length) return;
+  // merge blind cells into row runs for fewer nodes
+  const s = st.step, rows = new Map();
+  for (const [x, y] of st.blind) { const k = y.toFixed(3); if (!rows.has(k)) rows.set(k, []); rows.get(k).push(x); }
+  let d = '';
+  for (const [k, xs] of rows) {
+    xs.sort((a, b) => a - b); const y = +k - s / 2;
+    let x0 = xs[0], prev = xs[0];
+    for (let i = 1; i <= xs.length; i++) {
+      const x = xs[i];
+      if (i === xs.length || x - prev > s * 1.01) { d += `M${(x0 - s / 2).toFixed(3)} ${y.toFixed(3)}h${(prev - x0 + s).toFixed(3)}v${s}h${-(prev - x0 + s).toFixed(3)}z`; x0 = x; }
+      prev = x;
+    }
+  }
+  el('path', { d, fill: 'url(#hatch)' }, gBlind);
+}
+
+/* ---------------- panels ---------------- */
+function renderPalette() {
+  const pal = $('#pal'); pal.innerHTML = '';
+  for (const key in TYPES) {
+    const T = TYPES[key], b = document.createElement('button');
+    b.type = 'button'; b.className = 'ptype'; b.style.setProperty('--tc', T.color);
+    b.setAttribute('aria-pressed', armed === key); b.dataset.type = key;
+    b.innerHTML = `${typeIcon(key)}<span><b>${T.short === 'Bullet' ? 'Bullet' : T.name}</b><small>${T.resumo}</small></span>`;
+    b.addEventListener('click', () => arm(armed === key ? null : key));
+    pal.appendChild(b);
+  }
+  $('#palPane').classList.toggle('armed', !!armed);
+  svg.classList.toggle('armed', !!armed);
+}
+function arm(key) {
+  armed = key;
+  if (key && mode !== 'cam') setMode('cam');
+  renderPalette();
+  if (key && matchMedia('(max-width: 820px)').matches) svg.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'center' });
+}
+function renderSel() {
+  const box = $('#selBox'), c = S.cams.find(c => c.id === selCam);
+  if (!c) { box.innerHTML = '<p class="sel-empty">Toque em uma câmera na planta para ajustar a direção, a abertura e o alcance.</p>'; renderCamList(); return; }
+  const T = TYPES[c.type], A = areaAt(c.x, c.y), idx = S.cams.indexOf(c) + 1;
+  const opts = Object.keys(TYPES).map(k => `<option value="${k}" ${k === c.type ? 'selected' : ''}>${TYPES[k].name}</option>`).join('');
+  let html = `<div class="sel-head"><span class="ic" style="background:${T.color}">${T.tag}</span><div><b>Câmera ${idx} · ${T.name}</b><small>${A ? esc(A.name) + ' (' + A.type + ')' : 'Fora das áreas'}</small></div></div>
+    <label class="f">Modelo<select id="sType">${opts}</select></label>`;
+  if (c.type !== 'pano') html += rng('sDir', 'Direção', 0, 359, 1, Math.round(((c.dir % 360) + 360) % 360), '°');
+  if (c.type === 'bullet' || c.type === 'dome') html += rng('sFov', 'Abertura', T.fovMin, T.fovMax, 1, c.fov, '°');
+  if (c.type === 'ptz') html += rng('sZoom', 'Zoom', 0, 100, 1, Math.round(c.zoom * 100), '%', `${Math.round(camFov(c))}° · ${Math.round(camRange(c))} m`) +
+    `<label class="chk" style="margin-top:12px"><input type="checkbox" id="sPatrol" ${c.patrol ? 'checked' : ''}>Girar 360° (patrulha automática)</label>`;
+  if (c.type !== 'ptz') html += rng('sRange', 'Alcance', T.rMin, T.rMax, .5, c.range, ' m');
+  html += `<p class="desc"><b>${T.formato}</b> ${T.usoTxt}</p>
+    <div class="sel-btns"><button type="button" class="btn btn-line btn-sm" id="sDup">Duplicar</button><button type="button" class="btn btn-line btn-sm" id="sDel">Remover</button></div>`;
+  box.innerHTML = html;
+  const on = (id, ev, fn) => { const n = $('#' + id); if (n) n.addEventListener(ev, fn); };
+  on('sType', 'change', e => { setType(c, e.target.value); commit(); renderSel(); });
+  on('sDir', 'input', e => { c.dir = +e.target.value; out('sDir', c.dir + '°'); live(); });
+  on('sFov', 'input', e => { c.fov = +e.target.value; out('sFov', c.fov + '°'); live(); });
+  on('sRange', 'input', e => { c.range = +e.target.value; out('sRange', c.range + ' m'); live(); });
+  on('sZoom', 'input', e => { c.zoom = +e.target.value / 100; out('sZoom', Math.round(c.zoom * 100) + '%'); const x = $('#sZoom-x'); if (x) x.textContent = `${Math.round(camFov(c))}° · ${Math.round(camRange(c))} m`; live(); });
+  on('sPatrol', 'change', e => { c.patrol = e.target.checked; commit(); loopCheck(); });
+  ['sDir', 'sFov', 'sRange', 'sZoom'].forEach(id => on(id, 'change', commit));
+  on('sDup', 'click', () => { const n = { ...c, id: newId(), x: clamp(c.x + 1.2, .2, S.lot.w - .2), y: clamp(c.y + 1.2, .2, S.lot.h - .2) }; S.cams.push(n); selCam = n.id; commit(); renderSel(); });
+  on('sDel', 'click', () => removeCam(c.id));
+  renderCamList();
+}
+const rng = (id, label, min, max, step, val, unit, extra) => `<div class="rng"><div class="t"><span>${label}${extra ? ` <span id="${id}-x" style="color:var(--ink-3);font-weight:600">${extra}</span>` : ''}</span><output id="${id}-o">${val}${unit}</output></div><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}" aria-label="${label}"></div>`;
+const out = (id, v) => { const o = $('#' + id + '-o'); if (o) o.textContent = v; };
+function renderCamList() {
+  const ul = $('#camList'); ul.innerHTML = '';
+  S.cams.forEach((c, i) => {
+    const T = TYPES[c.type], A = areaAt(c.x, c.y), li = document.createElement('li');
+    li.innerHTML = `<button type="button" aria-current="${c.id === selCam}"><i style="background:${T.color}"></i>${i + 1}. ${T.short}<small>${A ? esc(A.name) : '—'}</small></button>`;
+    li.firstChild.addEventListener('click', () => { selCam = c.id; renderDynamic(); renderSel(); });
+    ul.appendChild(li);
+  });
+}
+function renderResults(st) {
+  const pct = Math.round(st.tot * 100);
+  $('#ringV').setAttribute('stroke-dasharray', `${S.cams.length ? pct : 0} 100`);
+  $('#ringV').setAttribute('stroke', pct >= 85 ? '#16A34A' : pct >= 60 ? '#D97706' : '#E11D2E');
+  $('#ringT').textContent = S.cams.length ? pct + '%' : '—';
+  $('#sTot').textContent = S.cams.length ? fmtPct(st.tot) : '—';
+  $('#sInt').textContent = st.int == null ? 'sem áreas' : S.cams.length ? fmtPct(st.int) : '—';
+  $('#sExt').textContent = st.ext == null ? 'sem áreas' : S.cams.length ? fmtPct(st.ext) : '—';
+  const cnt = {}; S.cams.forEach(c => cnt[c.type] = (cnt[c.type] || 0) + 1);
+  $('#counts').innerHTML = Object.keys(cnt).map(k => `<span><i style="background:${TYPES[k].color}"></i>${cnt[k]}× ${TYPES[k].short}</span>`).join('');
+  $('#bars').innerHTML = S.areas.slice().sort((a, b) => st.per[a.id] - st.per[b.id]).map(A => {
+    const v = st.per[A.id], col = v >= .85 ? '#16A34A' : v >= .5 ? '#D97706' : '#E11D2E';
+    return `<div class="bar"><div class="t"><span>${esc(A.name)}<em>${A.type}</em></span><b>${S.cams.length ? fmtPct(v) : '—'}</b></div><div class="tr"><i style="width:${S.cams.length ? v * 100 : 0}%;background:${col}"></i></div></div>`;
+  }).join('');
+  // tips
+  const tips = [];
+  if (!S.areas.length) tips.push(['', 'Comece desenhando as áreas da sua casa no modo "Editar áreas".']);
+  else if (!S.cams.length) tips.push(['', 'Toque em um tipo de câmera e depois na planta para instalar.']);
+  for (const c of S.cams) {
+    const A = areaAt(c.x, c.y), i = S.cams.indexOf(c) + 1;
+    if (!A) continue;
+    if ((c.type === 'dome' || c.type === 'pano') && A.type === 'externa') tips.push(['', `Câmera ${i} (${TYPES[c.type].short}) está em área externa: prefira um modelo com proteção IP67, como a Bullet.`]);
+    if (c.type === 'bullet' && A.type === 'interna') tips.push(['', `Câmera ${i} (Bullet) está em ambiente interno: uma Dome é mais discreta para ${esc(A.name)}.`]);
+    if (c.type === 'ptz' && A.type === 'interna') tips.push(['', `Câmera ${i} (PTZ) rende mais em áreas externas amplas, como quintal e garagem.`]);
+    if (c.type === 'pano') { const cx = A.x + A.w / 2, cy = A.y + A.h / 2; if (Math.hypot(c.x - cx, c.y - cy) > Math.min(A.w, A.h) * .3) tips.push(['', `Câmera ${i} (360°) cobre melhor instalada no centro do teto de ${esc(A.name)}.`]); }
+  }
+  if (S.cams.length) {
+    for (const A of S.areas) if (st.per[A.id] < .5) tips.push(['', `${esc(A.name)} está com só ${fmtPct(st.per[A.id])} de cobertura.`]);
+    if (st.tot >= .85) tips.push(['ok', 'Ótima cobertura! Envie o projeto para um especialista conferir.']);
+  }
+  $('#tips').innerHTML = tips.slice(0, 5).map(([c, t]) => `<li class="${c}">${t}</li>`).join('');
+}
+
+/* ---------------- updates ---------------- */
+let statT = 0;
+function live() { renderDynamic(); clearTimeout(statT); statT = setTimeout(refreshStats, 90); }
+function refreshStats() { lastStats = computeStats(); renderBlind(lastStats); renderResults(lastStats); renderLabels(); }
+function commit() { renderDynamic(); refreshStats(); save(); }
+function fullRender() { renderStatic(); renderDynamic(); refreshStats(); renderSel(); renderAreaEdit(); syncLot(); save(); }
+
+function setType(c, t) {
+  c.type = t; const T = TYPES[t];
+  if (t === 'bullet' || t === 'dome') { c.fov = clamp(c.fov || T.fov, T.fovMin, T.fovMax); c.range = clamp(c.range || T.range, T.rMin, T.rMax); if (c.fov < T.fovMin || c.fov > T.fovMax) c.fov = T.fov; }
+  if (t === 'pano') c.range = clamp(c.range || T.range, T.rMin, T.rMax);
+  if (t === 'ptz') { c.zoom = c.zoom ?? 0; c.patrol = c.patrol ?? false; }
+  if (t !== 'ptz') c.patrol = false;
+}
+function placeCam(type, x, y) {
+  const T = TYPES[type], A = areaAt(x, y);
+  let dir = 90;
+  if (A) { const cx = A.x + A.w / 2, cy = A.y + A.h / 2; if (Math.hypot(cx - x, cy - y) > .6) dir = Math.atan2(cy - y, cx - x) / RAD; }
+  const c = { id: newId(), type, x, y, dir: Math.round(dir), fov: T.fov || 80, range: T.range || 10, zoom: 0, patrol: false };
+  setType(c, type);
+  S.cams.push(c); selCam = c.id;
+  commit(); renderSel();
+  toast(`${T.short} instalada${A ? ' em ' + A.name : ''}. Arraste o círculo escuro para girar.`);
+}
+function removeCam(id) { S.cams = S.cams.filter(c => c.id !== id); if (selCam === id) selCam = null; commit(); renderSel(); }
+
+/* ---------------- modes & area editing ---------------- */
+function setMode(m) {
+  mode = m; $('#mCam').setAttribute('aria-pressed', m === 'cam'); $('#mArea').setAttribute('aria-pressed', m === 'area');
+  $('#areaTools').hidden = m !== 'area'; svg.classList.toggle('drawing', m === 'area');
+  if (m === 'area') { armed = null; renderPalette(); selCam = null; renderDynamic(); renderSel(); }
+  else { selArea = null; renderStatic(); renderAreaEdit(); }
+}
+function renderAreaEdit() {
+  const A = S.areas.find(a => a.id === selArea), box = $('#areaEdit');
+  box.hidden = !A;
+  if (!A) return;
+  $('#aName').value = A.name; $('#aInt').setAttribute('aria-pressed', A.type === 'interna'); $('#aExt').setAttribute('aria-pressed', A.type === 'externa');
+}
+function syncLot() { $('#lotW').value = S.lot.w; $('#lotH').value = S.lot.h; $('#preset').value = S.preset in PRESETS ? S.preset : 'branco'; }
+$('#mCam').addEventListener('click', () => setMode('cam'));
+$('#mArea').addEventListener('click', () => setMode('area'));
+$('#nInt').addEventListener('click', () => { newAreaType = 'interna'; $('#nInt').setAttribute('aria-pressed', true); $('#nExt').setAttribute('aria-pressed', false); });
+$('#nExt').addEventListener('click', () => { newAreaType = 'externa'; $('#nExt').setAttribute('aria-pressed', true); $('#nInt').setAttribute('aria-pressed', false); });
+$('#aName').addEventListener('input', e => { const A = S.areas.find(a => a.id === selArea); if (A) { A.name = e.target.value || 'Área'; renderLabels(); renderResults(lastStats); renderCamList(); save(); } });
+const setAType = t => { const A = S.areas.find(a => a.id === selArea); if (A) { A.type = t; fullRender(); } };
+$('#aInt').addEventListener('click', () => setAType('interna'));
+$('#aExt').addEventListener('click', () => setAType('externa'));
+$('#aDel').addEventListener('click', () => { S.areas = S.areas.filter(a => a.id !== selArea); selArea = null; fullRender(); });
+const lotChange = () => {
+  const w = clamp(+$('#lotW').value || S.lot.w, 6, 60), h = clamp(+$('#lotH').value || S.lot.h, 6, 60);
+  S.lot = { w, h };
+  S.areas = S.areas.map(a => ({ ...a, w: Math.min(a.w, w - a.x), h: Math.min(a.h, h - a.y) })).filter(a => a.w > .4 && a.h > .4 && a.x < w && a.y < h);
+  S.cams = S.cams.filter(c => c.x < w && c.y < h);
+  fullRender();
+};
+$('#lotW').addEventListener('change', lotChange); $('#lotH').addEventListener('change', lotChange);
+$('#preset').addEventListener('change', e => {
+  if (S.cams.length && !confirm('Trocar a planta remove as câmeras instaladas. Continuar?')) { e.target.value = S.preset; return; }
+  loadPreset(e.target.value); selCam = selArea = null;
+  if (e.target.value === 'branco') setMode('area');
+  fullRender();
+});
+
+/* ---------------- pointer interaction ---------------- */
+let drag = null;
+svg.addEventListener('pointerdown', e => {
+  if (e.button > 0) return;
+  const p = toM(e), tgt = e.target;
+  const inLot = p.x >= 0 && p.y >= 0 && p.x <= S.lot.w && p.y <= S.lot.h;
+  if (mode === 'cam') {
+    if (armed) { if (inLot) { placeCam(armed, p.x, p.y); armed = null; renderPalette(); } e.preventDefault(); return; }
+    if (tgt.dataset.rot) { drag = { kind: 'rot', id: tgt.dataset.rot }; svg.setPointerCapture(e.pointerId); e.preventDefault(); return; }
+    const g = tgt.closest('[data-cam]');
+    if (g) {
+      const c = S.cams.find(c => c.id === g.dataset.cam);
+      selCam = c.id; drag = { kind: 'move', id: c.id, dx: c.x - p.x, dy: c.y - p.y, moved: false };
+      svg.setPointerCapture(e.pointerId); renderDynamic(); renderSel(); e.preventDefault(); return;
+    }
+    if (selCam) { selCam = null; renderDynamic(); renderSel(); }
+    return;
+  }
+  // area mode
+  if (!inLot) return;
+  const snap = v => Math.round(v * 2) / 2;
+  drag = { kind: 'draw', x0: snap(p.x), y0: snap(p.y), x1: snap(p.x), y1: snap(p.y), px: p.x, py: p.y };
+  svg.setPointerCapture(e.pointerId); e.preventDefault();
+});
+svg.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const p = toM(e);
+  if (drag.kind === 'move') {
+    const c = S.cams.find(c => c.id === drag.id); if (!c) return;
+    c.x = clamp(p.x + drag.dx, .1, S.lot.w - .1); c.y = clamp(p.y + drag.dy, .1, S.lot.h - .1); drag.moved = true; live();
+  } else if (drag.kind === 'rot') {
+    const c = S.cams.find(c => c.id === drag.id); if (!c) return;
+    c.dir = Math.round(((Math.atan2(p.y - c.y, p.x - c.x) / RAD) + 360) % 360); live();
+    const s = $('#sDir'); if (s) { s.value = c.dir; out('sDir', c.dir + '°'); }
+  } else if (drag.kind === 'draw') {
+    drag.x1 = clamp(Math.round(p.x * 2) / 2, 0, S.lot.w); drag.y1 = clamp(Math.round(p.y * 2) / 2, 0, S.lot.h);
+    gDraft.innerHTML = '';
+    const x = Math.min(drag.x0, drag.x1), y = Math.min(drag.y0, drag.y1), w = Math.abs(drag.x1 - drag.x0), h = Math.abs(drag.y1 - drag.y0);
+    if (w && h) {
+      el('rect', { x, y, width: w, height: h, fill: newAreaType === 'interna' ? 'rgba(243,238,230,.85)' : 'rgba(231,240,227,.85)', stroke: '#E11D2E', 'stroke-width': 2, 'stroke-dasharray': '6 4', 'vector-effect': 'non-scaling-stroke' }, gDraft);
+      const t = el('text', { x: x + w / 2, y: y + h / 2, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': Math.max(.45, 12 / ppm()), 'font-weight': 800, fill: '#E11D2E', 'font-family': 'Manrope, Arial, sans-serif' }, gDraft);
+      t.textContent = `${w} × ${h} m`;
+    }
+  }
+});
+const endDrag = e => {
+  if (!drag) return;
+  const d = drag; drag = null;
+  if (d.kind === 'move' || d.kind === 'rot') { commit(); renderSel(); return; }
+  if (d.kind === 'draw') {
+    gDraft.innerHTML = '';
+    const x = Math.min(d.x0, d.x1), y = Math.min(d.y0, d.y1), w = Math.abs(d.x1 - d.x0), h = Math.abs(d.y1 - d.y0);
+    if (w >= 1 && h >= 1) {
+      const n = S.areas.length + 1, A = { id: newId(), name: (newAreaType === 'interna' ? 'Cômodo ' : 'Área externa ') + n, type: newAreaType, x, y, w, h };
+      S.areas.push(A); selArea = A.id; S.preset = 'custom'; fullRender();
+      setTimeout(() => { const i = $('#aName'); i.focus(); i.select(); }, 30);
+    } else {
+      const p = toM(e), A = areaAt(p.x, p.y);
+      selArea = A ? A.id : null; renderStatic(); renderAreaEdit();
+    }
+  }
+};
+svg.addEventListener('pointerup', endDrag);
+svg.addEventListener('pointercancel', endDrag);
+document.addEventListener('keydown', e => {
+  if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (e.key === 'Escape' && armed) { arm(null); return; }
+  const c = S.cams.find(c => c.id === selCam); if (!c) return;
+  if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); removeCam(c.id); }
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); c.dir = (c.dir + (e.key === 'ArrowLeft' ? -5 : 5) + 360) % 360; commit(); renderSel(); }
+});
+
+/* ---------------- toolbar ---------------- */
+$('#tBlind').addEventListener('change', e => { showBlind = e.target.checked; renderBlind(lastStats); });
+$('#tWalls').addEventListener('change', e => { wallsBlock = e.target.checked; commit(); });
+$('#bClear').addEventListener('click', () => { if (!S.cams.length) return; if (confirm('Remover todas as câmeras?')) { S.cams = []; selCam = null; commit(); renderSel(); } });
+$('#bPng').addEventListener('click', () => {
+  const clone = svg.cloneNode(true), vb = svg.viewBox.baseVal, W = 1600, H = Math.round(W * vb.height / vb.width);
+  clone.setAttribute('width', W); clone.setAttribute('height', H); clone.setAttribute('xmlns', NS);
+  clone.querySelectorAll('.rot').forEach(n => n.remove());
+  const bg = document.createElementNS(NS, 'rect'); bg.setAttribute('x', vb.x); bg.setAttribute('y', vb.y); bg.setAttribute('width', vb.width); bg.setAttribute('height', vb.height); bg.setAttribute('fill', '#FFFFFF'); clone.insertBefore(bg, clone.firstChild.nextSibling);
+  const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(clone)], { type: 'image/svg+xml' }));
+  const img = new Image();
+  img.onload = () => {
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const cx = cv.getContext('2d');
+    cx.drawImage(img, 0, 0, W, H); URL.revokeObjectURL(url);
+    cv.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'projeto-cameras.png'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); });
+  };
+  img.src = url;
+});
+$('#bSend').addEventListener('click', () => {
+  const st = lastStats || computeStats(), cnt = {};
+  S.cams.forEach(c => cnt[c.type] = (cnt[c.type] || 0) + 1);
+  const lines = ['Olá! Montei um projeto no simulador de câmeras do site:', ''];
+  if (S.cams.length) { lines.push('Câmeras:'); for (const k in cnt) lines.push(`• ${cnt[k]}x ${TYPES[k].name}`); }
+  else lines.push('(ainda sem câmeras)');
+  lines.push('', 'Cobertura por área:');
+  for (const A of S.areas) lines.push(`• ${A.name} (${A.type}): ${S.cams.length ? fmtPct(st.per[A.id]) : '-'}`);
+  lines.push('', `Cobertura total: ${S.cams.length ? fmtPct(st.tot) : '-'}`, `Terreno: ${S.lot.w} x ${S.lot.h} m`, '', 'Gostaria de agendar a visita técnica.');
+  open(`https://wa.me/${WA}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener');
+});
+
+/* ---------------- PTZ patrol animation ---------------- */
+let raf = 0, lastT = 0;
+function loopCheck() { if (!RM && S.cams.some(c => c.type === 'ptz' && c.patrol) && !raf) { lastT = performance.now(); raf = requestAnimationFrame(loop); } }
+function loop(now) {
+  const dt = Math.min(.05, (now - lastT) / 1000); lastT = now;
+  const pats = S.cams.filter(c => c.type === 'ptz' && c.patrol);
+  if (!pats.length) { raf = 0; return; }
+  pats.forEach(c => { c.dir = (c.dir + dt * 24) % 360; });
+  if (!drag) renderDynamic();
+  const s = $('#sDir'), sc = S.cams.find(c => c.id === selCam);
+  if (s && sc && sc.patrol) { s.value = Math.round(sc.dir); out('sDir', Math.round(sc.dir) + '°'); }
+  raf = requestAnimationFrame(loop);
+}
+
+/* ---------------- camera type cards ---------------- */
+$('#tgrid').innerHTML = Object.keys(TYPES).map(k => { const T = TYPES[k]; return `<article class="tcard" style="--tc:${T.color}">${typeIcon(k)}<h3>${T.name}</h3><dl><dt>Formato</dt><dd>${T.formato}</dd><dt>Uso</dt><dd>${T.usoTxt}</dd><dt>Ângulo de visão</dt><dd>${T.angulo}</dd></dl></article>`; }).join('');
+
+/* ---------------- boot ---------------- */
+renderPalette();
+fullRender();
+if (S.preset === 'custom' || !(S.preset in PRESETS)) $('#preset').value = 'branco';
+loopCheck();
+let rz = 0;
+addEventListener('resize', () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(() => { renderStatic(); renderDynamic(); renderBlind(lastStats); }); });
+})();
+</script>
+</body>
+</html>
