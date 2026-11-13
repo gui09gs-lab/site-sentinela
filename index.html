@@ -5,15 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sentinela Segurança</title>
 <meta name="description" content="Instalação de CFTV e monitoramento remoto de câmeras para residências. Veja sua casa pelo celular, em tempo real.">
-<meta name="theme-color" content="#0A0A0B">
+<meta name="theme-color" content="#141417">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Sora:wght@300;400;500;600&display=swap">
 <style>
 :root{
   color-scheme:dark;
-  --bg:#0A0A0B; --ink:#F2F2F0; --ink-2:rgba(242,242,240,.66); --ink-3:rgba(242,242,240,.42);
-  --line:rgba(255,255,255,.12); --glass:rgba(22,22,24,.46); --lime:#B9F53C; --rec:#FF4D4D;
+  --bg:#141417; --ink:#F7F7F5; --ink-2:rgba(247,247,245,.80); --ink-3:rgba(247,247,245,.56);
+  --line:rgba(255,255,255,.2); --line-2:rgba(255,255,255,.42); --glass:rgba(28,28,32,.74); --acc:#E5243B; --acc-2:#FF4257; --rec:#FF4257;
+  --box:rgba(16,16,19,.66);
   --f-display:"Michroma","Eurostile","Arial Black",system-ui,sans-serif;
   --f-body:"Sora","Helvetica Neue",Arial,system-ui,sans-serif;
   --gut:max(20px, env(safe-area-inset-left,0px)); --gut-r:max(20px, env(safe-area-inset-right,0px));
@@ -31,27 +32,27 @@ svg{display:block}
 /* ---------- stage ---------- */
 #stage{position:fixed;inset:0;z-index:0}
 #stage canvas{width:100%;height:100%;display:block;transition:opacity .6s}
-#stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0,0,0,.55) 100%)}
-body.dim #stage canvas{opacity:.28}
+#stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0,0,0,.38) 100%)}
+body.dim #stage canvas{opacity:.36}
 #clips{position:fixed;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
 #film{position:relative;z-index:10;height:620vh}
 
 /* ---------- chrome ---------- */
 .nav{position:fixed;top:env(safe-area-inset-top);left:0;right:0;z-index:40;padding:0 var(--gut-r) 0 var(--gut)}
-.nav::before{content:"";position:absolute;inset:calc(-1 * env(safe-area-inset-top)) 0 -18px;background:linear-gradient(rgba(10,10,11,.92) 60%,rgba(10,10,11,0));opacity:0;transition:opacity .5s;pointer-events:none;z-index:-1}
+.nav::before{content:"";position:absolute;inset:calc(-1 * env(safe-area-inset-top)) 0 -18px;background:linear-gradient(rgba(20,20,23,.94) 60%,rgba(20,20,23,0));opacity:0;transition:opacity .5s;pointer-events:none;z-index:-1}
 body.dim .nav::before{opacity:1}
 .nav .row{position:relative;height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px}
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-size:11px;letter-spacing:.18em;text-transform:uppercase}
 .links{display:flex;gap:44px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
 .links a{transition:color .2s}
 .links a:hover{color:var(--ink)}
-.dots{display:grid;grid-template-columns:repeat(3,3px);gap:3px;padding:8px}
-.dots i{width:3px;height:3px;border-radius:50%;background:var(--ink-2)}
+.nav-cta{height:34px;padding:0 16px;border-radius:999px;background:var(--acc);color:#fff;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.3);transition:background .2s}
+.nav-cta:hover{background:var(--acc-2)}
 .social{position:fixed;right:var(--gut-r);top:50%;transform:translateY(-50%);z-index:30;display:flex;flex-direction:column;gap:26px}
-.social a{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:9px;letter-spacing:.08em;color:var(--ink-2);border:1px solid var(--line);background:rgba(10,10,11,.4);transition:color .2s,border-color .2s}
-.social a:hover{color:var(--ink);border-color:var(--ink-3)}
-.chev{position:fixed;right:var(--gut-r);bottom:calc(22px + env(safe-area-inset-bottom));z-index:30;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);color:var(--ink-2);display:grid;place-items:center;background:rgba(10,10,11,.4);transition:transform .4s,color .2s}
-.chev:hover{color:var(--ink)}
+.social a{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:9px;letter-spacing:.08em;color:var(--ink-2);border:1px solid var(--line-2);background:rgba(16,16,19,.55);transition:color .2s,border-color .2s}
+.social a:hover{color:var(--ink);border-color:var(--acc)}
+.chev{position:fixed;right:var(--gut-r);bottom:calc(22px + env(safe-area-inset-bottom));z-index:30;width:34px;height:34px;border-radius:50%;border:1px solid var(--line-2);color:var(--ink-2);display:grid;place-items:center;background:rgba(16,16,19,.55);transition:transform .4s,color .2s,border-color .2s}
+.chev:hover{color:var(--ink);border-color:var(--acc)}
 .chev.up{transform:rotate(180deg)}
 .loader{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:35;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);transition:opacity .6s;pointer-events:none}
 .loader.done{opacity:0}
@@ -70,19 +71,20 @@ body.revealing .fx{transition:opacity .8s cubic-bezier(.22,.61,.36,1),transform 
 .h-title{position:absolute;left:0;top:8%;font-size:clamp(30px,4.6vw,74px)}
 .h-title span{display:block}
 .h-title span:nth-child(2){padding-left:.62em}
-.h-sub{position:absolute;left:.4em;top:calc(8% + clamp(30px,4.6vw,74px) * 3.5);max-width:30ch;font-size:14px;color:var(--ink-2);margin:0}
+.tbox{background:var(--box);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--line-2);border-left:3px solid var(--acc);border-radius:14px;padding:14px 18px}
+.h-sub{position:absolute;left:.4em;top:calc(8% + clamp(30px,4.6vw,74px) * 3.5);max-width:36ch;font-size:14px;color:var(--ink-2);margin:0}
 .h-cta{position:absolute;left:.4em;bottom:6%;display:flex;gap:10px}
-.buy{height:46px;padding:0 26px;border-radius:999px;background:var(--lime);color:#0A0A0B;font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;display:inline-flex;align-items:center;gap:10px;transition:filter .2s}
-.buy:hover{filter:brightness(1.08)}
-.arrow{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:rgba(10,10,11,.4);display:grid;place-items:center;transition:border-color .2s}
-.arrow:hover{border-color:var(--ink-3)}
-.play{position:absolute;left:49%;top:47%;width:62px;height:62px;border-radius:50%;background:rgba(20,20,22,.5);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);display:grid;place-items:center}
+.buy{height:46px;padding:0 26px;border-radius:999px;background:var(--acc);color:#fff;border:1px solid rgba(255,255,255,.35);box-shadow:0 8px 28px rgba(229,36,59,.35);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;display:inline-flex;align-items:center;gap:10px;transition:filter .2s}
+.buy:hover{background:var(--acc-2)}
+.arrow{width:46px;height:46px;border-radius:50%;border:1px solid var(--line-2);background:rgba(16,16,19,.6);display:grid;place-items:center;transition:border-color .2s}
+.arrow:hover{border-color:var(--acc)}
+.play{position:absolute;left:49%;top:47%;width:62px;height:62px;border-radius:50%;background:rgba(229,36,59,.18);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1.5px solid var(--acc);display:grid;place-items:center;box-shadow:0 0 0 6px rgba(229,36,59,.1)}
 .play svg{transform:translateX(3px)}
 
-.card{position:absolute;width:200px;padding:14px 16px 12px;border-radius:18px;background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);border:1px solid var(--line)}
+.card{position:absolute;width:200px;padding:14px 16px 12px;border-radius:18px;background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);border:1px solid var(--line-2);border-top:2px solid var(--acc);box-shadow:0 18px 40px rgba(0,0,0,.35)}
 .card .top{display:flex;justify-content:space-between;align-items:center}
 .card .lbl{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);display:flex;align-items:center;gap:7px}
-.chip{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;color:var(--ink-2)}
+.chip{width:22px;height:22px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;color:var(--ink-2)}
 .rec{width:6px;height:6px;border-radius:50%;background:var(--rec);box-shadow:0 0 8px var(--rec);animation:blink 1.4s steps(2,start) infinite}
 @keyframes blink{to{opacity:.2}}
 .val{font-family:var(--f-display);font-size:30px;line-height:1;margin:12px 0 6px;font-variant-numeric:tabular-nums}
@@ -98,18 +100,19 @@ body.revealing .fx{transition:opacity .8s cubic-bezier(.22,.61,.36,1),transform 
 /* design */
 .m-title{position:absolute;left:0;top:10%;font-size:clamp(26px,3.3vw,50px)}
 .m-title .thin{display:block}
-.m-copy{position:absolute;left:.3em;top:calc(10% + clamp(26px,3.3vw,50px) * 2.5 + 18px);max-width:28ch;color:var(--ink-2);margin:0}
-.stats{position:absolute;right:0;bottom:8%;display:grid;gap:22px;text-align:right}
+.m-copy{position:absolute;left:.3em;top:calc(10% + clamp(26px,3.3vw,50px) * 2.5 + 18px);max-width:34ch;color:var(--ink-2);margin:0}
+.stats{position:absolute;right:0;bottom:8%;display:grid;gap:12px;text-align:right}
+.stat{background:var(--box);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--line-2);border-right:3px solid var(--acc);border-radius:14px;padding:12px 16px}
 .stat .n{font-family:var(--f-display);font-size:clamp(26px,2.6vw,38px);line-height:1}
 .stat .n small{font-family:var(--f-body);font-size:10px;letter-spacing:.14em;color:var(--ink-3);margin-left:6px}
 .stat .l{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-top:6px}
 
 /* breakdown */
 .x-title{position:absolute;left:0;top:2%;font-size:clamp(24px,3vw,46px)}
-.x-info{position:absolute;right:11%;bottom:2%;display:flex;align-items:center;gap:24px;max-width:480px}
+.x-info{position:absolute;right:11%;bottom:2%;display:flex;align-items:center;gap:24px;max-width:520px}
 .dial{position:relative;width:132px;height:132px;flex:none}
 .dial canvas.ticks{width:100%;height:100%}
-.thumb{position:absolute;inset:26px;border-radius:50%;background:#141416;border:1px solid var(--line);overflow:hidden}
+.thumb{position:absolute;inset:26px;border-radius:50%;background:#1C1C20;border:1.5px solid var(--acc);overflow:hidden}
 .thumb canvas{width:100%;height:100%;display:block}
 .x-info h3{font-size:15px;font-weight:500;margin:0 0 10px}
 .x-info p{font-size:12.5px;color:var(--ink-2);max-width:40ch;margin:0}
@@ -118,33 +121,65 @@ body.revealing .fx{transition:opacity .8s cubic-bezier(.22,.61,.36,1),transform 
 .after{position:relative;z-index:12}
 .panel{padding:120px calc(var(--gut-r) + 56px) 40px var(--gut)}
 .wrap{max-width:1180px;margin:0 auto}
-.eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+.eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc-2);font-weight:500;display:inline-flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:9px;height:9px;background:var(--acc)}
+.eyebrow.light{color:#fff}.eyebrow.light::before{background:#fff}
 .panel h2{font-size:clamp(26px,3.4vw,48px);margin:16px 0 48px;max-width:20ch}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.cell{padding:26px 22px;border-radius:20px;background:var(--glass);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid var(--line)}
+.cell{padding:26px 22px;border-radius:20px;background:var(--glass);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid var(--line-2);border-top:3px solid var(--acc)}
 .cell .n{font-family:var(--f-display);font-size:clamp(28px,3vw,44px);line-height:1}
 .cell .n small{font-family:var(--f-body);font-size:11px;letter-spacing:.12em;color:var(--ink-3);margin-left:6px}
 .cell p{font-size:13px;color:var(--ink-2);margin:12px 0 0}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
-.lay{padding:18px 20px;border-radius:16px;border:1px solid var(--line);background:rgba(10,10,11,.35)}
+.lay{padding:18px 20px;border-radius:16px;border:1px solid var(--line-2);border-left:3px solid var(--acc);background:var(--box)}
 .lay .k{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
 .lay .v{font-weight:500;margin-top:4px}
 
-.svc{padding:26px 22px 24px;border-radius:20px;background:var(--glass);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid var(--line)}
-.svc .ic{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;color:var(--lime);margin-bottom:20px}
+.svc{padding:26px 22px 24px;border-radius:20px;background:var(--glass);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid var(--line-2);transition:border-color .25s,transform .25s}
+.svc:hover{border-color:var(--acc);transform:translateY(-3px)}
+.svc .ic{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--acc);background:rgba(229,36,59,.12);display:grid;place-items:center;color:#fff;margin-bottom:20px}
 .svc h3{font-size:15px;font-weight:500;margin:0 0 8px}
 .svc p{font-size:13px;color:var(--ink-2);margin:0}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
-.step{padding:20px 22px;border-radius:16px;border:1px solid var(--line);background:rgba(10,10,11,.35);display:flex;gap:16px;align-items:baseline}
-.step b{font-family:var(--f-display);font-weight:400;font-size:12px;color:var(--lime)}
+.step{padding:20px 22px;border-radius:16px;border:1px solid var(--line-2);background:var(--box);display:flex;gap:16px;align-items:baseline}
+.step b{font-family:var(--f-display);font-weight:400;font-size:12px;color:var(--acc-2)}
 .step span{font-size:13px;color:var(--ink-2)}
 .step span strong{display:block;color:var(--ink);font-weight:500;font-size:14px;margin-bottom:2px}
 
-.final{text-align:center;padding:140px var(--gut-r) 120px var(--gut)}
-.final h2{font-size:clamp(30px,5vw,72px);margin:16px auto 18px;max-width:14ch}
-.final p{color:var(--ink-2);max-width:40ch;margin:0 auto 34px}
-.final .ctas{display:flex;justify-content:center;gap:10px}
-footer{padding:26px calc(var(--gut-r) + 56px) 34px var(--gut);border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--ink-3);background:rgba(10,10,11,.6)}
+.lead{color:var(--ink-2);max-width:72ch;margin:-28px 0 40px;font-size:15.5px}
+.lead strong{color:var(--ink);font-weight:500}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{background:var(--acc);border-radius:18px;padding:30px 18px;text-align:center;border:1px solid rgba(255,255,255,.25);box-shadow:0 14px 36px rgba(229,36,59,.22)}
+.kpi .n{font-family:var(--f-display);font-size:clamp(26px,2.8vw,40px);line-height:1;color:#fff}
+.kpi .l{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.92);margin-top:12px;font-weight:500;line-height:1.5}
+.quote{margin:40px 0 0;padding:34px 38px;border:1px solid var(--line-2);border-left:4px solid var(--acc);border-radius:18px;background:var(--box)}
+.quote p{font-family:var(--f-display);text-transform:uppercase;font-size:clamp(17px,1.9vw,26px);line-height:1.35;margin:0 0 16px;max-width:44ch}
+.quote cite{font-style:normal;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc-2)}
+.final{padding:120px calc(var(--gut-r) + 56px) 120px var(--gut)}
+.cta-box{background:linear-gradient(135deg,var(--acc),#B5162A);border-radius:26px;padding:56px;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;border:1px solid rgba(255,255,255,.3);box-shadow:0 30px 80px rgba(229,36,59,.25)}
+.cta-copy h2{font-size:clamp(26px,3.4vw,46px);margin:16px 0 18px;max-width:16ch;color:#fff}
+.cta-copy p{color:rgba(255,255,255,.92);max-width:44ch;margin:0 0 22px}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:10px;font-weight:400}
+.checks li{display:flex;gap:10px;align-items:center}
+.checks li::before{content:"";width:16px;height:16px;flex:none;border-radius:50%;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4.5 8.2 2.3 2.3 4.7-5' fill='none' stroke='%23E5243B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat}
+.lead-form{background:#fff;color:#141417;border-radius:20px;padding:30px 28px;display:grid;gap:14px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.lead-form h3{margin:0 0 4px;color:var(--acc);font-weight:600;font-size:16px;text-transform:uppercase;letter-spacing:.04em}
+.lead-form label{display:grid;gap:4px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#6B6B72;font-weight:500}
+.lead-form input,.lead-form select{font:inherit;font-size:15px;letter-spacing:0;text-transform:none;color:#141417;background:#F4F4F6;border:1px solid #DADAE0;border-radius:10px;height:44px;padding:0 12px;outline:none;transition:border-color .2s}
+.lead-form input:focus,.lead-form select:focus{border-color:var(--acc)}
+.lead-form .buy{justify-content:center;margin-top:6px;box-shadow:none}
+.lead-form small{font-size:11px;color:#6B6B72;text-align:center}
+.wa-float{position:fixed;right:var(--gut-r);bottom:calc(22px + 34px + 14px + env(safe-area-inset-bottom));z-index:31;width:48px;height:48px;border-radius:50%;background:#25D366;color:#fff;display:grid;place-items:center;box-shadow:0 10px 26px rgba(0,0,0,.35);border:2px solid #fff;transition:transform .2s}
+.wa-float:hover{transform:scale(1.06)}
+.wa-float{opacity:0;pointer-events:none;transition:opacity .4s,transform .2s}
+body.dim .wa-float{opacity:1;pointer-events:auto}
+
+#servicos{background:linear-gradient(rgba(255,255,255,0),rgba(255,255,255,.03) 30%,rgba(255,255,255,0))}
+footer{padding:40px calc(var(--gut-r) + 56px) 30px var(--gut);border-top:3px solid var(--acc);display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:28px;font-size:12px;color:var(--ink-2);background:rgba(16,16,19,.92)}
+.f-col{display:grid;gap:8px;align-content:start}
+.f-col b{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc-2);font-weight:600}
+.f-col a:hover{color:var(--ink)}
+.f-bottom{grid-column:1/-1;border-top:1px solid var(--line);padding-top:18px;font-size:11px;color:var(--ink-3)}
 
 /* ---------- responsive ---------- */
 @media (max-width:980px){
@@ -152,12 +187,20 @@ footer{padding:26px calc(var(--gut-r) + 56px) 34px var(--gut);border-top:1px sol
   .c-cov{display:none}
   .stats{gap:14px}
   .grid4{grid-template-columns:repeat(2,1fr)}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .cta-box{grid-template-columns:1fr;padding:40px 32px}
 }
 @media (max-width:640px){
   .social{display:none}
   .layer{padding:84px var(--gut-r) 28px var(--gut)}
   .panel{padding:96px var(--gut-r) 32px var(--gut)}
-  footer{padding:24px var(--gut-r) 30px var(--gut)}
+  footer{padding:32px var(--gut-r) 30px var(--gut);grid-template-columns:1fr}
+  .final{padding:80px var(--gut-r) 90px var(--gut)}
+  .cta-box{padding:30px 20px;border-radius:22px}
+  .lead-form{padding:24px 18px}
+  .quote{padding:24px 22px}
+  .lead{margin-top:-24px}
+  .nav-cta{height:30px;padding:0 12px;font-size:9px}
   .h-title{top:2%}
   .h-sub{top:calc(2% + clamp(30px,4.6vw,74px) * 3.5);font-size:13px}
   .play{left:calc(50% - 31px);top:50%}
@@ -165,7 +208,10 @@ footer{padding:26px calc(var(--gut-r) + 56px) 34px var(--gut);border-top:1px sol
   .h-cta{bottom:2%}
   .m-title{top:2%}
   .m-copy{top:calc(2% + clamp(26px,3.3vw,50px) * 2.5 + 14px);font-size:13px}
-  .stats{left:0;right:44px;bottom:2%;grid-template-columns:repeat(3,1fr);text-align:left}
+  .stats{left:0;right:44px;bottom:2%;grid-template-columns:repeat(3,1fr);text-align:left;gap:8px}
+  .stat{border-right:1px solid var(--line-2);border-left:3px solid var(--acc);padding:10px 10px}
+  .tbox{padding:12px 14px}
+  .x-info{padding:12px}
   .x-title{top:2%}
   .x-info{left:0;right:auto;bottom:2%;gap:16px}
   .dial{width:96px;height:96px}
@@ -201,10 +247,11 @@ footer{padding:26px calc(var(--gut-r) + 56px) 34px var(--gut);border-top:1px sol
       <a href="#top" data-p="0">Início</a>
       <a href="#top" data-p="0.43">Câmera</a>
       <a href="#top" data-p="0.93">Por dentro</a>
-      <a href="#servicos">Serviços</a>
+      <a href="#sobre">Sobre</a>
+      <a href="#servicos">Soluções</a>
       <a href="#contato">Contato</a>
     </nav>
-    <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <a class="nav-cta" href="#contato">Solicitar orçamento</a>
   </div>
 </header>
 
@@ -227,10 +274,10 @@ footer{padding:26px calc(var(--gut-r) + 56px) 34px var(--gut);border-top:1px sol
       <h1 class="display h-title fx" data-in="-1" data-out="0.07" aria-label="Seus olhos em casa 24 horas">
         <span aria-hidden="true">Seus olhos</span><span aria-hidden="true">em casa</span><span aria-hidden="true">24 horas</span>
       </h1>
-      <p class="h-sub fx" data-in="-1" data-out="0.07">Instalação de CFTV e monitoramento remoto para residências. Veja cada canto da sua casa pelo celular, ao vivo, de onde estiver.</p>
+      <p class="h-sub tbox fx" data-in="-1" data-out="0.07">Segurança eletrônica e monitoramento 24 horas para residências. Câmeras, alarmes e acesso pelo celular, com central própria e resposta rápida.</p>
       <div class="h-cta fx" data-in="-1" data-out="0.07">
-        <a class="buy" href="#contato">Pedir orçamento</a>
-        <a class="arrow" href="#servicos" aria-label="Ver serviços">
+        <a class="buy" href="#contato">Solicitar orçamento</a>
+        <a class="arrow" href="#servicos" aria-label="Ver soluções">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><path d="M4 10 10 4M5 4h5v5"/></svg>
         </a>
       </div>
@@ -243,9 +290,9 @@ footer{padding:26px calc(var(--gut-r) + 56px) 34px var(--gut);border-top:1px sol
           <span class="chip" aria-hidden="true"><svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M2.5 7.5l5-5M3.5 2.5h4v4"/></svg></span></div>
         <div class="val"><span id="clock">21:47</span><small id="secs">:09</small></div>
         <svg class="chart" viewBox="0 0 168 56" preserveAspectRatio="none" aria-hidden="true">
-          <defs><linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B9F53C" stop-opacity=".35"/><stop offset="1" stop-color="#B9F53C" stop-opacity="0"/></linearGradient></defs>
+          <defs><linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF4257" stop-opacity=".4"/><stop offset="1" stop-color="#FF4257" stop-opacity="0"/></linearGradient></defs>
           <path id="cArea" fill="url(#gfill)"/>
-          <path id="cLine" fill="none" stroke="#B9F53C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+          <path id="cLine" fill="none" stroke="#FF4257" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
           <circle id="cDot" r="3" fill="#F2F2F0"/>
         </svg>
       </div>
@@ -255,8 +302,8 @@ footer{padding:26px calc(var(--gut-r) + 56px) 34px var(--gut);border-top:1px sol
           <span class="chip" aria-hidden="true"><svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M2.5 7.5l5-5M3.5 2.5h4v4"/></svg></span></div>
         <div class="gauge">
           <svg viewBox="0 0 150 84" aria-hidden="true">
-            <path d="M15 78a60 60 0 0 1 120 0" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="8" stroke-linecap="round"/>
-            <path d="M15 78a60 60 0 0 1 120 0" fill="none" stroke="#B9F53C" stroke-width="8" stroke-linecap="round" pathLength="100" stroke-dasharray="96 100"/>
+            <path d="M15 78a60 60 0 0 1 120 0" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="8" stroke-linecap="round"/>
+            <path d="M15 78a60 60 0 0 1 120 0" fill="none" stroke="#E5243B" stroke-width="8" stroke-linecap="round" pathLength="100" stroke-dasharray="96 100"/>
           </svg>
           <b>96<small>%</small></b>
         </div>
@@ -268,7 +315,7 @@ footer{padding:26px calc(var(--gut-r) + 56px) 34px var(--gut);border-top:1px sol
   <div class="layer" id="l-design">
     <div class="in">
       <h2 class="display m-title fx" data-in="0.30" data-out="0.53">Visão 4K <span class="thin">dia e noite</span></h2>
-      <p class="m-copy fx" data-in="0.34" data-out="0.53">Sensor Starlight que mantém as cores na penumbra e infravermelho até 40 metros. Carcaça IP67 que aguenta sol, chuva e poeira.</p>
+      <p class="m-copy tbox fx" data-in="0.34" data-out="0.53">Sensor Starlight que mantém as cores na penumbra e infravermelho até 40 metros. Carcaça IP67 que aguenta sol, chuva e poeira.</p>
       <div class="stats">
         <div class="stat fx" data-in="0.36" data-out="0.53"><div class="n">8<small>MP</small></div><div class="l">Resolução</div></div>
         <div class="stat fx" data-in="0.39" data-out="0.53"><div class="n">40<small>M</small></div><div class="l">Visão noturna</div></div>
@@ -281,7 +328,7 @@ footer{padding:26px calc(var(--gut-r) + 56px) 34px var(--gut);border-top:1px sol
   <div class="layer" id="l-break">
     <div class="in">
       <h2 class="display x-title fx" data-in="0.86" data-out="2">Feita <span class="thin">para</span><br>durar <span class="thin">anos</span></h2>
-      <div class="x-info fx" data-in="0.89" data-out="2">
+      <div class="x-info tbox fx" data-in="0.89" data-out="2">
         <div class="dial" aria-hidden="true">
           <canvas class="ticks" id="dial" width="264" height="264"></canvas>
           <div class="thumb"><canvas id="thumb"></canvas></div>
@@ -296,6 +343,24 @@ footer{padding:26px calc(var(--gut-r) + 56px) 34px var(--gut);border-top:1px sol
 </main>
 
 <div class="after">
+  <section id="sobre" class="panel">
+    <div class="wrap">
+      <div class="eyebrow">Sobre nós</div>
+      <h2 class="display">Segurança que <span class="thin">se antecipa</span></h2>
+      <p class="lead">A Sentinela é especializada em <strong>segurança eletrônica residencial</strong>: projeto, instalação e monitoramento de câmeras, alarmes e sensores. Unimos tecnologia, <strong>atendimento próximo</strong> e suporte técnico local para prevenir riscos e proteger o que realmente importa.</p>
+      <div class="kpis">
+        <div class="kpi"><div class="n">24H</div><div class="l">Monitoramento<br>com central própria</div></div>
+        <div class="kpi"><div class="n">48H</div><div class="l">Prazo médio<br>de instalação</div></div>
+        <div class="kpi"><div class="n">30</div><div class="l">Dias de gravação<br>em nuvem</div></div>
+        <div class="kpi"><div class="n">GRÁTIS</div><div class="l">Visita técnica<br>e orçamento</div></div>
+      </div>
+      <blockquote class="quote">
+        <p>“Proteger não é correr atrás do prejuízo. É enxergar o risco antes que ele chegue à sua porta.”</p>
+        <cite>Equipe Sentinela</cite>
+      </blockquote>
+    </div>
+  </section>
+
   <section id="specs" class="panel">
     <div class="wrap">
       <div class="eyebrow">Especificações</div>
@@ -319,8 +384,8 @@ footer{padding:26px calc(var(--gut-r) + 56px) 34px var(--gut);border-top:1px sol
 
   <section id="servicos" class="panel">
     <div class="wrap">
-      <div class="eyebrow">Serviços</div>
-      <h2 class="display">Tudo que sua casa <span class="thin">precisa</span></h2>
+      <div class="eyebrow">Nossas soluções</div>
+      <h2 class="display">Proteção completa <span class="thin">para sua casa</span></h2>
       <div class="grid3 svcs">
         <div class="svc"><div class="ic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.5h11l4-2v7l-4-2h-11z"/><path d="M6 9.5v5M3.5 14.5h5"/></svg></div><h3>Instalação de CFTV</h3><p>Projeto de cobertura, cabeamento embutido e configuração completa das câmeras.</p></div>
         <div class="svc"><div class="ic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="8" height="16" rx="2"/><path d="M9 15h2"/></svg></div><h3>Acesso pelo celular</h3><p>Veja todas as câmeras ao vivo e receba alertas de movimento no app.</p></div>
@@ -338,22 +403,53 @@ footer{padding:26px calc(var(--gut-r) + 56px) 34px var(--gut);border-top:1px sol
   </section>
 
   <section id="contato" class="final">
-    <div class="eyebrow">Visita técnica gratuita · resposta em minutos</div>
-    <h2 class="display">Proteja quem você ama</h2>
-    <p>Projeto sob medida, instalação limpa e suporte local. Fale agora com um especialista.</p>
-    <div class="ctas">
-      <a class="buy" href="https://wa.me/5500000000000" target="_blank" rel="noopener">Falar no WhatsApp</a>
-      <a class="arrow" href="tel:+5500000000000" aria-label="Ligar para a Sentinela">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><path d="M4 10 10 4M5 4h5v5"/></svg>
-      </a>
+    <div class="wrap cta-box">
+      <div class="cta-copy">
+        <div class="eyebrow light">Visita técnica gratuita</div>
+        <h2 class="display">Sua casa protegida, sua família tranquila</h2>
+        <p>Atendimento rápido, com resposta em poucos minutos. Análise de segurança e orçamento sem custo, com um especialista da nossa equipe.</p>
+        <ul class="checks">
+          <li>Projeto sob medida para cada imóvel</li>
+          <li>Instalação limpa, sem fios à mostra</li>
+          <li>Acesso às câmeras pelo celular</li>
+        </ul>
+      </div>
+      <form class="lead-form" id="leadForm">
+        <h3>Solicite uma análise de segurança grátis</h3>
+        <label>Nome<input name="nome" required autocomplete="name"></label>
+        <label>WhatsApp<input name="tel" type="tel" required autocomplete="tel" placeholder="(DDD) 9 0000-0000"></label>
+        <label>Bairro / cidade<input name="local" autocomplete="address-level2"></label>
+        <label>Tipo de imóvel
+          <select name="tipo"><option>Casa</option><option>Apartamento</option><option>Condomínio</option><option>Comércio</option></select>
+        </label>
+        <button class="buy" type="submit">Falar com especialista</button>
+        <small>Ao enviar, o WhatsApp abre com a sua mensagem pronta.</small>
+      </form>
     </div>
   </section>
 
   <footer>
-    <span>Sentinela · Segurança eletrônica residencial</span>
-    <span>© 2026 · CFTV, alarmes e monitoramento remoto</span>
+    <div class="f-col">
+      <span class="brand">Sentinela</span>
+      <span>Segurança eletrônica e monitoramento 24 horas para residências.</span>
+    </div>
+    <div class="f-col">
+      <b>Central de atendimento</b>
+      <a href="tel:+5500000000000">(00) 0000-0000</a>
+      <a href="mailto:contato@exemplo.com.br">contato@exemplo.com.br</a>
+    </div>
+    <div class="f-col">
+      <b>Links</b>
+      <a href="#servicos">Nossas soluções</a>
+      <a href="#contato">Solicitar orçamento</a>
+    </div>
+    <div class="f-bottom">© 2026 Sentinela · Todos os direitos reservados</div>
   </footer>
 </div>
+
+<a class="wa-float" href="https://wa.me/5500000000000" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a9.8 9.8 0 0 0-8.4 14.8L2.3 21.8l4.9-1.3A9.8 9.8 0 1 0 12 2.2zm0 17.8a8 8 0 0 1-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.7 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.5-.2z"/></svg>
+</a>
 
 <div class="loader" id="loader">Carregando</div>
 
@@ -371,7 +467,7 @@ footer{padding:26px calc(var(--gut-r) + 56px) 34px var(--gut);border-top:1px sol
 const CLIPS = { intro: '', turn: '', explode: '' };
 const USE_VIDEO = !!(CLIPS.intro && CLIPS.turn && CLIPS.explode);
 
-const HERO_SETTLE = 1.85, INTRO_LEN = 2.7;
+const HERO_SETTLE = 1.85, INTRO_LEN = 2.7, BG = '#141417';
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const clamp = (v, a = 0, b = 1) => v < a ? a : v > b ? b : v;
@@ -401,8 +497,8 @@ const MAT = {
   pcb:   { c: [14, 58, 40],    s: .3,  h: 12, amb: .35 },
   chip:  { c: [20, 20, 23],    s: .7,  h: 40, amb: .45 },
   gold:  { c: [200, 160, 82],  s: .8,  h: 30, amb: .4 },
-  led:   { c: [96, 16, 26],    s: 1.0, h: 60, amb: .5 },
-  lime:  { c: [185, 245, 60],  e: 1 }
+  led:   { c: [96, 16, 26],    s: 1.0, h: 60, amb: .5, glow: 1 },
+  red:   { c: [255, 66, 87],   e: 1 }
 };
 
 const V = [], VP = [], F = [];
@@ -414,7 +510,7 @@ function face(ids, m, hx, hy, hz) {
   const wx = V[c] - V[a], wy = V[c + 1] - V[a + 1], wz = V[c + 2] - V[a + 2];
   const nx = uy * wz - uz * wy, ny = uz * wx - ux * wz, nz = ux * wy - uy * wx;
   if (nx * hx + ny * hy + nz * hz < 0) ids = ids.slice().reverse();
-  F.push({ i: ids, m: MAT[m], p: cur });
+  const o = { i: ids, m: MAT[m], p: cur }; F.push(o); return o;
 }
 // lathe surface around X; y = r cos a, z = r sin a (a = 0 is the top)
 function tube(r, x0, x1, n, ls, m, inward, a0 = 0, a1 = TAU) {
@@ -427,7 +523,10 @@ function tube(r, x0, x1, n, ls, m, inward, a0 = 0, a1 = TAU) {
   const s = inward ? -1 : 1;
   for (let j = 0; j < ls; j++) for (let k = 0; k < n; k++) {
     const k2 = full ? (k + 1) % n : k + 1, a = a0 + (a1 - a0) * (k + .5) / n;
-    face([g[j][k], g[j][k2], g[j + 1][k2], g[j + 1][k]], m, 0, s * Math.cos(a), s * Math.sin(a));
+    const o = face([g[j][k], g[j][k2], g[j + 1][k2], g[j + 1][k]], m, 0, s * Math.cos(a), s * Math.sin(a));
+    const ka = a0 + (a1 - a0) * k / n, kb = a0 + (a1 - a0) * (k + 1) / n;
+    o.sa = [g[j][k], g[j + 1][k]]; o.sb = [g[j][k2], g[j + 1][k2]];
+    o.na = [0, s * Math.cos(ka), s * Math.sin(ka)]; o.nb = [0, s * Math.cos(kb), s * Math.sin(kb)];
   }
 }
 function disc(x, r0, r1, n, m, dir, a0 = 0, a1 = TAU, cy = 0, cz = 0) {
@@ -457,7 +556,7 @@ cur = 0;
 disc(1.56, 0, .79, 40, 'glass', 1);
 tube(.86, 1.44, 1.56, 48, 1, 'white');
 disc(1.56, .79, .86, 48, 'white', 1);
-disc(1.565, 0, .028, 10, 'lime', 1, 0, TAU, .825, 0);
+disc(1.565, 0, .028, 10, 'red', 1, 0, TAU, .825, 0);
 // Part 1 · IR LED ring
 cur = 1;
 disc(1.34, .40, .74, 40, 'dark', 1);
@@ -481,7 +580,7 @@ for (const [y, z] of [[.45, .45], [-.45, .45], [.45, -.45], [-.45, -.45]]) box(.
 box(.46, .49, -.5, -.36, -.12, .12, 'chip');
 // Part 4 · IP67 housing + sun hood
 cur = 4;
-tube(.85, -1.6, 1.44, 64, 8, 'white');
+tube(.85, -1.6, 1.44, 72, 8, 'white');
 tube(.80, -1.6, 1.44, 40, 6, 'inner', true);
 disc(1.44, .80, .85, 48, 'white', 1);
 {
@@ -513,24 +612,48 @@ cyl(.62, -3.1, -2.98, 40, 'white');
 
 const NV = VP.length, NF = F.length;
 const OFF = [5.5, 4.4, 3.4, 2.3, 0, -1.8];
+const DELAY = [0, .06, .12, .18, 0, .1];      // explode stagger per part
+const ARC = [.55, -.45, .4, -.35, 0, .3];     // each part arcs off-axis as it slides out
+const EI = new Float32Array(6);
+const LEDS = Array.from({ length: 8 }, (_, k) => { const a = TAU * k / 8 + TAU / 16; return [1.395, .57 * Math.cos(a), .57 * Math.sin(a)]; });
 const LABEL = [[1.5, .86], [1.36, .74], [.95, .37], [.43, .6], [.3, .95], [-2.6, .62]];
 const TX = new Float32Array(NV), TY = new Float32Array(NV), TZ = new Float32Array(NV);
 const SX = new Float32Array(NV), SY = new Float32Array(NV);
 const LDIR = (() => { const l = [-.45, .72, -.55], m = Math.hypot(...l); return l.map(v => v / m); })();
 
 /* render one frame of the model. pose in device px / degrees */
-function render(c, w, h, P, bg = '#0A0A0B', floor = true) {
+const rgb = (r, g, b, a = 1) => `rgba(${r > 255 ? 255 : r < 0 ? 0 : r | 0},${g > 255 ? 255 : g < 0 ? 0 : g | 0},${b > 255 ? 255 : b < 0 ? 0 : b | 0},${a})`;
+function shade(m, nx, ny, nz, vX, vY, vZ, glow) {
+  const dif = Math.max(0, nx * LDIR[0] + ny * LDIR[1] + nz * LDIR[2]);
+  const hx = LDIR[0] + vX, hy = LDIR[1] + vY, hz = LDIR[2] + vZ, hl = Math.hypot(hx, hy, hz);
+  const spec = Math.pow(Math.max(0, (nx * hx + ny * hy + nz * hz) / hl), m.h) * m.s;
+  const nv = Math.max(0, nx * vX + ny * vY + nz * vZ);
+  const rim = Math.pow(1 - nv, 3) * .34;
+  const fill = Math.max(0, nx * .8 - ny * .1 + nz * .2) * .14;
+  const bounce = Math.max(0, -ny) * .1;                       // floor bounce light from below
+  const k = m.amb + dif * .72 + fill + bounce;
+  let r = m.c[0] * k + 255 * spec + 120 * rim, g = m.c[1] * k + 255 * spec + 130 * rim, b = m.c[2] * k + 255 * spec + 150 * rim;
+  if (m.glow && glow > 0) { r = lerp(r, 255, glow * .85); g = lerp(g, 54, glow * .7); b = lerp(b, 70, glow * .7); }
+  return [r, g, b, spec];
+}
+function render(c, w, h, P, bg = BG, floor = true) {
   c.fillStyle = bg; c.fillRect(0, 0, w, h);
   const D = 14, Fz = P.k * D, cx0 = w / 2 + P.x, cy0 = h / 2 + P.y;
   const yw = P.yaw * RAD, pt = P.pitch * RAD, rl = P.roll * RAD;
   const cyw = Math.cos(yw), syw = Math.sin(yw), cp = Math.cos(pt), sp = Math.sin(pt), cr = Math.cos(rl), sr = Math.sin(rl);
-  const E = P.e, center = lerp(-.57, 1.0, E);
-  const xform = (x, y, z, part) => {
-    x = x + OFF[part] * E - center;
+  const E = P.e, center = lerp(-.57, 1.0, E), glow = P.glow || 0;
+  for (let i = 0; i < 6; i++) EI[i] = smooth(clamp((E - DELAY[i]) / (1 - .18)));
+  const rot = (x, y, z) => {
     const x1 = x * cyw + z * syw, z1 = -x * syw + z * cyw;
     const y2 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
-    return [x1 * cr - y2 * sr, x1 * sr + y2 * cr, z2 + D];
+    return [x1 * cr - y2 * sr, x1 * sr + y2 * cr, z2];
   };
+  const xform = (x, y, z, part) => {
+    const ei = EI[part];
+    const t = rot(x + OFF[part] * ei - center, y + Math.sin(ei * Math.PI) * ARC[part], z);
+    t[2] += D; return t;
+  };
+  const proj = t => [cx0 + t[0] * Fz / t[2], cy0 - t[1] * Fz / t[2]];
   let minX = 1e9, maxX = -1e9, maxY = -1e9;
   for (let i = 0; i < NV; i++) {
     const t = xform(V[i * 3], V[i * 3 + 1], V[i * 3 + 2], VP[i]);
@@ -539,24 +662,24 @@ function render(c, w, h, P, bg = '#0A0A0B', floor = true) {
     SX[i] = sx; SY[i] = sy;
     if (sx < minX) minX = sx; if (sx > maxX) maxX = sx; if (sy > maxY) maxY = sy;
   }
-  // studio light + floor pool
+  // studio: back light, floor pool and contact shadow
   const mx = (minX + maxX) / 2, span = Math.max(40, maxX - minX);
-  let g = c.createRadialGradient(mx, cy0, 0, mx, cy0, Math.max(w, h) * .6);
-  g.addColorStop(0, 'rgba(255,255,255,.05)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  let g = c.createRadialGradient(mx, cy0, 0, mx, cy0, Math.max(w, h) * .62);
+  g.addColorStop(0, 'rgba(255,255,255,.10)'); g.addColorStop(.5, 'rgba(255,255,255,.03)'); g.addColorStop(1, 'rgba(255,255,255,0)');
   c.fillStyle = g; c.fillRect(0, 0, w, h);
   const fa = floor ? (1 - E) : 0;
   if (fa > .01) {
     const fy = maxY + span * .06;
     c.save(); c.translate(mx, fy); c.scale(1, .14);
-    g = c.createRadialGradient(0, 0, 0, 0, 0, span * .75);
-    g.addColorStop(0, `rgba(255,255,255,${.07 * fa})`); g.addColorStop(1, 'rgba(255,255,255,0)');
-    c.fillStyle = g; c.beginPath(); c.arc(0, 0, span * .75, 0, TAU); c.fill();
-    g = c.createRadialGradient(0, 0, 0, 0, 0, span * .4);
-    g.addColorStop(0, `rgba(0,0,0,${.75 * fa})`); g.addColorStop(1, 'rgba(0,0,0,0)');
-    c.fillStyle = g; c.beginPath(); c.arc(0, 0, span * .4, 0, TAU); c.fill();
+    g = c.createRadialGradient(0, 0, 0, 0, 0, span * .8);
+    g.addColorStop(0, `rgba(255,255,255,${.12 * fa})`); g.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = g; c.beginPath(); c.arc(0, 0, span * .8, 0, TAU); c.fill();
+    g = c.createRadialGradient(0, 0, 0, 0, 0, span * .42);
+    g.addColorStop(0, `rgba(0,0,0,${.7 * fa})`); g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g; c.beginPath(); c.arc(0, 0, span * .42, 0, TAU); c.fill();
     c.restore();
   }
-  // faces: cull, shade, sort
+  // faces: cull, sort
   const vis = [];
   for (let f = 0; f < NF; f++) {
     const fc = F[f], ids = fc.i, a = ids[0], b = ids[1], d = ids[2];
@@ -568,44 +691,83 @@ function render(c, w, h, P, bg = '#0A0A0B', floor = true) {
     for (const k of ids) { gx += TX[k]; gy += TY[k]; gz += TZ[k]; }
     const q = ids.length; gx /= q; gy /= q; gz /= q;
     const vl = Math.hypot(gx, gy, gz), vX = -gx / vl, vY = -gy / vl, vZ = -gz / vl;
-    const nv = nx * vX + ny * vY + nz * vZ;
-    if (nv <= 0) continue;
-    vis.push({ z: gz, f: fc, nx, ny, nz, nv, vX, vY, vZ });
+    if (nx * vX + ny * vY + nz * vZ <= 0) continue;
+    vis.push({ z: gz, f: fc, nx, ny, nz, vX: 0, vY: 0, vZ: -1 });
   }
   vis.sort((A, B) => B.z - A.z);
   c.lineJoin = 'round'; c.lineWidth = Math.max(.6, P.k / 300);
   for (const o of vis) {
-    const m = o.f.m, ids = o.f.i;
-    let r, gg, bb, al = m.a || 1;
-    if (m.e) { [r, gg, bb] = m.c; }
-    else {
-      const dif = Math.max(0, o.nx * LDIR[0] + o.ny * LDIR[1] + o.nz * LDIR[2]);
-      let hx = LDIR[0] + o.vX, hy = LDIR[1] + o.vY, hz = LDIR[2] + o.vZ; const hl = Math.hypot(hx, hy, hz);
-      const spec = Math.pow(Math.max(0, (o.nx * hx + o.ny * hy + o.nz * hz) / hl), m.h) * m.s;
-      const rim = Math.pow(1 - o.nv, 3) * .3;
-      const fill = Math.max(0, o.nx * .8 - o.ny * .1 + o.nz * .2) * .12;
-      const k = m.amb + dif * .72 + fill;
-      r = m.c[0] * k + 255 * spec + 120 * rim; gg = m.c[1] * k + 255 * spec + 135 * rim; bb = m.c[2] * k + 255 * spec + 160 * rim;
-      if (al < 1) al = Math.min(1, al + spec * .8);
+    const fc = o.f, m = fc.m, ids = fc.i;
+    let style, al = m.a || 1;
+    if (m.e) style = rgb(...m.c);
+    else if (fc.sa && al >= 1) {
+      // smooth (Gouraud-like) shading across curved surfaces
+      const na = rot(...fc.na), nb = rot(...fc.nb);
+      const A = shade(m, na[0], na[1], na[2], o.vX, o.vY, o.vZ, glow), B = shade(m, nb[0], nb[1], nb[2], o.vX, o.vY, o.vZ, glow);
+      const ax = (SX[fc.sa[0]] + SX[fc.sa[1]]) / 2, ay = (SY[fc.sa[0]] + SY[fc.sa[1]]) / 2;
+      const bx = (SX[fc.sb[0]] + SX[fc.sb[1]]) / 2, by = (SY[fc.sb[0]] + SY[fc.sb[1]]) / 2;
+      // gradient perpendicular to the strip's long edges, so neighbouring segments line up exactly
+      const ex = SX[fc.sa[1]] - SX[fc.sa[0]], ey = SY[fc.sa[1]] - SY[fc.sa[0]], el = Math.hypot(ex, ey) || 1;
+      const px = -ey / el, py = ex / el, dd = (bx - ax) * px + (by - ay) * py;
+      if (Math.abs(dd) < .5) style = rgb((A[0] + B[0]) / 2, (A[1] + B[1]) / 2, (A[2] + B[2]) / 2);
+      else { style = c.createLinearGradient(ax, ay, ax + px * dd, ay + py * dd); style.addColorStop(0, rgb(A[0], A[1], A[2])); style.addColorStop(1, rgb(B[0], B[1], B[2])); }
+    } else {
+      const S = shade(m, o.nx, o.ny, o.nz, o.vX, o.vY, o.vZ, glow);
+      if (al < 1) al = Math.min(1, al + S[3] * .8);
+      style = rgb(S[0], S[1], S[2], al);
     }
-    const col = `rgba(${r > 255 ? 255 : r | 0},${gg > 255 ? 255 : gg | 0},${bb > 255 ? 255 : bb | 0},${al})`;
     c.beginPath(); c.moveTo(SX[ids[0]], SY[ids[0]]);
     for (let j = 1; j < ids.length; j++) c.lineTo(SX[ids[j]], SY[ids[j]]);
-    c.closePath(); c.fillStyle = col; c.fill();
-    if (al >= 1) { c.strokeStyle = col; c.stroke(); }
+    c.closePath(); c.fillStyle = style; c.fill();
+    if (al >= 1) { c.strokeStyle = style; c.stroke(); }
   }
+  // lens direction in view space (negative z = toward the viewer)
+  const fwd = rot(1, 0, 0), facing = clamp(-fwd[2] * 1.6);
+  c.save(); c.globalCompositeOperation = 'lighter';
+  // IR LEDs and status light bloom
+  const bloom = smooth(clamp((glow - .4) / .45));
+  if (bloom > .01 && facing > 0) {
+    const rr = P.k * .22;
+    for (const L of LEDS) {
+      const [x, y] = proj(xform(L[0] + .02, L[1], L[2], 1));
+      g = c.createRadialGradient(x, y, 0, x, y, rr);
+      g.addColorStop(0, `rgba(255,60,80,${.55 * bloom * facing})`); g.addColorStop(1, 'rgba(255,40,60,0)');
+      c.fillStyle = g; c.fillRect(x - rr, y - rr, rr * 2, rr * 2);
+    }
+  }
+  if (facing > 0 && (P.led || 0) > 0) {
+    const [x, y] = proj(xform(1.57, .825, 0, 0)), rr = P.k * .16;
+    g = c.createRadialGradient(x, y, 0, x, y, rr);
+    g.addColorStop(0, `rgba(255,70,90,${.8 * P.led * facing})`); g.addColorStop(1, 'rgba(255,40,60,0)');
+    c.fillStyle = g; c.fillRect(x - rr, y - rr, rr * 2, rr * 2);
+  }
+  // field-of-view beam out of the lens
+  if ((P.beam || 0) > .01) {
+    const L = 9, R = 3.1, n = 24, apex = proj(xform(1.62, 0, 0, 0)), ring = [];
+    for (let k = 0; k < n; k++) { const a = TAU * k / n; ring.push(proj(xform(1.62 + L, R * Math.cos(a), R * Math.sin(a), 0))); }
+    const far = proj(xform(1.62 + L, 0, 0, 0));
+    g = c.createLinearGradient(apex[0], apex[1], far[0], far[1]);
+    const pulse = .8 + .2 * Math.sin((P.t || 0) * 2);
+    g.addColorStop(0, `rgba(255,50,70,${.2 * P.beam * pulse})`); g.addColorStop(.55, `rgba(255,50,70,${.05 * P.beam * pulse})`); g.addColorStop(1, 'rgba(255,50,70,0)');
+    c.fillStyle = g; c.beginPath();
+    for (let k = 0; k < n; k++) { const p1 = ring[k], p2 = ring[(k + 1) % n]; c.moveTo(apex[0], apex[1]); c.lineTo(p1[0], p1[1]); c.lineTo(p2[0], p2[1]); c.closePath(); }
+    c.fill();
+  }
+  c.restore();
   // part numbers in the exploded view
   if (P.lab > .01) {
     c.save(); c.globalAlpha = P.lab;
     const fs = Math.max(9, P.k * .16);
-    c.font = `400 ${fs}px Sora, Helvetica, Arial, sans-serif`; c.textAlign = 'center';
+    c.font = `500 ${fs}px Sora, Helvetica, Arial, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
     LABEL.forEach(([lx, ly], i) => {
-      const a = xform(lx, ly, 0, i), b = xform(lx, ly + .95, 0, i);
-      const ax = cx0 + a[0] * Fz / a[2], ay = cy0 - a[1] * Fz / a[2], bx = cx0 + b[0] * Fz / b[2], by = cy0 - b[1] * Fz / b[2];
-      c.strokeStyle = 'rgba(242,242,240,.32)'; c.lineWidth = Math.max(1, P.k / 160);
+      const [ax, ay] = proj(xform(lx, ly, 0, i)), [bx, by] = proj(xform(lx, ly + .95, 0, i));
+      c.strokeStyle = 'rgba(247,247,245,.5)'; c.lineWidth = Math.max(1, P.k / 160);
       c.beginPath(); c.moveTo(ax, ay); c.lineTo(bx, by); c.stroke();
-      c.fillStyle = '#B9F53C'; c.beginPath(); c.arc(ax, ay, Math.max(2, P.k * .025), 0, TAU); c.fill();
-      c.fillStyle = 'rgba(242,242,240,.7)'; c.fillText('0' + (i + 1), bx, by - fs * .5);
+      c.fillStyle = '#FF4257'; c.beginPath(); c.arc(ax, ay, Math.max(2, P.k * .03), 0, TAU); c.fill();
+      const tw = fs * 2.4, th = fs * 1.6;
+      c.fillStyle = 'rgba(16,16,19,.85)'; c.strokeStyle = '#E5243B';
+      c.beginPath(); c.roundRect ? c.roundRect(bx - tw / 2, by - th, tw, th, th / 2) : c.rect(bx - tw / 2, by - th, tw, th); c.fill(); c.stroke();
+      c.fillStyle = '#F7F7F5'; c.fillText('0' + (i + 1), bx, by - th / 2);
     });
     c.restore();
   }
@@ -626,9 +788,16 @@ function poseAt(p, w, h) {
     B = { x: .04 * w, y: -.01 * h, k: .22 * w, yaw: 106, pitch: -10, roll: 0 };
     C = { x: .03 * w, y: -.02 * h, k: .112 * w, yaw: 122, pitch: -14, roll: 54 };
   }
+  // a small extra half-turn of the camera while it travels to the close-up
+  const swing = Math.sin(s1 * Math.PI) * 14;
   const o = {};
   for (const key in A) o[key] = lerp(lerp(A[key], B[key], s1), C[key], s2);
+  o.yaw -= swing; o.pitch += swing * .35;
   o.e = s2; o.lab = clamp((p - .84) / .05);
+  const close = smooth(clamp((p - .22) / .08)) * (1 - smooth(clamp((p - .56) / .1)));
+  o.glow = .3 + .7 * close;                      // night vision switches on in the close-up
+  o.beam = 1 - smooth(clamp(p / .1));
+  o.led = 1;
   return o;
 }
 /* pose during the intro, t in seconds */
@@ -639,7 +808,14 @@ function introPose(t, w, h) {
   o.x = lerp(w * .75, base.x, e);
   o.yaw = base.yaw + 330 * (1 - e);
   o.roll = 24 * (1 - e) * Math.sin(q * Math.PI * 2.2);
-  o.y = base.y - Math.abs(Math.sin(q * Math.PI * 2)) * (1 - e) * h * .06;
+  // two bounces that die out as it lands
+  o.y = base.y - Math.abs(Math.sin(q * Math.PI * 2.5)) * Math.pow(1 - q, 1.6) * h * .09;
+  // power-on: status LED flickers, IR ring warms up, then the view beam opens
+  const on = t - HERO_SETTLE;
+  o.led = on < 0 ? 0 : on < .35 ? (Math.sin(on * 60) > 0 ? 1 : .15) : 1;
+  o.glow = on < 0 ? 0 : base.glow * smooth(clamp((on - .2) / .5)) + .5 * Math.max(0, 1 - Math.abs(on - .45) / .25);
+  o.beam = smooth(clamp((on - .25) / .6));
+  o.t = t;
   return o;
 }
 
@@ -738,11 +914,11 @@ function reveal(instant) {
   if (instant || RM) {
     body.classList.remove('revealing');
     heroEls.forEach(el => el._rev = true);
-    introDone = true; updateFx(prog()); return;
+    introDone = true; updateFx(pNow()); return;
   }
   body.classList.add('revealing');
   heroEls.forEach((el, i) => revealTimers.push(setTimeout(() => {
-    el._rev = true; updateFx(prog());
+    el._rev = true; updateFx(pNow());
     if (i === heroEls.length - 1) {
       introDone = true;
       revealTimers.push(setTimeout(() => body.classList.remove('revealing'), 900));
@@ -753,7 +929,7 @@ function hideHero() {
   revealTimers.forEach(clearTimeout); revealTimers = [];
   body.classList.remove('revealing');
   heroEls.forEach(el => el._rev = false);
-  updateFx(prog());
+  updateFx(pNow());
 }
 function playIntro() {
   cancelAnimationFrame(introRaf);
@@ -763,10 +939,10 @@ function playIntro() {
   const t0 = performance.now(); let shown = false;
   const tick = now => {
     const t = (now - t0) / 1000;
-    render(ctx, W, H, introPose(t, W, H)); lastKey = '';
+    render(ctx, W, H, introPose(t, W, H));
     if (!shown && t >= HERO_SETTLE) { shown = true; reveal(); }
     if (t < INTRO_LEN) introRaf = requestAnimationFrame(tick);
-    else { introPlaying = false; schedule(); }
+    else { introPlaying = false; idleT0 = performance.now(); }
   };
   introRaf = requestAnimationFrame(tick);
 }
@@ -816,28 +992,57 @@ function updateFx(p) {
   }
 }
 const chev = $('#chev');
-let raf = 0;
-function schedule() { if (!raf) raf = requestAnimationFrame(update); }
-function update() {
-  raf = 0;
-  const p = prog();
+let raf = 0, ps = 0, idleT0 = performance.now();
+const par = { x: 0, y: 0, tx: 0, ty: 0 };
+const pNow = () => USE_VIDEO ? prog() : ps;
+function ui(p) {
   updateFx(p);
   const top = after.getBoundingClientRect().top;
   body.classList.toggle('dim', top < innerHeight * .55);
-  chev.classList.toggle('up', top < innerHeight * .2);
-  chev.setAttribute('aria-label', top < innerHeight * .2 ? 'Voltar ao topo' : 'Próxima seção');
-  if (introPlaying) return;
-  if (USE_VIDEO) {
-    if (!introDone && curClip === null) { drawVideo(vids.intro); return; }
-    videoTimeline(p);
-  } else {
-    const P = poseAt(p, W, H);
-    const key = W + 'x' + H + Object.values(P).map(v => v.toFixed(3)).join(',');
-    if (key === lastKey) return;
-    lastKey = key; render(ctx, W, H, P);
+  const up = top < innerHeight * .2;
+  if (chev.classList.contains('up') !== up) {
+    chev.classList.toggle('up', up);
+    chev.setAttribute('aria-label', up ? 'Voltar ao topo' : 'Próxima seção');
   }
 }
+function schedule() { if (USE_VIDEO && !raf) raf = requestAnimationFrame(update); }
+function update() {
+  raf = 0;
+  const p = prog();
+  ui(p);
+  if (introPlaying) return;
+  if (!introDone && curClip === null) { drawVideo(vids.intro); return; }
+  videoTimeline(p);
+}
+/* live 3D loop: eased scroll, idle float, pointer parallax, IR pulse */
+function loop(now) {
+  requestAnimationFrame(loop);
+  const target = prog();
+  ps = RM ? target : ps + (target - ps) * .14;
+  if (Math.abs(target - ps) < .0004) ps = target;
+  ui(ps);
+  if (introPlaying) return;
+  const P = poseAt(ps, W, H), t = now / 1000;
+  P.t = t;
+  if (!RM) {
+    const amp = smooth(clamp((now - idleT0) / 1400));
+    par.x += (par.tx - par.x) * .05; par.y += (par.ty - par.y) * .05;
+    P.y += Math.sin(t * 1.1) * H * .008 * amp * (1 - P.e * .6);
+    P.yaw += (Math.sin(t * .45) * 3 + par.x * 7) * amp;
+    P.pitch += (Math.sin(t * .7) * 1.2 - par.y * 4) * amp;
+    P.roll += Math.sin(t * .6) * .8 * amp * (1 - P.e);
+    P.glow *= .86 + .14 * Math.sin(t * 2.6);
+    P.led = Math.sin(t * 3.2) > -.6 ? 1 : .25;
+  }
+  if (body.classList.contains('dim')) P.lab = 0;
+  render(ctx, W, H, P);
+}
 addEventListener('scroll', schedule, { passive: true });
+addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse') return;
+  par.tx = e.clientX / innerWidth * 2 - 1; par.ty = e.clientY / innerHeight * 2 - 1;
+}, { passive: true });
+document.addEventListener('mouseleave', () => { par.tx = 0; par.ty = 0; });
 addEventListener('resize', () => { resize(); drawDial(); schedule(); });
 
 /* =====================================================================
@@ -856,9 +1061,20 @@ $$('a[href^="#"]:not([data-p])').forEach(a => a.addEventListener('click', e => {
 chev.addEventListener('click', () => {
   if (after.getBoundingClientRect().top < innerHeight * .2) { scrollTo({ top: 0, behavior }); return; }
   const p = prog(), next = STOPS.find(s => s > p + .02);
-  if (next === undefined) $('#specs').scrollIntoView({ behavior, block: 'start' }); else toP(next);
+  if (next === undefined) $('#sobre').scrollIntoView({ behavior, block: 'start' }); else toP(next);
 });
 $('#replay').addEventListener('click', () => { if (scrollY < 40) { if (USE_VIDEO) vids.intro.pause(); playIntro(); } });
+
+/* =====================================================================
+   LEAD FORM -> WhatsApp with the message ready
+   ===================================================================== */
+const WA = '5500000000000';
+$('#leadForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const msg = `Olá! Gostaria de uma análise de segurança grátis.\nNome: ${f.get('nome')}\nWhatsApp: ${f.get('tel')}\nBairro/cidade: ${f.get('local') || '-'}\nImóvel: ${f.get('tipo')}`;
+  open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+});
 
 /* =====================================================================
    HERO CARD · live clock + activity chart
@@ -903,7 +1119,7 @@ function drawDial() {
   const th = $('#thumb'), s = Math.round((th.clientWidth || 80) * 2);
   if (!s) return;
   th.width = s; th.height = s;
-  render(th.getContext('2d'), s, s, { x: s * .02, y: s * .04, k: s * .19, yaw: 140, pitch: -13, roll: 0, e: 0, lab: 0 }, '#141416', false);
+  render(th.getContext('2d'), s, s, { x: s * .02, y: s * .04, k: s * .19, yaw: 140, pitch: -13, roll: 0, e: 0, lab: 0, glow: .6, led: 1 }, '#1C1C20', false);
 }
 
 /* =====================================================================
@@ -912,11 +1128,13 @@ function drawDial() {
 resize();
 drawDial();
 if (USE_VIDEO) initVideo(); else loader.classList.add('done');
-updateFx(prog());
+updateFx(prog()); ps = prog();
 if (USE_VIDEO) startIntro();
 else {
-  ctx.fillStyle = '#0A0A0B'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+  ps = prog();
   requestAnimationFrame(startIntro);
+  requestAnimationFrame(loop);
 }
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { lastKey = ''; schedule(); });
 })();
