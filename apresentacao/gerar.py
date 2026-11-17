@@ -27,6 +27,8 @@ h1,h2{font-weight:700;letter-spacing:-.045em;line-height:.98}
 h1 .p,h2 .p{color:var(--egeu)} .escuro .p{color:var(--egeu-claro)}
 .escuro em,.escuro .az{font-style:normal;color:var(--egeu-claro)}
 p.txt{font-weight:400;color:var(--tinta-suave)} .escuro p.txt{color:var(--sec-escura)} .terra p.txt{color:var(--sobre-terra)}
+a.lk{white-space:nowrap;color:var(--egeu);font-weight:500;text-decoration:none;border-bottom:2px solid currentColor}
+.escuro a.lk{color:var(--egeu-claro)}
 .chips{display:flex;flex-wrap:wrap;gap:var(--cg)}
 .chip{border:2px solid var(--tinta);border-radius:4px;padding:var(--cp);font-weight:500;font-size:var(--cf)}
 .escuro .chip{border-color:var(--sobre-escura)}
@@ -138,11 +140,11 @@ cel.append(f"""<section class="s areia">{topo('O site', 3)}
 <div class="c" style="top:300px"><h2>Claro, direto e feito para o celular<span class="p">.</span></h2></div>
 <div class="c" style="top:640px"><div class="browser" style="width:860px"><div class="bar"><i></i><i></i><i></i></div><img src="prints/site-desktop.jpg" alt=""></div></div>
 <div style="position:absolute;right:70px;top:930px;width:330px" class="phone"><img src="prints/site-celular.jpg" alt=""></div>
-<div class="c" style="top:1520px;max-width:560px"><p class="txt" style="font-size:32px">Hero com a casa protegida, avisos ao vivo e o botão de orçamento sempre à mão.</p></div>{logo(False)}</section>""")
+<div class="c" style="top:1420px"><p class="txt" style="font-size:32px;max-width:560px">Hero com a casa protegida, avisos ao vivo e o botão de orçamento sempre à mão.</p><p class="txt" style="font-size:32px;margin-top:24px"><a class="lk" href="https://gui09gs-lab.github.io/site-sentinela/">gui09gs-lab.github.io/site-sentinela</a></p></div>{logo(False)}</section>""")
 cel.append(f"""<section class="s escuro">{marca(True, 'left:-560px;bottom:-460px')}{topo('O diferencial', 4)}
 <div class="c" style="top:300px"><h2>O visitante monta o projeto da <em>própria</em> casa<span class="p">.</span></h2></div>
 <div class="c" style="top:600px"><div class="browser"><div class="bar"><i></i><i></i><i></i></div><img style="height:520px;object-fit:cover;object-position:top" src="prints/simulador-planta.jpg" alt=""></div></div>
-<div class="c" style="top:1210px">{lista()}</div>{logo(True)}</section>""")
+<div class="c" style="top:1180px">{lista()}<p class="txt" style="font-size:30px;margin-top:28px">Teste: <a class="lk" href="https://gui09gs-lab.github.io/site-sentinela/simulador.html">site-sentinela/simulador.html</a></p></div>{logo(True)}</section>""")
 cel.append(f"""<section class="s">{topo('Simulador', 5)}
 <div class="c" style="top:300px"><h2>Cada câmera com a sua área de visão<span class="p">.</span></h2></div>
 <div class="c" style="top:700px">{cards()}</div>{logo(False)}</section>""")
@@ -155,7 +157,7 @@ cel.append(f"""<section class="s">{marca(False, 'right:-520px;top:-260px')}{topo
 <p class="txt" style="margin-top:80px">Tudo em páginas leves, sem sistema para manter, prontas para publicar no domínio do cliente.</p></div>{logo(False)}</section>""")
 cel.append(f"""<section class="s escuro">{marca(True, 'right:-420px;bottom:-300px')}{topo('Eikóna', 8)}
 <div class="c" style="top:640px"><h1>Quer um site que traz <em>orçamento</em><span class="p">.</span></h1>
-<p class="txt" style="margin-top:56px">Chama no WhatsApp ou no @eikona.mkt.</p></div>
+<p class="txt" style="margin-top:56px">Veja o site no ar:<br><a class="lk" href="https://gui09gs-lab.github.io/site-sentinela/">gui09gs-lab.github.io/site-sentinela</a></p><p class="txt" style="margin-top:20px">Chama no WhatsApp ou no @eikona.mkt.</p></div>
 <img class="logo" style="height:120px" src="marca/eikona-assinatura-claro.svg" alt="eikóna. marketing & comunicação"></section>""")
 
 # ---------------- COMPUTADOR 1920 x 1080 ----------------
@@ -182,12 +184,12 @@ pc.append(f"""<section class="s">{marca(False, 'right:-380px;bottom:-460px')}{to
 <p class="txt">O desafio: explicar algo técnico, como ângulo de câmera e ponto cego, para quem só quer a casa protegida.</p></div></div>{logo(False)}</section>""")
 pc.append(f"""<section class="s areia">{topo('O site', 3)}
 <div class="l" style="top:250px;width:620px"><h2>Claro, direto e feito para o celular<span class="p">.</span></h2>
-<p class="txt" style="margin-top:36px">Hero com a casa protegida, avisos ao vivo e o botão de orçamento sempre à mão.</p></div>
+<p class="txt" style="margin-top:36px">Hero com a casa protegida, avisos ao vivo e o botão de orçamento sempre à mão.</p><p class="txt" style="margin-top:28px"><a class="lk" href="https://gui09gs-lab.github.io/site-sentinela/">gui09gs-lab.github.io/site-sentinela</a></p></div>
 <div style="position:absolute;left:820px;top:170px;width:900px" class="browser"><div class="bar"><i></i><i></i><i></i></div><img src="prints/site-desktop.jpg" alt=""></div>
 <div style="position:absolute;right:90px;top:430px;width:250px" class="phone"><img src="prints/site-celular.jpg" alt=""></div>{logo(False)}</section>""")
 pc.append(f"""<section class="s escuro">{marca(True, 'left:-640px;bottom:-560px')}{topo('O diferencial', 4)}
 <div class="l" style="top:200px;width:660px"><h2>O visitante monta o projeto da <em>própria</em> casa<span class="p">.</span></h2>
-<div style="margin-top:48px">{lista()}</div></div>
+<div style="margin-top:48px">{lista()}</div><p class="txt" style="margin-top:36px">Teste: <a class="lk" href="https://gui09gs-lab.github.io/site-sentinela/simulador.html">site-sentinela/simulador.html</a></p></div>
 <div style="position:absolute;left:880px;top:190px;width:930px" class="browser"><div class="bar"><i></i><i></i><i></i></div><img style="height:700px;object-fit:cover;object-position:top" src="prints/simulador-planta.jpg" alt=""></div>{logo(True)}</section>""")
 pc.append(f"""<section class="s">{topo('Simulador', 5)}
 <div class="l" style="top:220px;width:1300px"><h2>Cada câmera com a sua área de visão<span class="p">.</span></h2></div>
@@ -201,7 +203,7 @@ pc.append(f"""<section class="s">{marca(False, 'right:-420px;top:-300px')}{topo(
 <p class="txt" style="margin-top:64px;max-width:900px">Tudo em páginas leves, sem sistema para manter, prontas para publicar no domínio do cliente.</p></div>{logo(False)}</section>""")
 pc.append(f"""<section class="s escuro">{marca(True, 'right:-300px;bottom:-360px')}{topo('Eikóna', 8)}
 <div class="l" style="top:330px;width:1200px"><h1>Quer um site que traz <em>orçamento</em><span class="p">.</span></h1>
-<p class="txt" style="margin-top:40px">Chama no WhatsApp ou no @eikona.mkt.</p></div>
+<p class="txt" style="margin-top:40px">Veja o site no ar: <a class="lk" href="https://gui09gs-lab.github.io/site-sentinela/">gui09gs-lab.github.io/site-sentinela</a></p><p class="txt" style="margin-top:16px">Chama no WhatsApp ou no @eikona.mkt.</p></div>
 <img class="logo" style="height:100px" src="marca/eikona-assinatura-claro.svg" alt="eikóna. marketing & comunicação"></section>""")
 
 (AQUI / 'celular.html').write_text(pagina('Sentinela · case Eikóna (celular)', CEL, cel), encoding='utf8')
