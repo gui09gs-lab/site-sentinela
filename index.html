@@ -120,8 +120,7 @@ section{padding:110px 0 0}
 .steps b{display:block}
 .steps span{color:var(--ink-2);font-size:14.5px}
 
-.sim{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center;background:var(--dark);color:#fff;border-radius:30px;padding:48px;overflow:hidden;transition:transform .3s}
-.sim:hover{transform:translateY(-4px)}
+.sim{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center;background:var(--dark);color:#fff;border-radius:30px;padding:48px;overflow:hidden}
 .sim h2{font-size:clamp(28px,3.4vw,44px);font-weight:800;margin:14px 0 14px}
 .sim p{color:rgba(255,255,255,.72);margin:0 0 26px;max-width:46ch}
 .sim-art{width:100%;height:auto;border-radius:18px}
@@ -162,6 +161,15 @@ section{padding:110px 0 0}
 .form input:focus,.form select:focus{border-color:var(--red);box-shadow:0 0 0 4px rgba(225,29,46,.18)}
 .form .btn{width:100%;margin-top:4px}
 .form small{color:var(--ink-3);font-size:12.5px;text-align:center}
+.form .err{font-size:12.5px;font-weight:600;color:var(--red-ink);min-height:0}
+.form .err:empty{display:none}
+.form [aria-invalid="true"]{border-color:var(--red-ink)}
+.form .next{margin:0;padding:0 0 0 18px;font-size:13px;color:var(--ink-2);display:grid;gap:2px}
+.form .ok{border:1.5px solid #1F8A4C;background:#EEF8F1;color:#14532D;border-radius:14px;padding:12px 14px;font-size:14px}
+.form .ok[hidden]{display:none}
+.form .ok a{color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.hero .sim-link{display:inline-flex;align-items:center;gap:8px;margin-top:18px;font-size:15px;font-weight:700;color:var(--ink);border-bottom:1.5px solid var(--red);padding-bottom:2px}
+.hero .sim-link:hover{color:var(--red-ink)}
 
 footer{margin-top:90px;border-top:1px solid var(--line);padding:46px 0 34px}
 footer .wrap{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:30px;font-size:14.5px;color:var(--ink-2)}
@@ -232,6 +240,7 @@ footer a:hover{color:var(--red)}
           <a class="btn btn-red" href="#contato">Solicitar orçamento grátis</a>
           <a class="btn btn-line" href="https://wa.me/5500000000000" target="_blank" rel="noopener">Falar no WhatsApp</a>
         </div>
+        <a class="sim-link rv" href="simulador.html">Não sabe quantas câmeras precisa? Monte o projeto no simulador <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></a>
         <div class="trust rv">
           <span><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 10.5 3 3 7-7.5"/></svg>Instalação em até 48h</span>
           <span><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 10.5 3 3 7-7.5"/></svg>Imagens no celular</span>
@@ -261,6 +270,29 @@ footer a:hover{color:var(--red)}
       <div class="stat rv"><div class="n">Grátis</div><div class="l">visita técnica e orçamento</div></div>
     </div>
   </div>
+
+  <section id="simulador">
+    <div class="wrap">
+      <div class="sim rv">
+        <div class="sim-tx">
+          <div class="eyebrow">Novo · simulador online</div>
+          <h2>Monte o projeto de câmeras da sua casa</h2>
+          <p>Escolha a planta, posicione as câmeras e veja na hora o que cada uma enxerga e onde ficam os pontos cegos. Depois é só enviar o projeto pelo WhatsApp.</p>
+          <a class="btn btn-red" href="simulador.html">Abrir o simulador</a>
+        </div>
+        <svg class="sim-art" viewBox="-1 -1 24 20" aria-hidden="true">
+          <rect x="0" y="0" width="22" height="18" fill="#2A2B30" rx=".3"/>
+          <rect x="6" y="3" width="14" height="10" fill="#3A3B41"/>
+          <path d="M.5 3.5 L9 3 L9 11 Z" fill="#E11D2E" opacity=".35"/>
+          <path d="M6.5 3.5 L14 3.5 L14 9 L6.5 9 Z" fill="#2563EB" opacity=".35"/>
+          <circle cx="17" cy="6" r="2.9" fill="#059669" opacity=".4"/>
+          <path d="M11 15.5 L3 18 L19 18 Z" fill="#D97706" opacity=".35"/>
+          <g fill="none" stroke="#F6F5F2" stroke-width=".22"><path d="M6 3h14v10H6z"/><path d="M14 3v4.5M14 8.5V13M6 9h3.5M10.5 9h9.5M11 9v4"/></g>
+          <g stroke-width=".25"><circle cx=".5" cy="3.5" r=".55" fill="#fff" stroke="#E11D2E"/><circle cx="6.5" cy="3.5" r=".55" fill="#fff" stroke="#2563EB"/><circle cx="17" cy="6" r=".55" fill="#fff" stroke="#059669"/><circle cx="11" cy="15.5" r=".55" fill="#fff" stroke="#D97706"/></g>
+        </svg>
+      </div>
+    </div>
+  </section>
 
   <section id="solucoes">
     <div class="wrap">
@@ -293,29 +325,6 @@ footer a:hover{color:var(--red)}
           <li class="rv"><div><b>Tudo no seu celular</b><span>Configuramos o aplicativo junto com você.</span></div></li>
         </ol>
       </div>
-    </div>
-  </section>
-
-  <section id="simulador">
-    <div class="wrap">
-      <a class="sim rv" href="simulador.html">
-        <div class="sim-tx">
-          <div class="eyebrow">Novo · simulador online</div>
-          <h2>Monte o projeto de câmeras da sua casa</h2>
-          <p>Escolha a planta, posicione câmeras Bullet, Dome, PTZ ou 360° e veja na hora o que cada uma enxerga e onde ficam os pontos cegos. Depois é só enviar o projeto pelo WhatsApp.</p>
-          <span class="btn btn-red">Abrir simulador</span>
-        </div>
-        <svg class="sim-art" viewBox="-1 -1 24 20" aria-hidden="true">
-          <rect x="0" y="0" width="22" height="18" fill="#2A2B30" rx=".3"/>
-          <rect x="6" y="3" width="14" height="10" fill="#3A3B41"/>
-          <path d="M.5 3.5 L9 3 L9 11 Z" fill="#E11D2E" opacity=".35"/>
-          <path d="M6.5 3.5 L14 3.5 L14 9 L6.5 9 Z" fill="#2563EB" opacity=".35"/>
-          <circle cx="17" cy="6" r="2.9" fill="#059669" opacity=".4"/>
-          <path d="M11 15.5 L3 18 L19 18 Z" fill="#D97706" opacity=".35"/>
-          <g fill="none" stroke="#F6F5F2" stroke-width=".22"><path d="M6 3h14v10H6z"/><path d="M14 3v4.5M14 8.5V13M6 9h3.5M10.5 9h9.5M11 9v4"/></g>
-          <g stroke-width=".25"><circle cx=".5" cy="3.5" r=".55" fill="#fff" stroke="#E11D2E"/><circle cx="6.5" cy="3.5" r=".55" fill="#fff" stroke="#2563EB"/><circle cx="17" cy="6" r=".55" fill="#fff" stroke="#059669"/><circle cx="11" cy="15.5" r=".55" fill="#fff" stroke="#D97706"/></g>
-        </svg>
-      </a>
     </div>
   </section>
 
@@ -353,13 +362,18 @@ footer a:hover{color:var(--red)}
         <h2>Fale com um especialista ainda hoje</h2>
         <p>Atendimento rápido, com resposta em poucos minutos. Preencha os dados e continuamos a conversa pelo WhatsApp.</p>
       </div>
-      <form class="form" id="leadForm">
+      <form class="form" id="leadForm" novalidate>
         <h3>Solicite sua visita técnica</h3>
-        <label>Nome<input name="nome" required autocomplete="name"></label>
-        <label>WhatsApp<input name="tel" type="tel" required autocomplete="tel" placeholder="(DDD) 9 0000-0000"></label>
-        <label>Tipo de imóvel<select name="tipo"><option>Casa</option><option>Apartamento</option><option>Condomínio</option><option>Comércio</option></select></label>
+        <label>Nome<input name="nome" required maxlength="60" autocomplete="name" aria-describedby="e-nome"><span class="err" id="e-nome"></span></label>
+        <label>WhatsApp<input name="tel" type="tel" inputmode="tel" required maxlength="20" autocomplete="tel" placeholder="(DDD) 9 0000-0000" aria-describedby="e-tel"><span class="err" id="e-tel"></span></label>
+        <label>Tipo de imóvel<select name="tipo" required aria-describedby="e-tipo"><option value="" disabled selected>Selecione</option><option>Casa</option><option>Apartamento</option><option>Condomínio</option><option>Comércio</option></select><span class="err" id="e-tipo"></span></label>
+        <ol class="next" aria-label="O que acontece depois">
+          <li>O WhatsApp abre com a sua mensagem pronta.</li>
+          <li>Você envia, e combinamos o dia da visita técnica.</li>
+        </ol>
         <button class="btn btn-red" type="submit">Enviar pelo WhatsApp</button>
-        <small>O WhatsApp abre com a sua mensagem pronta.</small>
+        <div class="ok" id="ok" role="status" hidden></div>
+        <small>Nenhum dado fica guardado no site: ele só monta a mensagem para o seu WhatsApp.</small>
       </form>
     </div>
   </div>
@@ -414,10 +428,24 @@ visual.addEventListener('mouseenter', () => { paused = true; stop(); });
 visual.addEventListener('mouseleave', () => { paused = false; });
 new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? setTimeout(run, 900) : stop()), { threshold: .3 }).observe(visual);
 // form -> WhatsApp
-document.getElementById('leadForm').addEventListener('submit', e => {
-  e.preventDefault(); const f = new FormData(e.target);
-  const msg = `Olá! Gostaria de uma visita técnica.\nNome: ${f.get('nome')}\nWhatsApp: ${f.get('tel')}\nImóvel: ${f.get('tipo')}`;
-  open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+const form = document.getElementById('leadForm'), ok = document.getElementById('ok');
+const setErr = (el, txt) => { document.getElementById(el.getAttribute('aria-describedby')).textContent = txt; el.setAttribute('aria-invalid', txt ? 'true' : 'false'); return !txt; };
+const checks = {
+  nome: v => v.trim().length < 2 ? 'Digite seu nome.' : '',
+  tel: v => { const d = v.replace(/\D/g, ''); return !d ? 'Digite seu WhatsApp com DDD.' : (d.length < 10 || d.length > 11) ? 'Confira o número: são 10 ou 11 dígitos com o DDD.' : ''; },
+  tipo: v => !v ? 'Escolha o tipo de imóvel.' : ''
+};
+Object.keys(checks).forEach(n => form.elements[n].addEventListener('change', e => setErr(e.target, checks[n](e.target.value))));
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const bad = Object.keys(checks).filter(n => !setErr(form.elements[n], checks[n](form.elements[n].value)));
+  if (bad.length) { form.elements[bad[0]].focus(); return; }
+  const f = new FormData(form);
+  const msg = `Olá! Gostaria de uma visita técnica.\nNome: ${f.get('nome').trim()}\nWhatsApp: ${f.get('tel').trim()}\nImóvel: ${f.get('tipo')}`;
+  const url = `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
+  open(url, '_blank', 'noopener');
+  ok.innerHTML = 'Mensagem pronta. Se o WhatsApp não abriu, <a target="_blank" rel="noopener">toque aqui para abrir</a>.';
+  ok.querySelector('a').href = url; ok.hidden = false;
 });
 })();
 </script>
