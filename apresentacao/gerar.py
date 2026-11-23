@@ -5,7 +5,7 @@ Depois o PDF é gerado com Playwright (ver apresentacao/pdf.js).
 import pathlib
 
 AQUI = pathlib.Path(__file__).parent
-TOTAL = 8
+TOTAL = 11
 
 BASE_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
@@ -68,7 +68,7 @@ TIPOS = [('bullet', 'Bullet', '53° a 98°', 'Externa. Portões, garagens e corr
          ('dome', 'Dome', '80° a 110°', 'Interna. Discreta, para salas e cômodos.'),
          ('ptz', 'Speed Dome / PTZ', 'Gira 360°', 'Zoom óptico para pátios e áreas grandes.'),
          ('pano', 'Panorâmica', '360°', 'No centro do teto, sem pontos cegos.')]
-ENTREGAS = ['Site responsivo', 'Simulador de câmeras', 'Pedidos pelo WhatsApp', 'Fotos otimizadas',
+ENTREGAS = ['Site responsivo', 'Simulador de câmeras', 'Pedidos pelo WhatsApp', 'Rebranding do Instagram', '9 posts de lançamento', 'Capas de destaque', 'Fotos otimizadas',
             'Perguntas frequentes', 'Briefing do cliente', 'Prévia para aprovação']
 SIMULADOR = ['Planta da casa com áreas internas e externas', 'Quatro tipos de câmera com a área de visão',
              'A visão para nas paredes, como na vida real', 'Pontos cegos e cobertura de cada cômodo',
@@ -115,6 +115,96 @@ def pagina(titulo, css, slides):
 </body></html>"""
 
 
+# ---------------- REBRANDING DO INSTAGRAM (identidade do cliente: Sentinela) ----------------
+import json as _json
+_ct = AQUI / 'contato.local.json'   # fora do git: {"linha": "Nome · WhatsApp · e-mail · @"}
+CONTATO = _json.loads(_ct.read_text(encoding='utf8')).get('linha', '') if _ct.exists() else ''
+
+SEN_LOGO = ('<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2"><circle cx="10" cy="10" r="7"/>'
+            '<circle cx="10" cy="10" r="2.4" fill="#fff" stroke="none"/></svg>')
+HL_ICON = {
+  'Câmeras': '<rect x="5" y="11" width="16" height="9"/><path d="M21 13l6-3v10l-6-3"/>',
+  'Alarmes': '<path d="M10 22v-7a6 6 0 0 1 12 0v7l2 3H8z"/><path d="M14 28h4"/>',
+  'Simulador': '<path d="M6 8h20v18H6z"/><path d="M14 8v8M6 16h12"/>',
+  'Clientes': '<circle cx="16" cy="12" r="5"/><path d="M7 27a9 9 0 0 1 18 0"/>',
+  'Orçamento': '<path d="M9 5h14v24H9z"/><path d="M13 11h6M13 16h6M13 21h4"/>',
+}
+
+def sen_logo_box(px):
+    return (f'<span style="width:{px}px;height:{px}px;border-radius:{px*.28:.0f}px;background:#E11D2E;display:inline-grid;'
+            f'place-items:center;flex:none"><span style="width:{px*.56:.0f}px;height:{px*.56:.0f}px;display:block">{SEN_LOGO}</span></span>')
+
+def highlights(u):
+    out = '<div class="ig-hl">'
+    for nome, path in HL_ICON.items():
+        out += (f'<div><span class="ig-hc"><svg viewBox="0 0 32 32" fill="none" stroke="#fff" stroke-width="2.2" '
+                f'stroke-linejoin="round">{path}</svg></span><small>{nome}</small></div>')
+    return out + '</div>'
+
+def ig_phone(w):
+    """Celular com o perfil do Instagram. w = largura em px; tudo escala por font-size."""
+    grid = ''.join(f'<img src="instagram/post-{i}.jpg" alt="">' for i in range(1, 10))
+    return f'''<div class="ig" style="width:{w}px;font-size:{w/26:.2f}px">
+<div class="ig-scr">
+ <div class="ig-top"><b>[@ do cliente]</b><span>···</span></div>
+ <div class="ig-head">{sen_logo_box(round(w*.2))}
+  <div class="ig-st"><div><b>9</b><small>publicações</small></div><div><b>[—]</b><small>seguidores</small></div><div><b>[—]</b><small>seguindo</small></div></div></div>
+ <div class="ig-bio"><b>Sentinela Segurança</b><span>Câmeras, alarmes e monitoramento 24h para residências.</span>
+ <span>Visita técnica grátis. Monte o projeto da sua casa:</span><span class="ig-lk">gui09gs-lab.github.io/site-sentinela</span></div>
+ <div class="ig-btn"><span class="on">Seguir</span><span>Mensagem</span><span>WhatsApp</span></div>
+ {highlights(w)}
+ <div class="ig-grid">{grid}</div>
+</div></div>'''
+
+IG_CSS = """
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap');
+.ig{background:#111214;border-radius:2.2em;padding:.55em;font-family:"Manrope",Arial,sans-serif}
+.ig-scr{background:#fff;border-radius:1.7em;overflow:hidden;color:#111214}
+.ig-top{display:flex;justify-content:space-between;padding:1.1em 1.2em .5em;font-size:1.05em}
+.ig-head{display:flex;align-items:center;gap:1.2em;padding:.4em 1.2em}
+.ig-head>span{border-radius:50%!important}
+.ig-st{display:flex;flex:1;justify-content:space-around;text-align:center}
+.ig-st b{display:block;font-size:1.1em}.ig-st small{font-size:.78em;color:#555}
+.ig-bio{padding:.6em 1.2em;display:grid;gap:.15em;font-size:.9em;line-height:1.35}
+.ig-lk{color:#1F5C8F;font-weight:700}
+.ig-btn{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4em;padding:.3em 1.2em .8em}
+.ig-btn span{background:#EFEFEF;border-radius:.5em;text-align:center;font-weight:700;font-size:.85em;padding:.45em 0}
+.ig-btn span.on{background:#E11D2E;color:#fff}
+.ig-hl{display:flex;justify-content:space-between;padding:.2em 1.2em 1em}
+.ig-hl div{display:grid;justify-items:center;gap:.35em}
+.ig-hc{width:3.4em;height:3.4em;border-radius:50%;background:#121316;display:grid;place-items:center;box-shadow:0 0 0 .14em #fff,0 0 0 .3em #E11D2E}
+.ig-hc svg{width:55%;height:55%}
+.ig-hl small{font-size:.72em}
+.ig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.ig-grid img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
+.pal{display:grid;gap:var(--cg)}
+.sw{display:flex;align-items:center;gap:20px;font-size:var(--cf)}
+.sw i{width:var(--sw);height:var(--sw);border:2px solid var(--veio);flex:none}
+.sw b{font-weight:500}
+.sw small{color:var(--tinta-suave);margin-left:auto;letter-spacing:.08em}
+.post-big img{width:100%;display:block;border:2px solid var(--veio)}
+.leg{background:var(--marmore-claro);border:2px solid var(--veio);border-radius:4px;padding:var(--cpad);font-size:var(--cf);line-height:1.45;color:var(--tinta-suave)}
+.leg b{color:var(--tinta);font-weight:500;letter-spacing:.16em;font-size:var(--rot);display:block;margin-bottom:10px}
+.contato{font-size:var(--cf);color:var(--sec-escura);margin-top:28px}
+"""
+BASE_CSS = BASE_CSS + IG_CSS
+
+def ident_html(logo_px, nome_px):
+    return f'''<div style="display:flex;align-items:center;gap:{logo_px*.35:.0f}px">{sen_logo_box(logo_px)}
+<span style="font-family:Manrope,Arial,sans-serif;font-weight:800;font-size:{nome_px}px;letter-spacing:-.03em;color:#111214">Sentinela</span></div>'''
+
+PALETA = [('#E11D2E', 'Vermelho alerta', 'DESTAQUE'), ('#121316', 'Grafite', 'TEXTO E FUNDOS'),
+          ('#F6F5F2', 'Gelo', 'FUNDO CLARO'), ('#FFFFFF', 'Branco', 'CARTÕES')]
+def paleta():
+    return '<div class="pal">' + ''.join(f'<div class="sw"><i style="background:{c}"></i><b>{n}</b><small>{u} · {c}</small></div>' for c, n, u in PALETA) + '</div>'
+VOZ = ['Direta e tranquilizadora: proteção, não medo', 'Benefício antes da técnica', 'Toda peça termina em WhatsApp ou link do simulador']
+def voz():
+    return '<ul class="lista" style="--lf:var(--cf)">' + ''.join(f'<li><b style="color:var(--egeu)">{i+1:02d}</b><span>{t}</span></li>' for i, t in enumerate(VOZ)) + '</ul>'
+LEGENDA = ('3 pontos que toda casa precisa ter na câmera: portão, garagem e fundos. São por onde a maioria das '
+           'pessoas entra e sai. Quer saber se a sua casa está coberta? Monte o projeto no simulador do link da bio '
+           'ou chama no WhatsApp.')
+
+
 # ---------------- CELULAR 1080 x 1920 (área segura: 260 topo, 340 base) ----------------
 CEL = """
 :root{--W:1080px;--H:1920px;--m:88px;--mt:150px;--mb:150px;--lg:64px;--mk:1150px;--rot:24px;--cg:16px;--cp:14px 22px;--cf:30px;
@@ -151,13 +241,27 @@ cel.append(f"""<section class="s">{topo('Simulador', 5)}
 cel.append(f"""<section class="s terra">{topo('Para o cliente final', 6)}
 <div class="c" style="top:300px"><h2>Do site ao orçamento em quatro passos.</h2></div>
 <div class="c" style="top:820px">{passos()}</div>{logo(True)}</section>""")
-cel.append(f"""<section class="s">{marca(False, 'right:-520px;top:-260px')}{topo('Entregas', 7)}
+cel.append(f"""<section class="s">{topo('Rebranding', 7)}
+<div class="c" style="top:300px"><h2>Uma identidade que passa confiança<span class="p">.</span></h2>
+<p class="txt" style="margin-top:36px">A Sentinela ganha uma marca própria, pronta para o site e para o Instagram.</p></div>
+<div class="c" style="top:820px">{ident_html(150, 120)}</div>
+<div class="c" style="top:1080px;--sw:64px">{paleta()}<div style="margin-top:48px">{voz()}</div></div>{logo(False)}</section>""")
+cel.append(f"""<section class="s escuro">{marca(True, 'left:-600px;top:-300px')}{topo('Instagram', 8)}
+<div class="c" style="top:290px"><h2>O Instagram depois do <em>rebranding</em><span class="p">.</span></h2></div>
+<div style="position:absolute;left:360px;top:540px">{ig_phone(520)}</div>{logo(True)}</section>""")
+cel.append(f"""<section class="s areia">{topo('Instagram', 9)}
+<div class="c" style="top:290px"><h2>Posts que vendem confiança<span class="p">.</span></h2></div>
+<div class="c" style="top:540px;width:780px;left:150px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div class="post-big"><img src="instagram/post-1.jpg" alt=""></div><div class="post-big"><img src="instagram/post-3.jpg" alt=""></div>
+<div class="post-big"><img src="instagram/post-4.jpg" alt=""></div><div class="post-big"><img src="instagram/post-7.jpg" alt=""></div></div>
+<div class="c" style="top:1560px"><p class="txt" style="font-size:30px">Grade alternada: dica, foto real e chamada. Bio e destaques levam direto para o simulador e o WhatsApp.</p></div>{logo(False)}</section>""")
+cel.append(f"""<section class="s">{marca(False, 'right:-520px;top:-260px')}{topo('Entregas', 10)}
 <div class="c" style="top:420px"><h2>O que entregamos<span class="p">.</span></h2>
 <div style="margin-top:72px">{chips()}</div>
 <p class="txt" style="margin-top:80px">Tudo em páginas leves, sem sistema para manter, prontas para publicar no domínio do cliente.</p></div>{logo(False)}</section>""")
-cel.append(f"""<section class="s escuro">{marca(True, 'right:-420px;bottom:-300px')}{topo('Eikóna', 8)}
+cel.append(f"""<section class="s escuro">{marca(True, 'right:-420px;bottom:-300px')}{topo('Eikóna', 11)}
 <div class="c" style="top:640px"><h1>Quer um site que traz <em>orçamento</em><span class="p">.</span></h1>
-<p class="txt" style="margin-top:56px">Veja o site no ar:<br><a class="lk" href="https://gui09gs-lab.github.io/site-sentinela/">gui09gs-lab.github.io/site-sentinela</a></p><p class="txt" style="margin-top:20px">Chama no WhatsApp ou no @eikona.mkt.</p></div>
+<p class="txt" style="margin-top:56px">Veja o site no ar:<br><a class="lk" href="https://gui09gs-lab.github.io/site-sentinela/">gui09gs-lab.github.io/site-sentinela</a></p><p class="txt" style="margin-top:20px">Chama no WhatsApp ou no @eikona.mkt.</p>{f'<p class="contato">{CONTATO}</p>' if CONTATO else ''}</div>
 <img class="logo" style="height:120px" src="marca/eikona-assinatura-claro.svg" alt="eikóna. marketing & comunicação"></section>""")
 
 # ---------------- COMPUTADOR 1920 x 1080 ----------------
@@ -197,13 +301,30 @@ pc.append(f"""<section class="s">{topo('Simulador', 5)}
 pc.append(f"""<section class="s terra">{topo('Para o cliente final', 6)}
 <div class="l" style="top:250px;width:1200px"><h2>Do site ao orçamento em quatro passos.</h2></div>
 <div style="position:absolute;left:var(--m);right:var(--m);top:560px">{passos()}</div>{logo(True)}</section>""")
-pc.append(f"""<section class="s">{marca(False, 'right:-420px;top:-300px')}{topo('Entregas', 7)}
+pc.append(f"""<section class="s">{topo('Rebranding', 7)}
+<div class="l" style="top:220px;width:760px"><h2>Uma identidade que passa confiança<span class="p">.</span></h2>
+<p class="txt" style="margin-top:32px">A Sentinela ganha uma marca própria, pronta para o site e para o Instagram.</p>
+<div style="margin-top:64px">{ident_html(110, 92)}</div></div>
+<div style="position:absolute;left:1020px;right:var(--m);top:230px;--sw:52px">{paleta()}<div style="margin-top:56px">{voz()}</div></div>{logo(False)}</section>""")
+pc.append(f"""<section class="s escuro">{marca(True, 'left:-640px;bottom:-560px')}{topo('Instagram', 8)}
+<div class="l" style="top:220px;width:820px"><h2>O Instagram depois do <em>rebranding</em><span class="p">.</span></h2>
+<div style="margin-top:48px"><ul class="lista"><li><b>01</b><span>Perfil com a nova marca e bio que leva ao simulador</span></li>
+<li><b>02</b><span>Destaques: Câmeras, Alarmes, Simulador, Clientes e Orçamento</span></li>
+<li><b>03</b><span>Grade alternada entre dica, foto real e chamada</span></li></ul></div></div>
+<div style="position:absolute;right:200px;top:110px">{ig_phone(380)}</div>{logo(True)}</section>""")
+pc.append(f"""<section class="s areia">{topo('Instagram', 9)}
+<div class="l" style="top:180px;width:1400px"><h2>Posts que vendem confiança<span class="p">.</span></h2></div>
+<div style="position:absolute;left:var(--m);top:360px;width:1180px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px">
+<div class="post-big"><img src="instagram/post-1.jpg" alt=""></div><div class="post-big"><img src="instagram/post-3.jpg" alt=""></div>
+<div class="post-big"><img src="instagram/post-4.jpg" alt=""></div><div class="post-big"><img src="instagram/post-7.jpg" alt=""></div></div>
+<div style="position:absolute;left:1340px;right:var(--m);top:360px" class="leg"><b>EXEMPLO DE LEGENDA</b>{LEGENDA}</div>{logo(False)}</section>""")
+pc.append(f"""<section class="s">{marca(False, 'right:-420px;top:-300px')}{topo('Entregas', 10)}
 <div class="l" style="top:250px;width:1300px"><h2>O que entregamos<span class="p">.</span></h2>
 <div style="margin-top:56px;max-width:1150px">{chips()}</div>
 <p class="txt" style="margin-top:64px;max-width:900px">Tudo em páginas leves, sem sistema para manter, prontas para publicar no domínio do cliente.</p></div>{logo(False)}</section>""")
-pc.append(f"""<section class="s escuro">{marca(True, 'right:-300px;bottom:-360px')}{topo('Eikóna', 8)}
+pc.append(f"""<section class="s escuro">{marca(True, 'right:-300px;bottom:-360px')}{topo('Eikóna', 11)}
 <div class="l" style="top:330px;width:1200px"><h1>Quer um site que traz <em>orçamento</em><span class="p">.</span></h1>
-<p class="txt" style="margin-top:40px">Veja o site no ar: <a class="lk" href="https://gui09gs-lab.github.io/site-sentinela/">gui09gs-lab.github.io/site-sentinela</a></p><p class="txt" style="margin-top:16px">Chama no WhatsApp ou no @eikona.mkt.</p></div>
+<p class="txt" style="margin-top:40px">Veja o site no ar: <a class="lk" href="https://gui09gs-lab.github.io/site-sentinela/">gui09gs-lab.github.io/site-sentinela</a></p><p class="txt" style="margin-top:16px">Chama no WhatsApp ou no @eikona.mkt.</p>{f'<p class="contato">{CONTATO}</p>' if CONTATO else ''}</div>
 <img class="logo" style="height:100px" src="marca/eikona-assinatura-claro.svg" alt="eikóna. marketing & comunicação"></section>""")
 
 (AQUI / 'celular.html').write_text(pagina('Sentinela · case Eikóna (celular)', CEL, cel), encoding='utf8')
